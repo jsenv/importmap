@@ -11,9 +11,6 @@
   },
   "main": "dist/commonjs/main.js",
   "module": "index.js",
-  "exports": {
-    "/": "/"
-  },
   "files": [
     "/dist/",
     "/src/",

@@ -66,7 +66,7 @@ import { applyImportMap } from "../../index.js"
         },
       },
     },
-    href: "http://example.com/node_modules/bar/src/bar.js",
+    href: "https://example.com/node_modules/bar/src/bar.js",
     importerHref: "https://example.com/build/best/node_modules/foo/src/foo.js",
   })
   const expected = "https://example.com/build/best/node_modules/foo/node_modules/bar/src/bar.js"
@@ -82,7 +82,7 @@ import { applyImportMap } from "../../index.js"
         },
       },
     },
-    href: "http://example.com/foo",
+    href: "https://example.com/foo",
     importerHref: "https://example.com/build/best/folder/file.js",
   })
   const expected = "https://example.com/build/best/foo/index.js"
@@ -98,7 +98,7 @@ import { applyImportMap } from "../../index.js"
         },
       },
     },
-    href: "http://example.com/foo/src/foo.js",
+    href: "https://example.com/foo/src/foo.js",
     importerHref: "https://example.com/build/best/folder/file.js",
   })
   const expected = "https://example.com/build/best/node_modules/foo/src/foo.js"

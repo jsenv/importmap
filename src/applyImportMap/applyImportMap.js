@@ -17,7 +17,8 @@
  *
  */
 
-import { hrefToPathname, hrefToOrigin } from "@jsenv/module-resolution"
+import { hrefToPathname } from "@jsenv/module-resolution/src/hrefToPathname.js"
+import { hrefToOrigin } from "@jsenv/module-resolution/src/hrefToOrigin.js"
 import { assertImportMap } from "../assertImportMap.js"
 
 export const applyImportMap = ({ importMap, href, importerHref }) => {

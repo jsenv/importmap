@@ -8,7 +8,7 @@ const actual = applyImportMap({
         "/node_modules/@babel/plugin-proposal-object-rest-spread/lib/index.js",
     },
   },
-  href: "@babel/plugin-proposal-object-rest-spread",
+  href: "http://example.com/@babel/plugin-proposal-object-rest-spread",
   importerHref: "http://example.com/file.js",
 })
 const expected =
