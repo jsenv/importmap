@@ -21,8 +21,8 @@
 // will be executed either on node or browser
 // and also we don't want to pull more code than necessary
 // when this one gets bundled
-import { hrefToPathname } from "@jsenv/module-resolution/src/hrefToPathname.js"
-import { hrefToOrigin } from "@jsenv/module-resolution/src/hrefToOrigin.js"
+import { hrefToPathname } from "@jsenv/href/src/hrefToPathname/hrefToPathname.js"
+import { hrefToOrigin } from "@jsenv/href/src/hrefToOrigin/hrefToOrigin.js"
 import { assertImportMap } from "../assertImportMap.js"
 
 export const applyImportMap = ({ importMap, href, importerHref }) => {
