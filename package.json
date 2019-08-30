@@ -1,0 +1,57 @@
+{
+  "name": "@jsenv/import-map",
+  "version": "1.0.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jsenv/jsenv-import-map"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "dist/commonjs/main.js",
+  "module": "index.js",
+  "exports": {
+    "/": "/"
+  },
+  "files": [
+    "/dist/",
+    "/src/",
+    "/index.js"
+  ],
+  "scripts": {
+    "test": "node ./script/test/test.js",
+    "eslint-check": "eslint .",
+    "prettier-check": "node ./script/prettier-check/prettier-check.js",
+    "generate-coverage": "node ./script/generate-coverage/generate-coverage.js",
+    "upload-coverage": "node ./script/upload-coverage/upload-coverage.js",
+    "generate-commonjs-bundle": "node ./script/generate-commonjs-bundle/generate-commonjs-bundle.js",
+    "generate-import-map": "node ./script/generate-import-map/generate-import-map.js",
+    "dist": "npm run clean && npm run generate-commonjs-bundle",
+    "clean": "rimraf dist && rimraf coverage",
+    "reinstall": "npm run clean && rimraf node_modules && npm install",
+    "postinstall": "npm run generate-import-map",
+    "prepublishOnly": "node ./script/transform-package/remove-postinstall.js && npm run dist",
+    "postpublish": "node ./script/transform-package/restore-postinstall.js"
+  },
+  "dependencies": {
+    "@jsenv/module-resolution": "3.6.0"
+  },
+  "devDependencies": {
+    "@dmail/assert": "3.14.0",
+    "@jsenv/bundling": "3.1.0",
+    "@jsenv/codecov-upload": "1.7.0",
+    "@jsenv/eslint-config": "10.0.0",
+    "@jsenv/execution": "3.1.0",
+    "@jsenv/node-launcher": "3.2.0",
+    "@jsenv/node-module-import-map": "6.0.0",
+    "@jsenv/operating-system-path": "2.4.0",
+    "@jsenv/prettier-config": "1.0.0",
+    "@jsenv/prettier-check-project": "3.3.0",
+    "@jsenv/url-meta": "2.0.0",
+    "@jsenv/testing": "2.4.0",
+    "eslint": "6.2.2",
+    "prettier": "1.18.2",
+    "rimraf": "3.0.0"
+  }
+}

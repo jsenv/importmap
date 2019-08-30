@@ -1,0 +1,14 @@
+/.dist/
+/coverage/
+/dist/
+/docs/execution/basic-project/node_modules/
+/docs/execution/basic-project/package-lock.json
+/docs/execution/basic-project/importMap.json
+/node_modules/
+/src/system/s-fork.js
+/src/system/s.js
+/test/**/syntax-error.js
+/package.json
+/package-lock.json
+/importMap.json
+/jsconfig.json
