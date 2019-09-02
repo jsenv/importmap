@@ -51,15 +51,23 @@ export const applyImportMap = ({ importMap, href, importerHref }) => {
     if (matchingPathnamePattern) {
       const scopeImports = scopes[matchingPathnamePattern]
 
-      return applyImports({
+      const scopeRemapping = applyImports({
         href,
         imports: scopeImports,
         // scopePattern: matchingPathnamePattern,
       })
+      if (scopeRemapping !== null) {
+        return scopeRemapping
+      }
     }
   }
 
-  return applyImports({ href, imports })
+  const topLevelimportRemapping = applyImports({ href, imports })
+  if (topLevelimportRemapping !== null) {
+    return topLevelimportRemapping
+  }
+
+  return href
 }
 
 const applyImports = ({ href, imports }) => {
@@ -84,7 +92,7 @@ const applyImports = ({ href, imports }) => {
     return `${moduleOrigin}${before}${replacement}${after}`
   }
 
-  return href
+  return null
 }
 
 const match = (pathname, pattern) => {
