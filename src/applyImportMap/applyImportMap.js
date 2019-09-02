@@ -74,9 +74,13 @@ const applyImports = ({ href, imports }) => {
     if (!matchResult) continue
 
     const { before, after } = matchResult
-    const moduleOrigin = hrefToOrigin(href)
     const replacement = imports[pathnamePattern]
 
+    if (replacement.startsWith("file://")) {
+      return `${before}${replacement}${after}`
+    }
+
+    const moduleOrigin = hrefToOrigin(href)
     return `${moduleOrigin}${before}${replacement}${after}`
   }
 
