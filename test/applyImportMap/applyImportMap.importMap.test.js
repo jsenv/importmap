@@ -10,5 +10,5 @@ const actual = applyImportMap({
   href: "http://example.com/.jsenv/importMap.json",
   importerHref: "http://example.com/folder/file.js",
 })
-const expected = "file:///User/me/folder/foo.js"
+const expected = "file:///Users/me/importMap.json"
 assert({ actual, expected })
