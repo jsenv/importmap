@@ -20,6 +20,7 @@ const actual = wrapImportMap(
 const expected = {
   imports: {
     foo: "/folder/bar/file.js", // top level foo wrapped
+    "/folder/": "/folder/",
     "/": "/folder/",
   },
   scopes: {
