@@ -5,6 +5,7 @@ const actual = wrapImportMap(
   {
     imports: {
       foo: "/bar/file.js",
+      "/": "/",
     },
     scopes: {
       "/node_modules/@jsenv/sample-project/": {
@@ -19,6 +20,7 @@ const actual = wrapImportMap(
 const expected = {
   imports: {
     foo: "/folder/bar/file.js", // top level foo wrapped
+    "/": "/folder/",
   },
   scopes: {
     // so that they still apply in the wrapped folder
@@ -32,9 +34,7 @@ const expected = {
       "/": "/folder/node_modules/@jsenv/sample-project/",
     },
     "/folder/": {
-      foo: "/folder/bar/file.js",
       "/folder/": "/folder/",
-      "/": "/folder/",
     },
   },
 }

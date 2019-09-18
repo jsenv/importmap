@@ -22,20 +22,18 @@ export const wrapImportMap = (importMap, folderRelativeName) => {
 
   const folderPattern = `/${folderRelativeName}/`
   const { imports, scopes } = importMap
-  const wrappedImports = imports ? prefixImports(imports, folderPattern) : {}
-  const prefixScope = {
-    [folderPattern]: ensureLeadingSlashImportWrapped(wrappedImports, folderPattern),
+  const importsWrapped = imports ? prefixImports(imports, folderPattern) : {}
+  const scopesWrapped = scopes ? prefixScopes(scopes, folderPattern) : {}
+
+  if (imports && "/" in imports) {
+    scopesWrapped[folderPattern] = {
+      [folderPattern]: folderPattern,
+    }
   }
-  const wrappedScopes = scopes
-    ? {
-        ...prefixScopes(scopes, folderPattern),
-        ...prefixScope,
-      }
-    : prefixScope
 
   return {
-    imports: wrappedImports,
-    scopes: wrappedScopes,
+    imports: importsWrapped,
+    scopes: scopesWrapped,
   }
 }
 
@@ -69,18 +67,19 @@ const prefixScopes = (scopes, folderPattern) => {
   const scopesPrefixed = {}
   Object.keys(scopes).forEach((scopeKey) => {
     if (scopeKey[0] === "/") {
-      const prefixedScopeKey = `${folderPattern}${scopeKey.slice(1)}`
       const scopeValue = scopes[scopeKey]
-      scopesPrefixed[prefixedScopeKey] = ensureLeadingSlashImportWrapped(
-        prefixScopedImport(scopeValue, folderPattern, scopeKey),
-        prefixedScopeKey,
-      )
+      const prefixedScopeKey = `${folderPattern}${scopeKey.slice(1)}`
+      const prefixedScopeImports = prefixScopeImports(scopeValue, folderPattern, scopeKey)
+      scopesPrefixed[prefixedScopeKey] =
+        "/" in scopeValue
+          ? ensureLeadingSlashImportWrapped(prefixedScopeImports, prefixedScopeKey)
+          : prefixedScopeImports
     }
   })
   return scopesPrefixed
 }
 
-const prefixScopedImport = (imports, folderPattern, scopeKey) => {
+const prefixScopeImports = (imports, folderPattern, scopeKey) => {
   const importsPrefixed = {}
   Object.keys(imports).forEach((importKey) => {
     const importValue = imports[importKey]
