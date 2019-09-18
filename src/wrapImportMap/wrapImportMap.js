@@ -56,6 +56,11 @@ const prefixImports = (imports, folderPattern) => {
   const importsPrefixed = {}
   Object.keys(imports).forEach((importKey) => {
     const importValue = imports[importKey]
+
+    if (importValue === "/") {
+      importsPrefixed[folderPattern] = folderPattern
+    }
+
     if (importValue[0] === "/") {
       importsPrefixed[importKey] = `${folderPattern}${importValue.slice(1)}`
     }
