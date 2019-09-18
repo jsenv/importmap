@@ -20,5 +20,5 @@ const actual = applyImportMap({
   href: `http://example.com/@jsenv/core/bar.js`,
   importerHref: `http://example.com/folder/node_modules/@jsenv/compile-server/node_modules/@jsenv/core/foo.js`,
 })
-const expected = `http://example.com/folder/node_modules/@jsenv/compile-server/node_modules/@jsenv/core`
+const expected = `http://example.com/folder/node_modules/@jsenv/compile-server/node_modules/@jsenv/core/bar.js`
 assert({ actual, expected })
