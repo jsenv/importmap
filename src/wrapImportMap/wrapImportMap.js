@@ -54,7 +54,8 @@ export const wrapImportMap = (importMap, folderRelativeName) => {
   importsForWrapping[into] = into
   importsForWrapping["/"] = into
   // and when already into, you stay inside
-  scopesForWrapping[into]["/"] = "/"
+  scopesForWrapping[into][into] = into
+  scopesForWrapping[into]["/"] = into
 
   return {
     imports: importsForWrapping,

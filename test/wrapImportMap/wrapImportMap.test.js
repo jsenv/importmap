@@ -40,7 +40,8 @@ const importMap = wrapImportMap(
         "/folder/a": "/folder/b",
         foo: "/folder/bar",
         a: "/folder/b",
-        "/": "/",
+        "/folder/": "/folder/",
+        "/": "/folder/",
       },
     },
   }
@@ -48,8 +49,8 @@ const importMap = wrapImportMap(
 }
 
 const noImporter = undefined
-const importerRemapped = "special"
-const importerWrapped = "folder"
+const importerRemapped = "http://example.com/special/whatever.js"
+const importerWrapped = "http://example.com/folder/whatever.js"
 
 // inside into stays inside
 {
