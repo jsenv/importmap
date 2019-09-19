@@ -35,6 +35,10 @@ const importMap = wrapImportMap(
         ding: "/folder/dong",
         a: "/folder/c",
       },
+      "/special/": {
+        ding: "/folder/dong",
+        a: "/folder/c",
+      },
       "/folder/": {
         "/folder/foo": "/folder/bar",
         "/folder/a": "/folder/b",
@@ -115,13 +119,13 @@ const importerWrapped = "http://example.com/folder/whatever.js"
 // outside with top level remapping -> remapped inside
 {
   const hrefOutsideWithTopLevelRemapping = `http://example.com/a`
-  const expected = `http://example.com/folder/b`
   {
     const actual = applyImportMap({
       importMap,
       href: hrefOutsideWithTopLevelRemapping,
       importerHref: noImporter,
     })
+    const expected = `http://example.com/folder/b`
     assert({ actual, expected })
   }
   {
@@ -130,6 +134,7 @@ const importerWrapped = "http://example.com/folder/whatever.js"
       href: hrefOutsideWithTopLevelRemapping,
       importerHref: importerRemapped,
     })
+    const expected = "http://example.com/folder/c"
     assert({ actual, expected })
   }
   {
@@ -138,6 +143,7 @@ const importerWrapped = "http://example.com/folder/whatever.js"
       href: hrefOutsideWithTopLevelRemapping,
       importerHref: importerWrapped,
     })
+    const expected = `http://example.com/folder/b`
     assert({ actual, expected })
   }
 }
@@ -176,7 +182,6 @@ const importerWrapped = "http://example.com/folder/whatever.js"
 // outside with scoped remapping -> remapped inside
 {
   const hrefOutsideWithScopedRemapping = `http://example.com/a`
-  const expected = `http://example.com/folder/c`
 
   {
     const actual = applyImportMap({
@@ -194,6 +199,7 @@ const importerWrapped = "http://example.com/folder/whatever.js"
       href: hrefOutsideWithScopedRemapping,
       importerHref: importerRemapped,
     })
+    const expected = `http://example.com/folder/c`
     assert({ actual, expected })
   }
   {
@@ -202,6 +208,7 @@ const importerWrapped = "http://example.com/folder/whatever.js"
       href: hrefOutsideWithScopedRemapping,
       importerHref: importerWrapped,
     })
+    const expected = `http://example.com/folder/b`
     assert({ actual, expected })
   }
 }
@@ -237,4 +244,26 @@ const importerWrapped = "http://example.com/folder/whatever.js"
     })
     assert({ actual, expected })
   }
+}
+
+// inside scope
+{
+  const actual = applyImportMap({
+    importMap,
+    href: "http://example.com/ding",
+    importerHref: importerRemapped,
+  })
+  const expected = "http://example.com/folder/dong"
+  assert({ actual, expected })
+}
+
+// ensure folder after scope does not remap
+{
+  const actual = applyImportMap({
+    importMap,
+    href: "http://example.com/folder/a",
+    importerHref: "http://example.com/special/folder/whatever.js",
+  })
+  const expected = "http://example.com/folder/b"
+  assert({ actual, expected })
 }

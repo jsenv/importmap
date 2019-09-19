@@ -27,24 +27,14 @@ export const wrapImportMap = (importMap, folderRelativeName) => {
   let scopesForWrapping
 
   if (scopes) {
-    scopesForWrapping = {}
-    Object.keys(scopes).forEach((scopeKey) => {
-      const scopeValue = scopes[scopeKey]
-      const scopeKeyPrefixed = wrapSpecifier(scopeKey, into)
-
-      if (scopeKeyPrefixed === scopeKey) {
-        scopesForWrapping[scopeKey] = scopeValue
-      } else {
-        scopesForWrapping[scopeKeyPrefixed] = wrapImports(scopeValue, into)
-      }
-    })
+    scopesForWrapping = wrapScopes(scopes, into)
   } else {
     scopesForWrapping = {}
   }
 
   if (imports) {
-    importsForWrapping = wrapImports(imports, into)
-    scopesForWrapping[into] = wrapImports(imports, into)
+    importsForWrapping = wrapTopLevelImports(imports, into)
+    scopesForWrapping[into] = wrapTopLevelImports(imports, into)
   } else {
     importsForWrapping = {}
     scopesForWrapping[into] = {}
@@ -61,6 +51,67 @@ export const wrapImportMap = (importMap, folderRelativeName) => {
     imports: importsForWrapping,
     scopes: scopesForWrapping,
   }
+}
+
+const wrapScopes = (scopes, into) => {
+  const scopesKeyWrapped = {}
+  const scopesRemaining = {}
+
+  Object.keys(scopes).forEach((scopeKey) => {
+    const scopeValue = scopes[scopeKey]
+    const scopeKeyWrapped = wrapSpecifier(scopeKey, into)
+
+    if (scopeKeyWrapped === scopeKey) {
+      scopesRemaining[scopeKey] = scopeValue
+    } else {
+      const { importsWithKeyWrapped, importsRemaining } = wrapImports(scopeValue, into)
+
+      let scopeValueWrapped
+      if (scopeHasLeadingSlashScopedRemapping(scopeValue, scopeKey)) {
+        const leadingSlashSpecifier = `${into}${scopeKey.slice(1)}`
+        scopeValueWrapped = {}
+        // put everything except the leading slash remapping
+        Object.keys(importsWithKeyWrapped).forEach((importKeyWrapped) => {
+          if (importKeyWrapped === leadingSlashSpecifier || importKeyWrapped === into) {
+            return
+          }
+          scopeValueWrapped[importKeyWrapped] = importsWithKeyWrapped[importKeyWrapped]
+        })
+        Object.keys(importsRemaining).forEach((importKey) => {
+          if (importKey === scopeKey || importKey === "/") {
+            return
+          }
+          scopeValueWrapped[importKey] = importsRemaining[importKey]
+        })
+        // now put leading slash remapping to ensure it comes last
+        scopeValueWrapped[leadingSlashSpecifier] = leadingSlashSpecifier
+        scopeValueWrapped[scopeKey] = leadingSlashSpecifier
+        scopeValueWrapped[into] = leadingSlashSpecifier
+        scopeValueWrapped["/"] = leadingSlashSpecifier
+      } else {
+        scopeValueWrapped = {
+          ...importsWithKeyWrapped,
+          ...importsRemaining,
+        }
+      }
+
+      scopesKeyWrapped[scopeKeyWrapped] = scopeValueWrapped
+      scopesRemaining[scopeKey] = importsRemaining
+    }
+  })
+  return {
+    ...scopesKeyWrapped,
+    ...scopesRemaining,
+  }
+}
+
+const scopeHasLeadingSlashScopedRemapping = (scopeImports, scopeKey) => {
+  return (
+    scopeKey in scopeImports &&
+    scopeImports[scopeKey] === scopeKey &&
+    "/" in scopeImports &&
+    scopeImports["/"] === scopeKey
+  )
 }
 
 const wrapImports = (imports, into) => {
@@ -82,11 +133,18 @@ const wrapImports = (imports, into) => {
     }
   })
 
-  const importsWrapped = {
+  return {
+    importsWithKeyWrapped,
+    importsRemaining,
+  }
+}
+
+const wrapTopLevelImports = (imports, into) => {
+  const { importsWithKeyWrapped, importsRemaining } = wrapImports(imports, into)
+  return {
     ...importsWithKeyWrapped,
     ...importsRemaining,
   }
-  return importsWrapped
 }
 
 const wrapSpecifier = (specifier, into) => {
