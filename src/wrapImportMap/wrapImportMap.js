@@ -20,80 +20,98 @@ import { assertImportMap } from "../assertImportMap.js"
 export const wrapImportMap = (importMap, folderRelativeName) => {
   assertImportMap(importMap)
 
-  const folderPattern = `/${folderRelativeName}/`
+  const into = `/${folderRelativeName}/`
   const { imports, scopes } = importMap
-  const importsWrapped = imports ? prefixImports(imports, folderPattern) : {}
-  const scopesWrapped = scopes ? prefixScopes(scopes, folderPattern) : {}
 
-  if (imports && "/" in imports) {
-    scopesWrapped[folderPattern] = {
-      [folderPattern]: folderPattern,
-    }
+  let importsForWrapping
+  let scopesForWrapping
+
+  if (scopes) {
+    scopesForWrapping = {}
+    Object.keys(scopes).forEach((scopeKey) => {
+      const scopeValue = scopes[scopeKey]
+      const scopeKeyPrefixed = wrapSpecifier(scopeKey, into)
+
+      if (scopeKeyPrefixed === scopeKey) {
+        scopesForWrapping[scopeKey] = scopeValue
+      } else {
+        scopesForWrapping[scopeKeyPrefixed] = wrapImports(scopeValue, into)
+      }
+    })
+  } else {
+    scopesForWrapping = {}
   }
+
+  if (imports) {
+    importsForWrapping = wrapImports(imports, into)
+    scopesForWrapping[into] = wrapImports(imports, into)
+  } else {
+    importsForWrapping = {}
+    scopesForWrapping[into] = {}
+  }
+
+  // ensure anything not directly remapped is remapped inside into
+  importsForWrapping[into] = into
+  importsForWrapping["/"] = into
+  // and when already into, you stay inside
+  scopesForWrapping[into]["/"] = "/"
 
   return {
-    imports: importsWrapped,
-    scopes: scopesWrapped,
+    imports: importsForWrapping,
+    scopes: scopesForWrapping,
   }
 }
 
-// this function must make sure it returns imports so that
-// Object.keys(imports).indexOf('/') === Object.keys(imports).length - 1
-// Object.keys(imports).indexOf(folderPattern) === Object.keys(imports).length - 2
-// even if imports already contains '/' or folderPattern
-const ensureLeadingSlashImportWrapped = (imports, folderPattern) => {
-  const wrappedImports = {}
-  Object.keys(imports).forEach((key) => {
-    if (key === "/" || key === folderPattern) return
-    wrappedImports[key] = imports[key]
-  })
-  wrappedImports[folderPattern] = folderPattern
-  wrappedImports["/"] = folderPattern
-  return wrappedImports
-}
+const wrapImports = (imports, into) => {
+  const importsWithKeyWrapped = {}
+  const importsRemaining = {}
 
-const prefixImports = (imports, folderPattern) => {
-  const importsPrefixed = {}
   Object.keys(imports).forEach((importKey) => {
     const importValue = imports[importKey]
+    const importKeyWrapped = wrapSpecifier(importKey, into)
+    const importValueWrapped = wrapSpecifier(importValue, into)
 
-    if (importValue === "/") {
-      importsPrefixed[folderPattern] = folderPattern
-    }
-
-    if (importValue[0] === "/") {
-      importsPrefixed[importKey] = `${folderPattern}${importValue.slice(1)}`
+    if (importKeyWrapped === importKey) {
+      importsRemaining[importKey] = importValue
+    } else if (importValueWrapped === importValue) {
+      importsWithKeyWrapped[importKeyWrapped] = importValue
+    } else {
+      importsWithKeyWrapped[importKeyWrapped] = importValueWrapped
+      importsRemaining[importKey] = importValueWrapped
     }
   })
-  return importsPrefixed
+
+  const importsWrapped = {
+    ...importsWithKeyWrapped,
+    ...importsRemaining,
+  }
+  return importsWrapped
 }
 
-const prefixScopes = (scopes, folderPattern) => {
-  const scopesPrefixed = {}
-  Object.keys(scopes).forEach((scopeKey) => {
-    if (scopeKey[0] === "/") {
-      const scopeValue = scopes[scopeKey]
-      const prefixedScopeKey = `${folderPattern}${scopeKey.slice(1)}`
-      const prefixedScopeImports = prefixScopeImports(scopeValue, folderPattern, scopeKey)
-      scopesPrefixed[prefixedScopeKey] =
-        "/" in scopeValue
-          ? ensureLeadingSlashImportWrapped(prefixedScopeImports, prefixedScopeKey)
-          : prefixedScopeImports
-    }
-  })
-  return scopesPrefixed
+const wrapSpecifier = (specifier, into) => {
+  if (isOriginRelativeSpecifier(specifier)) {
+    return `${into}${specifier.slice(1)}`
+  }
+  if (isBareSpecifier(specifier)) {
+    return `${into}${specifier}`
+  }
+  return specifier
 }
 
-const prefixScopeImports = (imports, folderPattern, scopeKey) => {
-  const importsPrefixed = {}
-  Object.keys(imports).forEach((importKey) => {
-    const importValue = imports[importKey]
-    if (importValue[0] === "/") {
-      const prefixedImportKey = importKey.startsWith(scopeKey)
-        ? `${folderPattern.slice(0, -1)}${importKey}`
-        : importKey
-      importsPrefixed[prefixedImportKey] = `${folderPattern}${importValue.slice(1)}`
-    }
-  })
-  return importsPrefixed
+const isOriginRelativeSpecifier = (specifier) => {
+  return specifier[0] === "/" && specifier[1] !== "/"
+}
+
+const isBareSpecifier = (specifier) => {
+  // it has a scheme
+  if (/^[a-zA-Z]+:/.test(specifier)) return false
+
+  // scheme relative
+  if (specifier.slice(0, 2) === "//") return false
+
+  // pathname relative
+  if (specifier.slice(0, 2) === "./") return false
+  if (specifier.slice(0, 3) === "../") return false
+
+  return true
 }
