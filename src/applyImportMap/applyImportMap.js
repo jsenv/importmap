@@ -1,22 +1,3 @@
-/**
- * DISCLAIMER:
- * For now you could not resolve to a different origin
- * because applyImportMap work only with pathname and not url.
- *
- * It means passing
- * {
- *   imports: {
- *     "foo": "https://example.com/node_modules/foo/index.js"
- *   }
- * }
- * is not supported
- *
- * I could convert https://github.com/WICG/import-maps/blob/93f94c6dfb268bde3009644b65580fb2fbb98fcf/reference-implementation/lib/resolver.js#L12
- * into import/export and use it directly.
- *
- *
- */
-
 // directly target the files because this code
 // will be executed either on node or browser
 // and also we don't want to pull more code than necessary
@@ -39,11 +20,6 @@ export const applyImportMap = ({ importMap, href, importerHref }) => {
     }
 
     const importerPathname = hrefToPathname(importerHref)
-    // here instead or taking the first match
-    // take the best match instead
-    // check the importMap spec repo to find how
-    // (bsically most char matching is a win)
-    // (or just the longest scope)
     const matchingPathnamePattern = Object.keys(scopes).find((pathnameMatchPattern) =>
       match(importerPathname, pathnameMatchPattern),
     )

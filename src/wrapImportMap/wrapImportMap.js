@@ -15,6 +15,8 @@
  *
  */
 
+import { isOriginRelativeSpecifier } from "../resolveSpecifier/originRelativeSpecifier.js"
+import { isBareSpecifier } from "../resolveSpecifier/bareSpecifier.js"
 import { assertImportMap } from "../assertImportMap.js"
 
 export const wrapImportMap = (importMap, folderRelativeName) => {
@@ -155,22 +157,4 @@ const wrapSpecifier = (specifier, into) => {
     return `${into}${specifier}`
   }
   return specifier
-}
-
-const isOriginRelativeSpecifier = (specifier) => {
-  return specifier[0] === "/" && specifier[1] !== "/"
-}
-
-const isBareSpecifier = (specifier) => {
-  // it has a scheme
-  if (/^[a-zA-Z]+:/.test(specifier)) return false
-
-  // scheme relative
-  if (specifier.slice(0, 2) === "//") return false
-
-  // pathname relative
-  if (specifier.slice(0, 2) === "./") return false
-  if (specifier.slice(0, 3) === "../") return false
-
-  return true
 }
