@@ -1,22 +1,23 @@
 import { assert } from "@dmail/assert"
 import { applyImportMap } from "../../index.js"
 
+const origin = "http://example.com"
+
 {
   const actual = applyImportMap({
     importMap: {
       scopes: {
-        "/.dist/best/": {
-          "/": "/.dist/best/",
-          "/.dist/best/": "/.dist/best/",
+        [`${origin}/.dist/best/`]: {
+          [`${origin}/`]: `${origin}/.dist/best/`,
+          [`${origin}/.dist/best/`]: `${origin}/.dist/best/`,
         },
       },
     },
-    href: "http://example.com/.dist/best/bar.js",
-    importerHref: "http://example.com/.dist/best/foo.js",
+    href: `${origin}/.dist/best/bar.js`,
+    importerHref: `${origin}/.dist/best/foo.js`,
   })
-  // be very carefull on order otherwise .dist/best
-  // is appended twice
-  const expected = "http://example.com/.dist/best/.dist/best/bar.js"
+  // order is important: here .dist/best is appended twice
+  const expected = `${origin}/.dist/best/.dist/best/bar.js`
   assert({ actual, expected })
 }
 
@@ -24,15 +25,15 @@ import { applyImportMap } from "../../index.js"
   const actual = applyImportMap({
     importMap: {
       scopes: {
-        "/.dist/best/": {
-          "/.dist/best/": "/.dist/best/",
-          "/": "/.dist/best/",
+        [`${origin}/.dist/best/`]: {
+          [`${origin}/.dist/best/`]: `${origin}/.dist/best/`,
+          [`${origin}/`]: `${origin}/.dist/best/`,
         },
       },
     },
-    href: "http://example.com/.dist/best/bar.js",
-    importer: "http://example.com/.dist/best/foo.js",
+    href: `${origin}/.dist/best/bar.js`,
+    importerHref: `${origin}/.dist/best/foo.js`,
   })
-  const expected = "http://example.com/.dist/best/bar.js"
+  const expected = `${origin}/.dist/best/bar.js`
   assert({ actual, expected })
 }

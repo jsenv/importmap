@@ -6,12 +6,13 @@ const internalOrigin = "http://internal.com"
 
 // remapping internal to external
 {
-  const actual = applyImportMap({
-    importMap: {
-      imports: {
-        "foo.js": `${externalOrigin}/bar.js`,
-      },
+  const importMap = {
+    imports: {
+      [`${internalOrigin}/foo.js`]: `${externalOrigin}/bar.js`,
     },
+  }
+  const actual = applyImportMap({
+    importMap,
     href: `${internalOrigin}/foo.js`,
   })
   const expected = `${externalOrigin}/bar.js`
@@ -20,12 +21,13 @@ const internalOrigin = "http://internal.com"
 
 // remapping external to internal
 {
-  const actual = applyImportMap({
-    importMap: {
-      imports: {
-        [`${externalOrigin}/foo.js`]: "/bar.js",
-      },
+  const importMap = {
+    imports: {
+      [`${externalOrigin}/foo.js`]: `${internalOrigin}/bar.js`,
     },
+  }
+  const actual = applyImportMap({
+    importMap,
     href: `${externalOrigin}/foo.js`,
   })
   const expected = `${internalOrigin}/bar.js`
@@ -34,12 +36,13 @@ const internalOrigin = "http://internal.com"
 
 // remapping external to external
 {
-  const actual = applyImportMap({
-    importMap: {
-      imports: {
-        [`${externalOrigin}/foo.js`]: `${externalOrigin}/bar.js`,
-      },
+  const importMap = {
+    imports: {
+      [`${externalOrigin}/foo.js`]: `${externalOrigin}/bar.js`,
     },
+  }
+  const actual = applyImportMap({
+    importMap,
     href: `${externalOrigin}/foo.js`,
   })
   const expected = `${externalOrigin}/bar.js`

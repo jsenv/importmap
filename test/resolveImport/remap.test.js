@@ -1,16 +1,17 @@
 import { assert } from "@dmail/assert"
 import { resolveImport } from "../../index.js"
 
+const origin = "http://example.com"
 const actual = resolveImport({
   specifier: "/whatever/foo.js",
-  importer: `http://example.com/folder/file.js`,
+  importer: `${origin}/folder/file.js`,
   importMap: {
     scopes: {
-      "/folder/": {
-        "/whatever/": "/remapped/",
+      [`${origin}/folder/`]: {
+        [`${origin}/whatever/`]: `${origin}/remapped/`,
       },
     },
   },
 })
-const expected = `http://example.com/remapped/foo.js`
+const expected = `${origin}/remapped/foo.js`
 assert({ actual, expected })

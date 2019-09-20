@@ -8,7 +8,6 @@
 /src/system/s-fork.js
 /src/system/s.js
 /test/**/syntax-error.js
-/package.json
-/package-lock.json
 /importMap.json
 /jsconfig.json
+/package-lock.json

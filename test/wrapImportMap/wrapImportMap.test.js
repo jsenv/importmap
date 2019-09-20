@@ -1,5 +1,5 @@
 import { assert } from "@dmail/assert"
-import { wrapImportMap, applyImportMap } from "../../index.js"
+import { wrapImportMap, normalizeImportMap, applyImportMap } from "../../index.js"
 
 const importMap = wrapImportMap(
   {
@@ -55,6 +55,7 @@ const importMap = wrapImportMap(
 const noImporter = undefined
 const importerRemapped = "http://example.com/special/whatever.js"
 const importerWrapped = "http://example.com/folder/whatever.js"
+const importMapNormalized = normalizeImportMap(importMap, "http://example.com")
 
 // inside into stays inside
 {
@@ -62,7 +63,7 @@ const importerWrapped = "http://example.com/folder/whatever.js"
   const expected = `http://example.com/folder/bar.js`
   {
     const actual = applyImportMap({
-      importMap,
+      importMap: importMapNormalized,
       href: hrefInside,
       importerHref: noImporter,
     })
@@ -70,7 +71,7 @@ const importerWrapped = "http://example.com/folder/whatever.js"
   }
   {
     const actual = applyImportMap({
-      importMap,
+      importMap: importMapNormalized,
       href: hrefInside,
       importerHref: importerRemapped,
     })
@@ -78,7 +79,7 @@ const importerWrapped = "http://example.com/folder/whatever.js"
   }
   {
     const actual = applyImportMap({
-      importMap,
+      importMap: importMapNormalized,
       href: hrefInside,
       importerHref: importerWrapped,
     })
@@ -92,7 +93,7 @@ const importerWrapped = "http://example.com/folder/whatever.js"
   const expected = `http://example.com/folder/bar.js`
   {
     const actual = applyImportMap({
-      importMap,
+      importMap: importMapNormalized,
       href: hrefOutside,
       importerHref: noImporter,
     })
@@ -100,7 +101,7 @@ const importerWrapped = "http://example.com/folder/whatever.js"
   }
   {
     const actual = applyImportMap({
-      importMap,
+      importMap: importMapNormalized,
       href: hrefOutside,
       importerHref: importerRemapped,
     })
@@ -108,7 +109,7 @@ const importerWrapped = "http://example.com/folder/whatever.js"
   }
   {
     const actual = applyImportMap({
-      importMap,
+      importMap: importMapNormalized,
       href: hrefOutside,
       importerHref: importerWrapped,
     })
@@ -121,7 +122,7 @@ const importerWrapped = "http://example.com/folder/whatever.js"
   const hrefOutsideWithTopLevelRemapping = `http://example.com/a`
   {
     const actual = applyImportMap({
-      importMap,
+      importMap: importMapNormalized,
       href: hrefOutsideWithTopLevelRemapping,
       importerHref: noImporter,
     })
@@ -130,7 +131,7 @@ const importerWrapped = "http://example.com/folder/whatever.js"
   }
   {
     const actual = applyImportMap({
-      importMap,
+      importMap: importMapNormalized,
       href: hrefOutsideWithTopLevelRemapping,
       importerHref: importerRemapped,
     })
@@ -139,7 +140,7 @@ const importerWrapped = "http://example.com/folder/whatever.js"
   }
   {
     const actual = applyImportMap({
-      importMap,
+      importMap: importMapNormalized,
       href: hrefOutsideWithTopLevelRemapping,
       importerHref: importerWrapped,
     })
@@ -155,7 +156,7 @@ const importerWrapped = "http://example.com/folder/whatever.js"
 
   {
     const actual = applyImportMap({
-      importMap,
+      importMap: importMapNormalized,
       href: hrefInsideWithTopLevelRemapping,
       importerHref: noImporter,
     })
@@ -163,7 +164,7 @@ const importerWrapped = "http://example.com/folder/whatever.js"
   }
   {
     const actual = applyImportMap({
-      importMap,
+      importMap: importMapNormalized,
       href: hrefInsideWithTopLevelRemapping,
       importerHref: importerRemapped,
     })
@@ -171,7 +172,7 @@ const importerWrapped = "http://example.com/folder/whatever.js"
   }
   {
     const actual = applyImportMap({
-      importMap,
+      importMap: importMapNormalized,
       href: hrefInsideWithTopLevelRemapping,
       importerHref: importerWrapped,
     })
@@ -185,7 +186,7 @@ const importerWrapped = "http://example.com/folder/whatever.js"
 
   {
     const actual = applyImportMap({
-      importMap,
+      importMap: importMapNormalized,
       href: hrefOutsideWithScopedRemapping,
       importerHref: noImporter,
     })
@@ -195,7 +196,7 @@ const importerWrapped = "http://example.com/folder/whatever.js"
   }
   {
     const actual = applyImportMap({
-      importMap,
+      importMap: importMapNormalized,
       href: hrefOutsideWithScopedRemapping,
       importerHref: importerRemapped,
     })
@@ -204,7 +205,7 @@ const importerWrapped = "http://example.com/folder/whatever.js"
   }
   {
     const actual = applyImportMap({
-      importMap,
+      importMap: importMapNormalized,
       href: hrefOutsideWithScopedRemapping,
       importerHref: importerWrapped,
     })
@@ -220,7 +221,7 @@ const importerWrapped = "http://example.com/folder/whatever.js"
 
   {
     const actual = applyImportMap({
-      importMap,
+      importMap: importMapNormalized,
       href: hrefInsideWithScopedRemapping,
       importerHref: noImporter,
     })
@@ -230,7 +231,7 @@ const importerWrapped = "http://example.com/folder/whatever.js"
   }
   {
     const actual = applyImportMap({
-      importMap,
+      importMap: importMapNormalized,
       href: hrefInsideWithScopedRemapping,
       importerHref: importerRemapped,
     })
@@ -238,7 +239,7 @@ const importerWrapped = "http://example.com/folder/whatever.js"
   }
   {
     const actual = applyImportMap({
-      importMap,
+      importMap: importMapNormalized,
       href: hrefInsideWithScopedRemapping,
       importerHref: importerWrapped,
     })
@@ -249,7 +250,7 @@ const importerWrapped = "http://example.com/folder/whatever.js"
 // inside scope
 {
   const actual = applyImportMap({
-    importMap,
+    importMap: importMapNormalized,
     href: "http://example.com/ding",
     importerHref: importerRemapped,
   })
@@ -260,7 +261,7 @@ const importerWrapped = "http://example.com/folder/whatever.js"
 // ensure folder after scope does not remap
 {
   const actual = applyImportMap({
-    importMap,
+    importMap: importMapNormalized,
     href: "http://example.com/folder/a",
     importerHref: "http://example.com/special/folder/whatever.js",
   })

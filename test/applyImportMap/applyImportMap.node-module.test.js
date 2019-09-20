@@ -1,16 +1,17 @@
 import { assert } from "@dmail/assert"
 import { applyImportMap } from "../../index.js"
 
+const origin = "https://example.com"
 const actual = applyImportMap({
   importMap: {
     scopes: {
-      "/node_modules/foo/": {
-        "/node_modules/bar/": "/node_modules/foo/node_modules/bar/",
+      [`${origin}/node_modules/foo/`]: {
+        [`${origin}/node_modules/bar/`]: `${origin}/node_modules/foo/node_modules/bar/`,
       },
     },
   },
-  href: "https://example.com/node_modules/bar/src/bar.js",
-  importerHref: "https://example.com/node_modules/foo/src/foo.js",
+  href: `${origin}/node_modules/bar/src/bar.js`,
+  importerHref: `${origin}/node_modules/foo/src/foo.js`,
 })
-const expected = "https://example.com/node_modules/foo/node_modules/bar/src/bar.js"
+const expected = `${origin}/node_modules/foo/node_modules/bar/src/bar.js`
 assert({ actual, expected })

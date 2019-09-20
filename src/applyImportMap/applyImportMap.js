@@ -1,120 +1,59 @@
-// directly target the files because this code
-// will be executed either on node or browser
-// and also we don't want to pull more code than necessary
-// when this one gets bundled
-import { hrefToPathname } from "@jsenv/href/src/hrefToPathname/hrefToPathname.js"
-import { hrefToOrigin } from "@jsenv/href/src/hrefToOrigin/hrefToOrigin.js"
 import { assertImportMap } from "../assertImportMap.js"
+import { assertUrlLike } from "../assertUrlLike.js"
 
 export const applyImportMap = ({ importMap, href, importerHref }) => {
   assertImportMap(importMap)
-  if (typeof href !== "string") {
-    throw new TypeError(`href must be a string, got ${href}`)
+  assertUrlLike(href, "href")
+  if (importerHref) {
+    assertUrlLike(importerHref, "importerHref")
   }
 
-  const { imports = {}, scopes = {} } = importMap
-
-  if (importerHref) {
-    if (typeof importerHref !== "string") {
-      throw new TypeError(`importerHref must be a string, got ${importerHref}`)
-    }
-
-    const importerPathname = hrefToPathname(importerHref)
-    const matchingPathnamePattern = Object.keys(scopes).find((pathnameMatchPattern) =>
-      match(importerPathname, pathnameMatchPattern),
-    )
-
-    if (matchingPathnamePattern) {
-      const scopeImports = scopes[matchingPathnamePattern]
-
-      const scopeRemapping = applyImports({
-        href,
-        imports: scopeImports,
-        // scopePattern: matchingPathnamePattern,
-      })
-      if (scopeRemapping !== null) {
-        return scopeRemapping
+  const { scopes } = importMap
+  if (scopes && importerHref) {
+    const scopeKeyMatching = Object.keys(scopes).find((scopeKey) => {
+      return scopeKey === importerHref || specifierIsPrefixOf(scopeKey, importerHref)
+    })
+    if (scopeKeyMatching) {
+      const scopeValue = scopes[scopeKeyMatching]
+      const remappingFromScopeImports = applyImports(href, scopeValue)
+      if (remappingFromScopeImports !== null) {
+        return remappingFromScopeImports
       }
     }
   }
 
-  const topLevelimportRemapping = applyImports({ href, imports })
-  if (topLevelimportRemapping !== null) {
-    return topLevelimportRemapping
+  const { imports } = importMap
+  if (imports) {
+    const remappingFromImports = applyImports(href, imports)
+    if (remappingFromImports !== null) {
+      return remappingFromImports
+    }
   }
 
   return href
 }
 
-const applyImports = ({ href, imports }) => {
-  const modulePathname = hrefToPathname(href)
-  const pathnamePatternArray = Object.keys(imports)
+const applyImports = (href, imports) => {
+  const importKeyArray = Object.keys(imports)
 
   let i = 0
-  while (i < pathnamePatternArray.length) {
-    const pathnamePattern = pathnamePatternArray[i]
+  while (i < importKeyArray.length) {
+    const importKey = importKeyArray[i]
     i++
-    const matchResult = match(modulePathname, pathnamePattern)
-    if (!matchResult) continue
-
-    const { before, after } = matchResult
-    const replacement = imports[pathnamePattern]
-
-    if (replacement.startsWith("file://")) {
-      return `${before}${replacement}${after}`
+    if (importKey === href) {
+      const importValue = imports[importKey]
+      return importValue
     }
-
-    const moduleOrigin = hrefToOrigin(href)
-    return `${moduleOrigin}${before}${replacement}${after}`
+    if (specifierIsPrefixOf(importKey, href)) {
+      const importValue = imports[importKey]
+      const afterImportKey = href.slice(importKey.length)
+      return importValue + afterImportKey
+    }
   }
 
   return null
 }
 
-const match = (pathname, pattern) => {
-  const patternHasLeadingSlash = pattern[0] === "/"
-  const patternHasTrailingSlash = pattern[pattern.length - 1] === "/"
-
-  // pattern : '/foo/'
-  if (patternHasLeadingSlash && patternHasTrailingSlash) {
-    const index = pathname.indexOf(pattern)
-
-    // pathname: '/fo/bar'
-    // pathname: '/foobar'
-    if (index === -1) return null
-
-    // pathname: '/foo/bar'
-    return { before: pathname.slice(0, index), after: pathname.slice(index + pattern.length) }
-  }
-
-  // pattern: '/foo'
-  if (patternHasLeadingSlash && !patternHasTrailingSlash) {
-    // pathname: '/fo', /foobar'
-    if (pathname !== pattern) return null
-
-    // pathname: '/foo'
-    return { before: "", after: "" }
-  }
-
-  // pattern: 'foo/'
-  if (!patternHasLeadingSlash && patternHasTrailingSlash) {
-    const index = pathname.indexOf(`/${pattern}`)
-
-    // pathname: '/fo/bar'
-    if (index === -1) return null
-
-    // pathname: '/bar/foo/file.js'
-    if (index !== 0) return null
-
-    // pathname: '/foo', '/foo/bar'
-    return { before: "", after: pathname.slice(pattern.length + 1) }
-  }
-
-  // pattern 'foo'
-
-  // pathname: '/fo', /foobar'
-  if (pathname.slice(1) !== pattern) return null
-
-  // pathname: '/foo'
-  return { before: "", after: "" }
+const specifierIsPrefixOf = (specifierHref, href) => {
+  return specifierHref[specifierHref.length - 1] === "/" && href.startsWith(specifierHref)
 }

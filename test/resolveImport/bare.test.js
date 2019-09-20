@@ -16,29 +16,31 @@ import { resolveImport } from "../../index.js"
 }
 
 {
+  const origin = "http://example.com"
   const actual = resolveImport({
     specifier: "foo",
-    importer: "http://example.com",
+    importer: origin,
     importMap: {
       imports: {
-        "/foo": "/node_modules/foo/src/foo.js",
+        [`${origin}/foo`]: `${origin}/node_modules/foo/src/foo.js`,
       },
     },
   })
-  const expected = "http://example.com/node_modules/foo/src/foo.js"
+  const expected = `${origin}/node_modules/foo/src/foo.js`
   assert({ actual, expected })
 }
 
 {
+  const origin = "http://example.com"
   const actual = resolveImport({
     specifier: "foo/src/foo.js",
-    importer: "http://example.com",
+    importer: origin,
     importMap: {
       imports: {
-        "/foo/": "/node_modules/foo/",
+        [`${origin}/foo/`]: `${origin}/node_modules/foo/`,
       },
     },
   })
-  const expected = "http://example.com/node_modules/foo/src/foo.js"
+  const expected = `${origin}/node_modules/foo/src/foo.js`
   assert({ actual, expected })
 }

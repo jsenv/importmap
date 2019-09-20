@@ -1,3 +1,7 @@
+// directly target the files because this code
+// will be executed either on node or browser
+// and also we don't want to pull more code than necessary
+// when this one gets bundled
 import { hrefToPathname } from "@jsenv/href/src/hrefToPathname/hrefToPathname.js"
 import { pathnameToExtension } from "@jsenv/href/src/pathnameToExtension/pathnameToExtension.js"
 import { resolveSpecifier } from "../resolveSpecifier/resolveSpecifier.js"

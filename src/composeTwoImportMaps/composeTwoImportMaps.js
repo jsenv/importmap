@@ -17,11 +17,11 @@ const composeTwoImports = (leftImports = {}, rightImports = {}) => {
 
 const composeTwoScopes = (leftScopes = {}, rightScopes = {}) => {
   const scopes = { ...leftScopes }
-  Object.keys(rightScopes).forEach((pattern) => {
-    if (scopes.hasOwnProperty(pattern)) {
-      scopes[pattern] = { ...scopes[pattern], ...rightScopes[pattern] }
+  Object.keys(rightScopes).forEach((scopeKey) => {
+    if (scopes.hasOwnProperty(scopeKey)) {
+      scopes[scopeKey] = { ...scopes[scopeKey], ...rightScopes[scopeKey] }
     } else {
-      scopes[pattern] = { ...rightScopes[pattern] }
+      scopes[scopeKey] = { ...rightScopes[scopeKey] }
     }
   })
   return scopes

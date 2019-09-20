@@ -1,36 +1,34 @@
 import { assert } from "@dmail/assert"
 import { applyImportMap } from "../../index.js"
 
+const origin = "http://example.com"
+
 {
-  const actual = applyImportMap({
-    importMap: {
-      imports: {
-        foo: "/bar.js",
-      },
+  const importMap = {
+    imports: {
+      [`${origin}/foo`]: `${origin}/bar.js`,
     },
-    href: "http://example.com/foo",
-    importerHref: "http://example.com/folder/file.js",
+  }
+  const actual = applyImportMap({
+    importMap,
+    href: `${origin}/foo`,
+    importerHref: `${origin}/folder/file.js`,
   })
-  const expected = "http://example.com/bar.js"
-  assert({
-    actual,
-    expected,
-  })
+  const expected = `${origin}/bar.js`
+  assert({ actual, expected })
 }
 
 {
-  const actual = applyImportMap({
-    importMap: {
-      imports: {
-        foo: "/foo.js",
-      },
+  const importMap = {
+    imports: {
+      [`${origin}/foo`]: `${origin}/foo.js`,
     },
-    href: "http://example.com/foobar",
-    importerHref: "http://example.com/folder/file.js",
+  }
+  const actual = applyImportMap({
+    importMap,
+    href: `${origin}/foobar`,
+    importerHref: `${origin}/folder/file.js`,
   })
-  const expected = "http://example.com/foobar"
-  assert({
-    actual,
-    expected,
-  })
+  const expected = `${origin}/foobar`
+  assert({ actual, expected })
 }
