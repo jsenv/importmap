@@ -8,7 +8,7 @@
 
 ## Introduction
 
-`jsenv-import-map` implements importMap in native js. It is used by jsenv to use importMap even if they are not yet supported.<br />
+`jsenv-import-map` implements importMap in native js. It is used by jsenv to use importMap even if they are not implemented by browsers.<br />
 — see [importMap spec](https://github.com/WICG/import-maps)
 
 It has the following exports
@@ -25,7 +25,7 @@ It has the following exports
 > takes { specifier, importer, importMap, defaultExtension } and returns an url.
 
 ```js
-import { resolvePath } from "@jsenv/module-resolution"
+import { resolveImport } from "@jsenv/import-map"
 
 const importUrl = resolveImport({
   specifier: "../index.js",
