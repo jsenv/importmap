@@ -2,7 +2,7 @@
 
 > importMap programmatic implementation
 
-[![npm package](https://img.shields.io/github/package-json/v/jsenv/jsenv-import-map.svg?label=package&logo=github)](https://github.com/jsenv/jsenv-import-map/packages)
+[![npm package](https://img.shields.io/npm/v/@jsenv/import-map.svg)](https://www.npmjs.com/package/@jsenv/import-map)
 [![ci status](https://github.com/jsenv/jsenv-import-map/workflows/ci/badge.svg)](https://github.com/jsenv/jsenv-import-map/actions)
 [![codecov](https://codecov.io/gh/jsenv/jsenv-import-map/branch/master/graph/badge.svg)](https://codecov.io/gh/jsenv/jsenv-import-map)
 
@@ -165,20 +165,9 @@ This feature is not part of the spec but is usefull to redirect your imports ins
 ## Installation
 
 ```console
-npm install @jsenv/import-map@5.0.0
+npm install @jsenv/import-map@5.2.0
 ```
 
 ```console
-yarn add @jsenv/import-map@5.0.0
+yarn add @jsenv/import-map@5.2.0
 ```
-
-`@jsenv/import-map` is published on github package registry.<br />
-To use it, add the following line in your project `.npmrc`
-
-```
-registry=https://npm.pkg.github.com
-```
-
-It will tell npm or yarn to search package on github package registry.
-
-— see [github package registry documentation](https://help.github.com/en/articles/about-github-package-registry)
