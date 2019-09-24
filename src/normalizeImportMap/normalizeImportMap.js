@@ -37,23 +37,23 @@ const normalizeScopes = (scopes, href) => {
 }
 
 const sortImports = (imports) => {
-  const sortedImports = {}
+  const importsSorted = {}
   Object.keys(imports)
     .sort(compareLengthOrLocaleCompare)
     .forEach((name) => {
-      sortedImports[name] = imports[name]
+      importsSorted[name] = imports[name]
     })
-  return sortedImports
+  return importsSorted
 }
 
 const sortScopes = (scopes) => {
-  const sortedScopes = {}
+  const scopesSorted = {}
   Object.keys(scopes)
     .sort(compareLengthOrLocaleCompare)
     .forEach((scopeName) => {
-      sortedScopes[scopeName] = sortImports(scopes[scopeName])
+      scopesSorted[scopeName] = sortImports(scopes[scopeName])
     })
-  return sortedScopes
+  return scopesSorted
 }
 
 const compareLengthOrLocaleCompare = (a, b) => {
