@@ -1,10 +1,10 @@
 # jsenv-import-map
 
-[![npm package](https://img.shields.io/npm/v/@jsenv/import-map.svg)](https://www.npmjs.com/package/@jsenv/import-map)
+> importMap programmatic implementation
+
+[![npm package](https://img.shields.io/github/package-json/v/jsenv/jsenv-import-map.svg?label=package&logo=github)](https://github.com/jsenv/jsenv-import-map/packages)
 [![ci status](https://github.com/jsenv/jsenv-import-map/workflows/ci/badge.svg)](https://github.com/jsenv/jsenv-import-map/actions)
 [![codecov](https://codecov.io/gh/jsenv/jsenv-import-map/branch/master/graph/badge.svg)](https://codecov.io/gh/jsenv/jsenv-import-map)
-
-> importMap programmatic implementation
 
 ## Introduction
 
