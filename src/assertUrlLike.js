@@ -5,6 +5,6 @@ export const assertUrlLike = (value, name = "specifier") => {
     throw new TypeError(`${name} must be a string, got ${value}`)
   }
   if (!isAbsoluteSpecifier(value)) {
-    throw new Error(`${name} must be an url and no scheme found, got ${value}`)
+    throw new Error(`${name} must be a url and no scheme found, got ${value}`)
   }
 }

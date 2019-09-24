@@ -8,21 +8,98 @@
 
 ## Introduction
 
-`jsenv-import-map` implements importMap in native js. It is used by jsenv to use importMap even if they are not implemented by browsers.<br />
+`jsenv-import-map` is a javasScript implementation of the importMap specification. It is written using es modules and is compatible with Node.js.<br />
+
+I made this project because jsenv uses importMap but they are not yet available in browsers.<br />
+
 — see [importMap spec](https://github.com/WICG/import-maps)
 
-It has the following exports
+`@jsenv/import-map` has the following exports:
 
-- `applyImportMap`
-- `composeTwoImportMaps`
-- `normalizeImportMap`
-- `resolveImport`
-- `resolveSpecifier`
-- `wrapImportMap`
+- [applyImportMap](#applyimportmap)
+- [composeTwoImportMaps](#composetwoimportmaps)
+- [normalizeImportMap](#normalizeimportmap)
+- [resolveImport](#resolveimport)
+- [resolveSpecifier](#resolvespecifier)
+- [wrapImportMap](#wrapimportmap)
+
+## applyImportMap
+
+> takes { `importMap`, `href`, `importerHref` } and returns either the `href` remapped by `importMap` or the original `href`.
+
+```js
+import { applyImportMap } from "@jsenv/import-map"
+
+const href = "http://domain.com/foo"
+const importMap = {
+  imports: {
+    "http://domain.com/foo": "http://domain.com/bar",
+  },
+}
+const hrefRemapped = applyImportMap({
+  href,
+  importMap,
+})
+console.log(hrefRemapped)
+```
+
+The code above logs `"http://domain.com/bar"`.<br />
+The provided `importMap` specifiers must be absolute and sorted to work as expected.<br />
+You can use [normalizeImportMap](#normalizeimportmap) to do that.<br />
+
+— see [applyImportMap source code](./src/applyImportMap/applyImportMap.js)
+
+## composeTwoImportMaps
+
+> takes (`leftImportMap`, `rightImportMap`) and returns an importMap being the composition of the two.
+
+```js
+import { composeTwoImportMaps } from "@jsenv/import-map"
+
+const leftImportMap = {
+  imports: {
+    foo: "bar",
+  },
+}
+const rightImportMap = {
+  imports: {
+    foo: "whatever",
+  },
+}
+const importMap = composeTwoImportMaps(leftImportMap, rightImportMap)
+
+console.log(importMap.imports.foo)
+```
+
+The code above logs `"whatever"`.
+
+— see [composeTwoImportMaps source code](./src/composeTwoImportMaps/composeTwoImportMaps.js)
+
+## normalizeImportMap
+
+> takes (`importMap`, `href`) and returns an importMap where relative specifier are resolved against `href` and sorted.
+
+```js
+import { normalizeImportMap } from "@jsenv/import-map"
+
+const importMap = {
+  imports: {
+    foo: "http://cdndomain.com/bar",
+  },
+}
+const href = "http://mydomain.com"
+const importMapNormalized = normalizeImportMap(importMap, href)
+
+console.log(importMapNormalized.imports["http://mydomain.com/foo"])
+```
+
+The code above logs `"http://cdndomain.com/bar"`.
+
+— see [normalizeImportMap source code](./src/normalizeImportMap/normalizeImportMap.js)
 
 ## resolveImport
 
-> takes { specifier, importer, importMap, defaultExtension } and returns an url.
+> takes { `specifier`, `importer`, `importMap`, `defaultExtension` } and returns a url.
 
 ```js
 import { resolveImport } from "@jsenv/import-map"
@@ -40,14 +117,57 @@ const importUrl = resolveImport({
 console.log(importUrl)
 ```
 
-The code above logs `http://domain.com/main.js`.
+The code above logs `"http://domain.com/main.js"`.
+
+— see [resolveImport source code](./src/resolveImport/resolveImport.js)
+
+## resolveSpecifier
+
+> takes (`specifier`, `importer`) and returns `specifier` resolved against `importer`.
+
+```js
+import { resolveSpecifier } from "@jsenv/import-map"
+
+const specifier = "../file.js"
+const importer = "http://mydomain.com/folder/index.js"
+const specifierResolved = resolveSpecifier(specifier, importer)
+
+console.log(specifierResolved)
+```
+
+The code above logs `"http://mydomain.com/file.js"`.
+
+— see [resolveSpecifier source code](./src/resolveSpecifier/resolveSpecifier.js)
+
+## wrapImportMap
+
+> takes (`importMap`, `folderRelativeName`) and returns an importMap wrapped inside `folderRelativeName`.
+
+```js
+import { wrapImportMap } from "@jsenv/import-map"
+
+const importMap = {
+  imports: {
+    foo: "bar",
+  },
+}
+const folderRelativeName = "/dist"
+const importMapWrapped = wrapImportMap(specifier, importer)
+
+console.log(importMapWrapped.imports.foo)
+```
+
+The code above logs `"/dist/bar"`.<br />
+This feature is not part of the spec but is usefull to redirect your imports inside a given folder.<br />
+
+— see [wrapImportMap source code](./src/wrapImportMap/wrapImportMap.js)
 
 ## Installation
 
 ```console
-npm install @jsenv/import-map@1.0.0
+npm install @jsenv/import-map@5.0.0
 ```
 
 ```console
-yarn add @jsenv/import-map@1.0.0
+yarn add @jsenv/import-map@5.0.0
 ```

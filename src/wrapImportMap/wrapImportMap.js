@@ -21,6 +21,9 @@ import { assertImportMap } from "../assertImportMap.js"
 
 export const wrapImportMap = (importMap, folderRelativeName) => {
   assertImportMap(importMap)
+  if (typeof folderRelativeName !== "string") {
+    throw new TypeError(`folderRelativeName must be a string, got ${folderRelativeName}`)
+  }
 
   const into = `/${folderRelativeName}/`
   const { imports, scopes } = importMap
