@@ -171,3 +171,14 @@ npm install @jsenv/import-map@5.0.0
 ```console
 yarn add @jsenv/import-map@5.0.0
 ```
+
+`@jsenv/import-map` is published on github package registry.<br />
+To use it, add the following line in your project `.npmrc`
+
+```
+registry=https://npm.pkg.github.com
+```
+
+It will tell npm or yarn to search package on github package registry.
+
+— see [github package registry documentation](https://help.github.com/en/articles/about-github-package-registry)
