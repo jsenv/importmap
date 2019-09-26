@@ -8,7 +8,7 @@
   },
   "publishConfig": {
     "access": "public",
-    "registry": "https://registry.npmjs.org"
+    "registry": "https://npm.pkg.github.com/"
   },
   "main": "dist/commonjs/main.js",
   "module": "index.js",

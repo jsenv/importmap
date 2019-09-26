@@ -10,28 +10,23 @@ on:
 
 jobs:
   build:
-    name: Test on node ${{ matrix.node_version }} and ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        node-version: [8.x, 12.x]
-        os: [ubuntu-latest]
-
+    name: Test on node 12 and ubuntu
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js 12.x
         uses: actions/setup-node@v1
         with:
-          node-version: ${{ matrix.node-version }}
-      - name: npm install, build, and test
+          node-version: 12.x
+      - name: yarn install, build, and test
         run: |
-          npm install
-          npm run generate-import-map
-          npm run eslint-check
-          npm run prettier-check
-          npm run generate-coverage
-          npm run upload-coverage
+          npm config set //npm.pkg.github.com/:_authToken ${{ secrets.GITHUB_TOKEN }}
+          npm config set @jsenv:registry https://npm.pkg.github.com
+          yarn install
+          yarn eslint-check
+          yarn prettier-check
+          yarn generate-coverage
+          yarn upload-coverage
         env:
           CI: true
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

@@ -2,7 +2,7 @@
 
 > importMap programmatic implementation
 
-[![npm package](https://img.shields.io/npm/v/@jsenv/import-map.svg)](https://www.npmjs.com/package/@jsenv/import-map)
+[![github package](https://img.shields.io/github/package-json/v/jsenv/jsenv-import-map.svg?label=package&logo=github)](https://github.com/jsenv/jsenv-import-map/packages)
 [![ci status](https://github.com/jsenv/jsenv-import-map/workflows/ci/badge.svg)](https://github.com/jsenv/jsenv-import-map/actions)
 [![codecov](https://codecov.io/gh/jsenv/jsenv-import-map/branch/master/graph/badge.svg)](https://codecov.io/gh/jsenv/jsenv-import-map)
 
@@ -162,11 +162,39 @@ This feature is not part of the spec but is usefull to redirect your imports ins
 
 — see [wrapImportMap source code](./src/wrapImportMap/wrapImportMap.js)
 
-## Installation
+## Installation using npm
+
+To install `@jsenv/import-map` you need to configure npm to use github registry for this package.
+
+1. Configure npm authentification
+
+Github registry requires an authentification token. If you haven't configured it already, read how in the documentation below.<br />
+
+— see [Authenticating to GitHub Package Registry documentation on GitHub](https://help.github.com/en/articles/configuring-npm-for-use-with-github-package-registry#authenticating-to-github-package-registry)
+
+For the record, you can save your token with this command
+
+```console
+npm config set '//npm.pkg.github.com/:_authToken' 'personal-access-token'
+```
+
+2. Configure npm registry
+
+Run the command below to use github registry for `@jsenv/import-map`
+
+```console
+npm config set @jsenv:registry https://npm.pkg.github.com
+```
+
+3. Run install command
 
 ```console
 npm install @jsenv/import-map@5.2.0
 ```
+
+### Installation using yarn
+
+Same steps as [Installation using npm](#installation-using-npm) replacing step 3 by
 
 ```console
 yarn add @jsenv/import-map@5.2.0

@@ -9,8 +9,8 @@
 /node_modules/
 /test/**/.dist/
 /.npmrc
-/env.json
 /importMap.json
 /jsconfig.json
+/secrets.json
 /package-lock.json
 /yarn.lock
