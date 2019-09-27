@@ -23,6 +23,9 @@ export const resolveSpecifier = (specifier, importer) => {
   if (!importer) {
     throw new Error(createMissingImporterMessage(specifier, importer))
   }
+  if (!isAbsoluteSpecifier(importer)) {
+    throw new Error(createAbsoluteImporterRequiredMessage(importer))
+  }
 
   if (isSchemeRelativeSpecifier(specifier)) {
     return resolveSchemeRelativeSpecifier(specifier, importer)
@@ -45,5 +48,9 @@ const createMissingImporterMessage = (
 ) => `missing importer to resolve relative specifier.
 --- specifier ---
 ${specifier}
+--- importer ---
+${importer}`
+
+const createAbsoluteImporterRequiredMessage = (importer) => `importer must be absolute.
 --- importer ---
 ${importer}`
