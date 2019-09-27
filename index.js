@@ -3,4 +3,5 @@ export { composeTwoImportMaps } from "./src/composeTwoImportMaps/composeTwoImpor
 export { normalizeImportMap } from "./src/normalizeImportMap/normalizeImportMap.js"
 export { resolveImport } from "./src/resolveImport/resolveImport.js"
 export { resolveSpecifier } from "./src/resolveSpecifier/resolveSpecifier.js"
+export { sortImportMap } from "./src/sortImportMap/sortImportMap.js"
 export { wrapImportMap } from "./src/wrapImportMap/wrapImportMap.js"

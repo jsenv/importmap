@@ -1,5 +1,6 @@
-import { resolveSpecifier } from "../resolveSpecifier/resolveSpecifier.js"
 import { assertImportMap } from "../assertImportMap.js"
+import { resolveSpecifier } from "../resolveSpecifier/resolveSpecifier.js"
+import { sortImports, sortScopes } from "../sortImportMap/sortImportMap.js"
 
 export const normalizeImportMap = (importMap, href) => {
   assertImportMap(importMap)
@@ -8,6 +9,7 @@ export const normalizeImportMap = (importMap, href) => {
   }
 
   const { imports, scopes } = importMap
+
   return {
     imports: imports ? normalizeImports(imports, href) : undefined,
     scopes: scopes ? normalizeScopes(scopes, href) : undefined,
@@ -34,28 +36,4 @@ const normalizeScopes = (scopes, href) => {
     scopesNormalized[scopeKeyNormalized] = scopeValueNormalized
   })
   return sortScopes(scopesNormalized)
-}
-
-const sortImports = (imports) => {
-  const importsSorted = {}
-  Object.keys(imports)
-    .sort(compareLengthOrLocaleCompare)
-    .forEach((name) => {
-      importsSorted[name] = imports[name]
-    })
-  return importsSorted
-}
-
-const sortScopes = (scopes) => {
-  const scopesSorted = {}
-  Object.keys(scopes)
-    .sort(compareLengthOrLocaleCompare)
-    .forEach((scopeName) => {
-      scopesSorted[scopeName] = sortImports(scopes[scopeName])
-    })
-  return scopesSorted
-}
-
-const compareLengthOrLocaleCompare = (a, b) => {
-  return b.length - a.length || a.localeCompare(b)
 }
