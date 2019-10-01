@@ -168,19 +168,17 @@ To install `@jsenv/import-map` you need to configure npm to use github registry 
 
 1. Configure npm authentification
 
-Github registry requires an authentification token. If you haven't configured it already, read how in the documentation below.<br />
-
-— see [Authenticating to GitHub Package Registry documentation on GitHub](https://help.github.com/en/articles/configuring-npm-for-use-with-github-package-registry#authenticating-to-github-package-registry)
-
-For the record, you can save your token with this command
-
-```console
-npm config set '//npm.pkg.github.com/:_authToken' 'personal-access-token'
-```
+— see [documentation about npm authentification on github registry](https://github.com/jsenv/jsenv-core/blob/master/docs/npm-auth-github-registry.md##npm-authentification-on-github-registry)
 
 2. Configure npm registry
 
-Run the command below to use github registry for `@jsenv/import-map`
+Add the following line to your `.npmrc`
+
+```
+@jsenv:registry=https://npm.pkg.github.com
+```
+
+Or run the following command
 
 ```console
 npm config set @jsenv:registry https://npm.pkg.github.com
@@ -189,13 +187,15 @@ npm config set @jsenv:registry https://npm.pkg.github.com
 3. Run install command
 
 ```console
-npm install @jsenv/import-map@5.2.0
+npm install @jsenv/import-map@5.8.0
 ```
 
 ### Installation using yarn
 
+Does not work until https://github.com/yarnpkg/yarn/issues/7552 is fixed.
+
 Same steps as [Installation using npm](#installation-using-npm) replacing step 3 by
 
 ```console
-yarn add @jsenv/import-map@5.2.0
+yarn add @jsenv/import-map@5.8.0
 ```
