@@ -54,7 +54,7 @@ You can use [normalizeImportMap](#normalizeimportmap) to do that.<br />
 
 — see [applyImportMap source code](./src/applyImportMap/applyImportMap.js)
 
-## composeTwoImportMaps
+### composeTwoImportMaps
 
 > takes (`leftImportMap`, `rightImportMap`) and returns an importMap being the composition of the two.
 
@@ -80,7 +80,7 @@ The code above logs `"whatever"`.
 
 — see [composeTwoImportMaps source code](./src/composeTwoImportMaps/composeTwoImportMaps.js)
 
-## normalizeImportMap
+### normalizeImportMap
 
 > takes (`importMap`, `href`) and returns an importMap where relative specifier are resolved against `href` and sorted.
 
@@ -102,7 +102,7 @@ The code above logs `"http://cdndomain.com/bar"`.
 
 — see [normalizeImportMap source code](./src/normalizeImportMap/normalizeImportMap.js)
 
-## resolveImport
+### resolveImport
 
 > takes { `specifier`, `importer`, `importMap`, `defaultExtension` } and returns a url.
 
@@ -126,7 +126,7 @@ The code above logs `"http://domain.com/main.js"`.
 
 — see [resolveImport source code](./src/resolveImport/resolveImport.js)
 
-## resolveSpecifier
+### resolveSpecifier
 
 > takes (`specifier`, `importer`) and returns `specifier` resolved against `importer`.
 
@@ -144,7 +144,7 @@ The code above logs `"http://mydomain.com/file.js"`.
 
 — see [resolveSpecifier source code](./src/resolveSpecifier/resolveSpecifier.js)
 
-## wrapImportMap
+### wrapImportMap
 
 > takes (`importMap`, `folderRelativeName`) and returns an importMap wrapped inside `folderRelativeName`.
 
