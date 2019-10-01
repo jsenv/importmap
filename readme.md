@@ -1,29 +1,34 @@
 # jsenv-import-map
 
-> importMap programmatic implementation
-
 [![github package](https://img.shields.io/github/package-json/v/jsenv/jsenv-import-map.svg?label=package&logo=github)](https://github.com/jsenv/jsenv-import-map/packages)
 [![ci status](https://github.com/jsenv/jsenv-import-map/workflows/ci/badge.svg)](https://github.com/jsenv/jsenv-import-map/actions)
 [![codecov](https://codecov.io/gh/jsenv/jsenv-import-map/branch/master/graph/badge.svg)](https://codecov.io/gh/jsenv/jsenv-import-map)
 
 ## Introduction
 
-`jsenv-import-map` is a javasScript implementation of the importMap specification. It is written using es modules and is compatible with Node.js.<br />
+`@jsenv/import-map` can be used to implement the behaviour of importMap as described in the specification. It is written using es modules and is compatible with Node.js.<br />
 
 I made this project because jsenv uses importMap but they are not yet available in browsers.<br />
 
 — see [importMap spec](https://github.com/WICG/import-maps)
 
-`@jsenv/import-map` has the following exports:
+## Table of contents
 
-- [applyImportMap](#applyimportmap)
-- [composeTwoImportMaps](#composetwoimportmaps)
-- [normalizeImportMap](#normalizeimportmap)
-- [resolveImport](#resolveimport)
-- [resolveSpecifier](#resolvespecifier)
-- [wrapImportMap](#wrapimportmap)
+- [api](#api)
+  - [applyImportMap](#applyimportmap)
+  - [composeTwoImportMaps](#composetwoimportmaps)
+  - [normalizeImportMap](#normalizeimportmap)
+  - [resolveImport](#resolveimport)
+  - [resolveSpecifier](#resolvespecifier)
+  - [wrapImportMap](#wrapimportmap)
+- [Installation using npm](#installation-using-npm)
+- [Installation using yarn](#installation-using-yarn)
 
-## applyImportMap
+## api
+
+`@jsenv/import-map` exports are documented in this section.
+
+### applyImportMap
 
 > takes { `importMap`, `href`, `importerHref` } and returns either the `href` remapped by `importMap` or the original `href`.
 
@@ -164,7 +169,8 @@ This feature is not part of the spec but is usefull to redirect your imports ins
 
 ## Installation using npm
 
-To install `@jsenv/import-map` you need to configure npm to use github registry for this package.
+`@jsenv/node-module-import-map` is published on github package registry.<br />
+You need to configure npm to use github registry for this package.
 
 1. Configure npm authentification
 
@@ -187,15 +193,13 @@ npm config set @jsenv:registry https://npm.pkg.github.com
 3. Run install command
 
 ```console
-npm install @jsenv/import-map@5.8.0
+npm install @jsenv/import-map@5.8.1
 ```
 
 ### Installation using yarn
 
-Does not work until https://github.com/yarnpkg/yarn/issues/7552 is fixed.
-
 Same steps as [Installation using npm](#installation-using-npm) replacing step 3 by
 
 ```console
-yarn add @jsenv/import-map@5.8.0
+yarn add @jsenv/import-map@5.8.1
 ```

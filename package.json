@@ -1,6 +1,7 @@
 {
   "name": "@jsenv/import-map",
-  "version": "5.8.0",
+  "description": "helpers to implement importMap",
+  "version": "5.8.1",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -36,8 +37,8 @@
     "postpublish": "node ./script/transform-package/restore-postinstall.js"
   },
   "dependencies": {
-    "@jsenv/href": "1.0.0",
-    "@jsenv/operating-system-path": "2.5.0"
+    "@jsenv/href": "1.0.1",
+    "@jsenv/operating-system-path": "2.5.1"
   },
   "devDependencies": {
     "@dmail/assert": "3.14.0",
