@@ -1,7 +1,7 @@
 # jsenv-import-map
 
 [![github package](https://img.shields.io/github/package-json/v/jsenv/jsenv-import-map.svg?label=package&logo=github)](https://github.com/jsenv/jsenv-import-map/packages)
-[![ci status](https://github.com/jsenv/jsenv-import-map/workflows/ci/badge.svg)](https://github.com/jsenv/jsenv-import-map/actions)
+[![workflow status](https://github.com/jsenv/jsenv-node-module-import-map/workflows/continuous%20testing/badge.svg)](https://github.com/jsenv/jsenv-node-module-import-map/actions?workflow=continuous+testing)
 [![codecov](https://codecov.io/gh/jsenv/jsenv-import-map/branch/master/graph/badge.svg)](https://codecov.io/gh/jsenv/jsenv-import-map)
 
 ## Introduction
@@ -21,8 +21,7 @@ I made this project because jsenv uses importMap but they are not yet available 
   - [resolveImport](#resolveimport)
   - [resolveSpecifier](#resolvespecifier)
   - [wrapImportMap](#wrapimportmap)
-- [Installation using npm](#installation-using-npm)
-- [Installation using yarn](#installation-using-yarn)
+- [Installation](#installation)
 
 ## api
 
@@ -167,39 +166,16 @@ This feature is not part of the spec but is usefull to redirect your imports ins
 
 — see [wrapImportMap source code](./src/wrapImportMap/wrapImportMap.js)
 
-## Installation using npm
+## Installation
 
-`@jsenv/node-module-import-map` is published on github package registry.<br />
-You need to configure npm to use github registry for this package.
+If you never installed a jsenv package, read [Installing a jsenv package](https://github.com/jsenv/jsenv-core/blob/master/docs/installing-jsenv-package.md#installing-a-jsenv-package) before going further.
 
-1. Configure npm authentification
-
-— see [documentation about npm authentification on github registry](https://github.com/jsenv/jsenv-core/blob/master/docs/npm-auth-github-registry.md##npm-authentification-on-github-registry)
-
-2. Configure npm registry
-
-Add the following line to your `.npmrc`
-
-```
-@jsenv:registry=https://npm.pkg.github.com
-```
-
-Or run the following command
+This documentation is up-to-date with a specific version so prefer any of the following commands
 
 ```console
-npm config set @jsenv:registry https://npm.pkg.github.com
+npm install --save-dev @jsenv/import-map@5.8.2
 ```
 
-3. Run install command
-
 ```console
-npm install @jsenv/import-map@5.8.1
-```
-
-### Installation using yarn
-
-Same steps as [Installation using npm](#installation-using-npm) replacing step 3 by
-
-```console
-yarn add @jsenv/import-map@5.8.1
+yarn add --dev @jsenv/import-map@5.8.2
 ```

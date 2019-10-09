@@ -1,7 +1,7 @@
 {
   "name": "@jsenv/import-map",
   "description": "helpers to implement importMap",
-  "version": "5.8.1",
+  "version": "5.8.2",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -42,13 +42,14 @@
   },
   "devDependencies": {
     "@dmail/assert": "3.14.0",
-    "@jsenv/bundling": "6.3.0",
+    "@jsenv/bundling": "6.7.1",
     "@jsenv/codecov-upload": "2.0.0",
+    "@jsenv/continuous-size-reporting": "1.1.0",
     "@jsenv/eslint-config": "10.2.0",
     "@jsenv/execution": "6.2.0",
     "@jsenv/node-launcher": "4.21.0",
-    "@jsenv/node-module-import-map": "7.2.0",
-    "@jsenv/prettier-config": "1.0.0",
+    "@jsenv/node-module-import-map": "7.2.3",
+    "@jsenv/prettier-config": "1.0.1",
     "@jsenv/prettier-check-project": "3.5.0",
     "@jsenv/testing": "3.7.0",
     "babel-eslint": "11.0.0-beta.0",
