@@ -1,6 +1,6 @@
 {
   "name": "@jsenv/import-map",
-  "description": "helpers to implement importMap",
+  "description": "Helpers to implement importMap",
   "version": "5.8.2",
   "license": "MIT",
   "repository": {
