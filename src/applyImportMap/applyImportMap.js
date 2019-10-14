@@ -1,5 +1,6 @@
 import { assertImportMap } from "../assertImportMap.js"
 import { hasFetchScheme } from "../hasFetchScheme.js"
+import { tryUrlResolution } from "../tryUrlResolution.js"
 import { resolveSpecifier } from "../resolveSpecifier/resolveSpecifier.js"
 
 export const applyImportMap = ({ importMap, specifier, importer }) => {
@@ -63,7 +64,7 @@ const applyImports = (specifier, imports) => {
       const importValue = imports[importKey]
       const afterImportKey = specifier.slice(importKey.length)
 
-      return resolveSpecifier(afterImportKey, importValue)
+      return tryUrlResolution(afterImportKey, importValue)
     }
   }
 

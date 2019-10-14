@@ -1,8 +1,8 @@
 import { assertImportMap } from "../assertImportMap.js"
-import { hasScheme } from "../hasScheme.js"
+import { tryUrlResolution } from "../tryUrlResolution.js"
 import { hasFetchScheme } from "../hasFetchScheme.js"
 import { resolveSpecifier } from "../resolveSpecifier/resolveSpecifier.js"
-import { resolveUrl } from "../resolveUrl/resolveUrl.js"
+
 import { sortImports, sortScopes } from "../sortImportMap/sortImportMap.js"
 
 export const normalizeImportMap = (importMap, baseUrl) => {
@@ -100,11 +100,6 @@ const normalizeScopes = (scopes, baseUrl) => {
     scopesNormalized[scopeUrl] = scopeValueNormalized
   })
   return sortScopes(scopesNormalized)
-}
-
-const tryUrlResolution = (string, url) => {
-  const result = resolveUrl(string, url)
-  return hasScheme(result) ? result : null
 }
 
 const writeBaseUrlMustBeAString = ({ baseUrl }) => `baseUrl must be a string.
