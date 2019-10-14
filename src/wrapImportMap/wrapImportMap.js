@@ -15,9 +15,8 @@
  *
  */
 
-import { isOriginRelativeSpecifier } from "../resolveSpecifier/originRelativeSpecifier.js"
-import { isBareSpecifier } from "../resolveSpecifier/bareSpecifier.js"
 import { assertImportMap } from "../assertImportMap.js"
+import { hasFetchScheme } from "../hasFetchScheme.js"
 
 export const wrapImportMap = (importMap, folderRelativeName) => {
   assertImportMap(importMap)
@@ -153,11 +152,26 @@ const wrapTopLevelImports = (imports, into) => {
 }
 
 const wrapSpecifier = (specifier, into) => {
-  if (isOriginRelativeSpecifier(specifier)) {
+  if (specifier.startsWith("//")) {
+    return specifier
+  }
+
+  if (specifier[0] === "/") {
     return `${into}${specifier.slice(1)}`
   }
-  if (isBareSpecifier(specifier)) {
-    return `${into}${specifier}`
+
+  if (specifier.startsWith("./")) {
+    return `./${into}${specifier.slice(2)}`
   }
-  return specifier
+
+  if (specifier.startsWith("../")) {
+    return specifier
+  }
+
+  if (hasFetchScheme(specifier)) {
+    return specifier
+  }
+
+  // bare specifier
+  return `${into}${specifier}`
 }
