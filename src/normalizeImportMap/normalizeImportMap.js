@@ -5,21 +5,21 @@ import { resolveSpecifier } from "../resolveSpecifier/resolveSpecifier.js"
 import { resolveUrl } from "../resolveUrl/resolveUrl.js"
 import { sortImports, sortScopes } from "../sortImportMap/sortImportMap.js"
 
-export const normalizeImportMap = (importMap, href) => {
+export const normalizeImportMap = (importMap, baseUrl) => {
   assertImportMap(importMap)
-  if (typeof href !== "string") {
-    throw new TypeError(`href must be a string, got ${href}`)
+  if (typeof baseUrl !== "string") {
+    throw new TypeError(writeBaseUrlMustBeAString({ baseUrl }))
   }
 
   const { imports, scopes } = importMap
 
   return {
-    imports: imports ? normalizeImports(imports, href) : undefined,
-    scopes: scopes ? normalizeScopes(scopes, href) : undefined,
+    imports: imports ? normalizeImports(imports, baseUrl) : undefined,
+    scopes: scopes ? normalizeScopes(scopes, baseUrl) : undefined,
   }
 }
 
-const normalizeImports = (imports, url) => {
+const normalizeImports = (imports, baseUrl) => {
   const importsNormalized = {}
   Object.keys(imports).forEach((specifier) => {
     const address = imports[specifier]
@@ -34,23 +34,23 @@ const normalizeImports = (imports, url) => {
       return
     }
 
-    const specifierResolved = resolveSpecifier(specifier, url)
+    const specifierResolved = resolveSpecifier(specifier, baseUrl)
     if (specifierResolved === null) {
       console.warn(
         writeSpecifierResolutionFailed({
           specifier,
-          importer: url,
+          baseUrl,
         }),
       )
       return
     }
 
-    const addressUrl = tryUrlResolution(address, url)
+    const addressUrl = tryUrlResolution(address, baseUrl)
     if (addressUrl === null) {
       console.warn(
         writeAdressResolutionFailed({
           address,
-          url,
+          baseUrl,
           specifier,
         }),
       )
@@ -72,16 +72,16 @@ const normalizeImports = (imports, url) => {
   return sortImports(importsNormalized)
 }
 
-const normalizeScopes = (scopes, url) => {
+const normalizeScopes = (scopes, baseUrl) => {
   const scopesNormalized = {}
   Object.keys(scopes).forEach((scope) => {
     const scopeValue = scopes[scope]
-    const scopeUrl = tryUrlResolution(scope, url)
+    const scopeUrl = tryUrlResolution(scope, baseUrl)
     if (scopeUrl === null) {
       console.warn(
         writeScopeResolutionFailed({
           scope,
-          url,
+          baseUrl,
         }),
       )
       return
@@ -91,12 +91,12 @@ const normalizeScopes = (scopes, url) => {
         writeScopeUrlMustUseFetchScheme({
           scopeUrl,
           scope,
-          url,
+          baseUrl,
         }),
       )
       return
     }
-    const scopeValueNormalized = normalizeImports(scopeValue, url)
+    const scopeValueNormalized = normalizeImports(scopeValue, baseUrl)
     scopesNormalized[scopeUrl] = scopeValueNormalized
   })
   return sortScopes(scopesNormalized)
@@ -107,11 +107,15 @@ const tryUrlResolution = (string, url) => {
   return hasScheme(result) ? result : null
 }
 
-const writeSpecifierResolutionFailed = ({ specifier, importer }) => `Specifier resolution failed.
+const writeBaseUrlMustBeAString = ({ baseUrl }) => `baseUrl must be a string.
+--- base url ---
+${baseUrl}`
+
+const writeSpecifierResolutionFailed = ({ specifier, baseUrl }) => `Specifier resolution failed.
 --- specifier ---
 ${specifier}
---- importer ---
-${importer}`
+--- base url ---
+${baseUrl}`
 
 const writeAddressMustBeAString = ({ specifier, address }) => `Address must be a string.
 --- address ---
@@ -119,11 +123,15 @@ ${address}
 --- specifier ---
 ${specifier}`
 
-const writeAdressResolutionFailed = ({ address, url, specifier }) => `Address url resolution failed.
+const writeAdressResolutionFailed = ({
+  address,
+  baseUrl,
+  specifier,
+}) => `Address url resolution failed.
 --- address ---
 ${address}
---- url ---
-${url}
+--- base url ---
+${baseUrl}
 --- specifier ---
 ${specifier}`
 
@@ -139,20 +147,20 @@ ${address}
 --- specifier ---
 ${specifier}`
 
-const writeScopeResolutionFailed = ({ scope, url }) => `Scope url resolution failed.
+const writeScopeResolutionFailed = ({ scope, baseUrl }) => `Scope url resolution failed.
 --- scope ---
 ${scope}
---- url ---
-${url}`
+--- base url ---
+${baseUrl}`
 
 const writeScopeUrlMustUseFetchScheme = ({
   scopeUrl,
   scope,
-  url,
+  baseUrl,
 }) => `Scope url must use a fetch scheme.
 --- scope url ---
 ${scopeUrl}
 --- scope ---
 ${scope}
---- url ---
-${url}`
+--- baseUrl ---
+${baseUrl}`

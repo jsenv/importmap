@@ -12,12 +12,12 @@ export const resolveImport = ({ specifier, importer, importMap, defaultExtension
     url: importMap
       ? applyImportMap({ importMap, specifier, importer })
       : resolveUrl(specifier, importer),
-    importerUrl: importer,
+    importer,
     defaultExtension,
   })
 }
 
-const applyDefaultExtension = ({ url, importerUrl, extension }) => {
+const applyDefaultExtension = ({ url, importer, extension }) => {
   if (typeof extension === "string") {
     const extension = pathnameToExtension(url)
     if (extension === "") {
@@ -27,9 +27,9 @@ const applyDefaultExtension = ({ url, importerUrl, extension }) => {
   }
 
   if (extension === true) {
-    const extension = pathnameToExtension(importerUrl)
-    if (extension === "" && importerUrl) {
-      const importerPathname = hrefToPathname(importerUrl)
+    const extension = pathnameToExtension(importer)
+    if (extension === "" && importer) {
+      const importerPathname = hrefToPathname(importer)
       const importerExtension = pathnameToExtension(importerPathname)
       return `${url}${importerExtension}`
     }
