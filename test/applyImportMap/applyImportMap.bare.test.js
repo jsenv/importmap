@@ -9,8 +9,8 @@ const importMap = {
 }
 const actual = applyImportMap({
   importMap,
-  href: `${origin}/@babel/plugin-proposal-object-rest-spread`,
-  importerHref: `${origin}/file.js`,
+  specifier: `${origin}/@babel/plugin-proposal-object-rest-spread`,
+  importer: `${origin}/file.js`,
 })
 const expected = `${origin}/node_modules/@babel/plugin-proposal-object-rest-spread/lib/index.js`
 assert({ actual, expected })

@@ -64,24 +64,24 @@ const importMapNormalized = normalizeImportMap(importMap, "http://example.com")
   {
     const actual = applyImportMap({
       importMap: importMapNormalized,
-      href: hrefInside,
-      importerHref: noImporter,
+      specifier: hrefInside,
+      importer: noImporter,
     })
     assert({ actual, expected })
   }
   {
     const actual = applyImportMap({
       importMap: importMapNormalized,
-      href: hrefInside,
-      importerHref: importerRemapped,
+      specifier: hrefInside,
+      importer: importerRemapped,
     })
     assert({ actual, expected })
   }
   {
     const actual = applyImportMap({
       importMap: importMapNormalized,
-      href: hrefInside,
-      importerHref: importerWrapped,
+      specifier: hrefInside,
+      importer: importerWrapped,
     })
     assert({ actual, expected })
   }
@@ -94,24 +94,24 @@ const importMapNormalized = normalizeImportMap(importMap, "http://example.com")
   {
     const actual = applyImportMap({
       importMap: importMapNormalized,
-      href: hrefOutside,
-      importerHref: noImporter,
+      specifier: hrefOutside,
+      importer: noImporter,
     })
     assert({ actual, expected })
   }
   {
     const actual = applyImportMap({
       importMap: importMapNormalized,
-      href: hrefOutside,
-      importerHref: importerRemapped,
+      specifier: hrefOutside,
+      importer: importerRemapped,
     })
     assert({ actual, expected })
   }
   {
     const actual = applyImportMap({
       importMap: importMapNormalized,
-      href: hrefOutside,
-      importerHref: importerWrapped,
+      specifier: hrefOutside,
+      importer: importerWrapped,
     })
     assert({ actual, expected })
   }
@@ -123,8 +123,8 @@ const importMapNormalized = normalizeImportMap(importMap, "http://example.com")
   {
     const actual = applyImportMap({
       importMap: importMapNormalized,
-      href: hrefOutsideWithTopLevelRemapping,
-      importerHref: noImporter,
+      specifier: hrefOutsideWithTopLevelRemapping,
+      importer: noImporter,
     })
     const expected = `http://example.com/folder/b`
     assert({ actual, expected })
@@ -132,8 +132,8 @@ const importMapNormalized = normalizeImportMap(importMap, "http://example.com")
   {
     const actual = applyImportMap({
       importMap: importMapNormalized,
-      href: hrefOutsideWithTopLevelRemapping,
-      importerHref: importerRemapped,
+      specifier: hrefOutsideWithTopLevelRemapping,
+      importer: importerRemapped,
     })
     const expected = "http://example.com/folder/c"
     assert({ actual, expected })
@@ -141,8 +141,8 @@ const importMapNormalized = normalizeImportMap(importMap, "http://example.com")
   {
     const actual = applyImportMap({
       importMap: importMapNormalized,
-      href: hrefOutsideWithTopLevelRemapping,
-      importerHref: importerWrapped,
+      specifier: hrefOutsideWithTopLevelRemapping,
+      importer: importerWrapped,
     })
     const expected = `http://example.com/folder/b`
     assert({ actual, expected })
@@ -157,24 +157,24 @@ const importMapNormalized = normalizeImportMap(importMap, "http://example.com")
   {
     const actual = applyImportMap({
       importMap: importMapNormalized,
-      href: hrefInsideWithTopLevelRemapping,
-      importerHref: noImporter,
+      specifier: hrefInsideWithTopLevelRemapping,
+      importer: noImporter,
     })
     assert({ actual, expected })
   }
   {
     const actual = applyImportMap({
       importMap: importMapNormalized,
-      href: hrefInsideWithTopLevelRemapping,
-      importerHref: importerRemapped,
+      specifier: hrefInsideWithTopLevelRemapping,
+      importer: importerRemapped,
     })
     assert({ actual, expected })
   }
   {
     const actual = applyImportMap({
       importMap: importMapNormalized,
-      href: hrefInsideWithTopLevelRemapping,
-      importerHref: importerWrapped,
+      specifier: hrefInsideWithTopLevelRemapping,
+      importer: importerWrapped,
     })
     assert({ actual, expected })
   }
@@ -187,8 +187,8 @@ const importMapNormalized = normalizeImportMap(importMap, "http://example.com")
   {
     const actual = applyImportMap({
       importMap: importMapNormalized,
-      href: hrefOutsideWithScopedRemapping,
-      importerHref: noImporter,
+      specifier: hrefOutsideWithScopedRemapping,
+      importer: noImporter,
     })
     // no importer, so we expect to fallback to top level remapping
     const expected = "http://example.com/folder/b"
@@ -197,8 +197,8 @@ const importMapNormalized = normalizeImportMap(importMap, "http://example.com")
   {
     const actual = applyImportMap({
       importMap: importMapNormalized,
-      href: hrefOutsideWithScopedRemapping,
-      importerHref: importerRemapped,
+      specifier: hrefOutsideWithScopedRemapping,
+      importer: importerRemapped,
     })
     const expected = `http://example.com/folder/c`
     assert({ actual, expected })
@@ -206,8 +206,8 @@ const importMapNormalized = normalizeImportMap(importMap, "http://example.com")
   {
     const actual = applyImportMap({
       importMap: importMapNormalized,
-      href: hrefOutsideWithScopedRemapping,
-      importerHref: importerWrapped,
+      specifier: hrefOutsideWithScopedRemapping,
+      importer: importerWrapped,
     })
     const expected = `http://example.com/folder/b`
     assert({ actual, expected })
@@ -222,8 +222,8 @@ const importMapNormalized = normalizeImportMap(importMap, "http://example.com")
   {
     const actual = applyImportMap({
       importMap: importMapNormalized,
-      href: hrefInsideWithScopedRemapping,
-      importerHref: noImporter,
+      specifier: hrefInsideWithScopedRemapping,
+      importer: noImporter,
     })
     // no importer, so we expect to fallback to top level remapping
     const expected = "http://example.com/folder/b"
@@ -232,16 +232,16 @@ const importMapNormalized = normalizeImportMap(importMap, "http://example.com")
   {
     const actual = applyImportMap({
       importMap: importMapNormalized,
-      href: hrefInsideWithScopedRemapping,
-      importerHref: importerRemapped,
+      specifier: hrefInsideWithScopedRemapping,
+      importer: importerRemapped,
     })
     assert({ actual, expected })
   }
   {
     const actual = applyImportMap({
       importMap: importMapNormalized,
-      href: hrefInsideWithScopedRemapping,
-      importerHref: importerWrapped,
+      specifier: hrefInsideWithScopedRemapping,
+      importer: importerWrapped,
     })
     assert({ actual, expected })
   }
@@ -251,8 +251,8 @@ const importMapNormalized = normalizeImportMap(importMap, "http://example.com")
 {
   const actual = applyImportMap({
     importMap: importMapNormalized,
-    href: "http://example.com/ding",
-    importerHref: importerRemapped,
+    specifier: "http://example.com/ding",
+    importer: importerRemapped,
   })
   const expected = "http://example.com/folder/dong"
   assert({ actual, expected })
@@ -262,8 +262,8 @@ const importMapNormalized = normalizeImportMap(importMap, "http://example.com")
 {
   const actual = applyImportMap({
     importMap: importMapNormalized,
-    href: "http://example.com/folder/a",
-    importerHref: "http://example.com/special/folder/whatever.js",
+    specifier: "http://example.com/folder/a",
+    importer: "http://example.com/special/folder/whatever.js",
   })
   const expected = "http://example.com/folder/b"
   assert({ actual, expected })

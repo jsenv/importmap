@@ -4,6 +4,9 @@ import { resolveSpecifier } from "../resolveSpecifier/resolveSpecifier.js"
 
 export const applyImportMap = ({ importMap, specifier, importer }) => {
   assertImportMap(importMap)
+  if (typeof specifier !== "string") {
+    throw new TypeError(writeSpecifierMustBeAString({ specifier, importer }))
+  }
   if (importer) {
     if (typeof importer !== "string") {
       throw new TypeError(writeImporterMustBeAString({ importer, specifier }))
@@ -70,6 +73,12 @@ const applyImports = (specifier, imports) => {
 const specifierIsPrefixOf = (specifierHref, href) => {
   return specifierHref[specifierHref.length - 1] === "/" && href.startsWith(specifierHref)
 }
+
+const writeSpecifierMustBeAString = ({ specifier, importer }) => `specifier must be a string.
+--- specifier ---
+${specifier}
+--- importer ---
+${importer}`
 
 const writeImporterMustBeAString = ({ importer, specifier }) => `importer must be a string.
 --- importer ---

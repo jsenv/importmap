@@ -13,7 +13,7 @@ const internalOrigin = "http://internal.com"
   }
   const actual = applyImportMap({
     importMap,
-    href: `${internalOrigin}/foo.js`,
+    specifier: `${internalOrigin}/foo.js`,
   })
   const expected = `${externalOrigin}/bar.js`
   assert({ actual, expected })
@@ -28,7 +28,7 @@ const internalOrigin = "http://internal.com"
   }
   const actual = applyImportMap({
     importMap,
-    href: `${externalOrigin}/foo.js`,
+    specifier: `${externalOrigin}/foo.js`,
   })
   const expected = `${internalOrigin}/bar.js`
   assert({ actual, expected })
@@ -43,7 +43,7 @@ const internalOrigin = "http://internal.com"
   }
   const actual = applyImportMap({
     importMap,
-    href: `${externalOrigin}/foo.js`,
+    specifier: `${externalOrigin}/foo.js`,
   })
   const expected = `${externalOrigin}/bar.js`
   assert({ actual, expected })

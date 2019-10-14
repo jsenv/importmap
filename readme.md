@@ -34,14 +34,14 @@ I made this project because jsenv uses importMap but they are not yet available 
 ```js
 import { applyImportMap } from "@jsenv/import-map"
 
-const href = "http://domain.com/foo"
+const specifier = "http://domain.com/foo"
 const importMap = {
   imports: {
     "http://domain.com/foo": "http://domain.com/bar",
   },
 }
 const hrefRemapped = applyImportMap({
-  href,
+  specifier,
   importMap,
 })
 console.log(hrefRemapped)

@@ -61,8 +61,8 @@ const importMapNormalized = normalizeImportMap(importMap, origin)
   {
     const actual = applyImportMap({
       importMap: importMapNormalized,
-      href: hrefOutsideWithScopedRemapping,
-      importerHref: noImporter,
+      specifier: hrefOutsideWithScopedRemapping,
+      importer: noImporter,
     })
     // no importer, so we expect to fallback to top level remapping
     const expected = `${origin}/${into}/foo`
@@ -71,8 +71,8 @@ const importMapNormalized = normalizeImportMap(importMap, origin)
   {
     const actual = applyImportMap({
       importMap: importMapNormalized,
-      href: hrefOutsideWithScopedRemapping,
-      importerHref: importerRemapped,
+      specifier: hrefOutsideWithScopedRemapping,
+      importer: importerRemapped,
     })
     const expected = `${origin}/${into}/bar`
     assert({ actual, expected })
@@ -80,8 +80,8 @@ const importMapNormalized = normalizeImportMap(importMap, origin)
   {
     const actual = applyImportMap({
       importMap: importMapNormalized,
-      href: hrefOutsideWithScopedRemapping,
-      importerHref: importerWrapped,
+      specifier: hrefOutsideWithScopedRemapping,
+      importer: importerWrapped,
     })
     const expected = `${origin}/${into}/foo`
     assert({ actual, expected })
@@ -94,8 +94,8 @@ const importMapNormalized = normalizeImportMap(importMap, origin)
   {
     const actual = applyImportMap({
       importMap: importMapNormalized,
-      href: hrefInsideWithScopedRemapping,
-      importerHref: noImporter,
+      specifier: hrefInsideWithScopedRemapping,
+      importer: noImporter,
     })
     // no importer, so we expect to fallback to top level remapping
     const expected = `${origin}/${into}/foo`
@@ -104,8 +104,8 @@ const importMapNormalized = normalizeImportMap(importMap, origin)
   {
     const actual = applyImportMap({
       importMap: importMapNormalized,
-      href: hrefInsideWithScopedRemapping,
-      importerHref: importerRemapped,
+      specifier: hrefInsideWithScopedRemapping,
+      importer: importerRemapped,
     })
     const expected = `${origin}/${into}/${scopePath}/${into}/foo`
     assert({ actual, expected })
@@ -113,8 +113,8 @@ const importMapNormalized = normalizeImportMap(importMap, origin)
   {
     const actual = applyImportMap({
       importMap: importMapNormalized,
-      href: hrefInsideWithScopedRemapping,
-      importerHref: importerWrapped,
+      specifier: hrefInsideWithScopedRemapping,
+      importer: importerWrapped,
     })
     const expected = `${origin}/${into}/foo`
     assert({ actual, expected })

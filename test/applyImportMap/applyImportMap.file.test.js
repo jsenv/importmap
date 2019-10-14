@@ -9,7 +9,7 @@ const importMap = {
 }
 const actual = applyImportMap({
   importMap,
-  href: `${origin}/foo.js`,
+  specifier: `${origin}/foo.js`,
 })
 const expected = `${origin}/User/me/folder/foo.js`
 assert({ actual, expected })
