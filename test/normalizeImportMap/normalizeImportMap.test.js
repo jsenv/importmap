@@ -10,10 +10,10 @@ const actual = normalizeImportMap(
     },
     scopes: {
       "foo/": {
-        a: "a",
+        a: "./a",
       },
       "bar/": {
-        a: "a",
+        a: "./a",
       },
     },
   },

@@ -34,16 +34,7 @@ const normalizeImports = (imports, baseUrl) => {
       return
     }
 
-    const specifierResolved = resolveSpecifier(specifier, baseUrl)
-    if (specifierResolved === null) {
-      console.warn(
-        writeSpecifierResolutionFailed({
-          specifier,
-          baseUrl,
-        }),
-      )
-      return
-    }
+    const specifierResolved = resolveSpecifier(specifier, baseUrl) || specifier
 
     const addressUrl = tryUrlResolution(address, baseUrl)
     if (addressUrl === null) {
@@ -103,12 +94,6 @@ const normalizeScopes = (scopes, baseUrl) => {
 }
 
 const writeBaseUrlMustBeAString = ({ baseUrl }) => `baseUrl must be a string.
---- base url ---
-${baseUrl}`
-
-const writeSpecifierResolutionFailed = ({ specifier, baseUrl }) => `Specifier resolution failed.
---- specifier ---
-${specifier}
 --- base url ---
 ${baseUrl}`
 
