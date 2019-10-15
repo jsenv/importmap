@@ -21,7 +21,7 @@ import { hasScheme } from "../hasScheme.js"
 export const wrapImportMap = (importMap, folderRelativeName) => {
   assertImportMap(importMap)
   if (typeof folderRelativeName !== "string") {
-    throw new TypeError(`folderRelativeName must be a string, got ${folderRelativeName}`)
+    throw new TypeError(formulateFolderRelativeNameMustBeAString({ folderRelativeName }))
   }
 
   const into = `/${folderRelativeName}/`
@@ -63,7 +63,7 @@ const wrapScopes = (scopes, into) => {
 
   Object.keys(scopes).forEach((scopeKey) => {
     const scopeValue = scopes[scopeKey]
-    const scopeKeyWrapped = wrapSpecifier(scopeKey, into)
+    const scopeKeyWrapped = wrapAddress(scopeKey, into)
 
     if (scopeKeyWrapped === scopeKey) {
       scopesRemaining[scopeKey] = scopeValue
@@ -125,7 +125,7 @@ const wrapImports = (imports, into) => {
   Object.keys(imports).forEach((importKey) => {
     const importValue = imports[importKey]
     const importKeyWrapped = wrapSpecifier(importKey, into)
-    const importValueWrapped = wrapSpecifier(importValue, into)
+    const importValueWrapped = wrapAddress(importValue, into)
 
     if (importKeyWrapped === importKey) {
       importsRemaining[importKey] = importValue
@@ -164,14 +164,36 @@ const wrapSpecifier = (specifier, into) => {
     return `./${into}${specifier.slice(2)}`
   }
 
-  if (specifier.startsWith("../")) {
-    return specifier
-  }
-
-  if (hasScheme(specifier)) {
-    return specifier
-  }
-
-  // bare specifier
-  return `${into}${specifier}`
+  return specifier
 }
+
+const wrapAddress = (string, into) => {
+  if (string.startsWith("//")) {
+    return string
+  }
+
+  if (string[0] === "/") {
+    return `${into}${string.slice(1)}`
+  }
+
+  if (string.startsWith("./")) {
+    return `./${into}${string.slice(2)}`
+  }
+
+  if (string.startsWith("../")) {
+    return string
+  }
+
+  if (hasScheme(string)) {
+    return string
+  }
+
+  // bare
+  return `${into}/${string}`
+}
+
+const formulateFolderRelativeNameMustBeAString = ({
+  folderRelativeName,
+}) => `folderRelativeName must be a string.
+--- folder relative name ---
+${folderRelativeName}`
