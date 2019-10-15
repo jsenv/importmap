@@ -47,9 +47,7 @@ export const resolveUrl = (specifier, baseUrl) => {
   if (specifier.slice(0, 3) === "../") {
     let unresolvedPathname = specifier
     const importerFolders = basePathname.split("/")
-    if (basePathname.endsWith("/")) {
-      importerFolders.pop()
-    }
+    importerFolders.pop()
 
     while (unresolvedPathname.slice(0, 3) === "../") {
       // when there is no folder left to resolved

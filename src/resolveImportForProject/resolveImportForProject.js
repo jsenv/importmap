@@ -26,7 +26,7 @@ export const resolveImportForProject = ({
     !importerHref.startsWith(`${projectHref}/`)
   ) {
     throw new Error(
-      createImporterMustBeInsideProjectMessage({
+      formulateImporterMustBeInsideProject({
         projectPathname,
         importer,
       }),
@@ -69,7 +69,7 @@ export const resolveImportForProject = ({
     !importResolved.startsWith(`${projectHref}/`)
   ) {
     throw new Error(
-      createImportMustBeInsideProjectMessage({
+      formulateImportMustBeInsideProject({
         projectPathname,
         specifier,
         importer,
@@ -88,16 +88,16 @@ export const resolveImportForProject = ({
 
 const hrefUseFileProtocol = (specifier) => specifier.startsWith("file://")
 
-const createImporterMustBeInsideProjectMessage = ({
+const formulateImporterMustBeInsideProject = ({
   projectPathname,
   importer,
 }) => `importer must be inside project.
-  --- importer ---
-  ${importer}
-  --- project ---
-  ${pathnameToOperatingSystemPath(projectPathname)}`
+--- importer ---
+${importer}
+--- project ---
+${pathnameToOperatingSystemPath(projectPathname)}`
 
-const createImportMustBeInsideProjectMessage = ({
+const formulateImportMustBeInsideProject = ({
   projectPathname,
   specifier,
   importer,
