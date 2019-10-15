@@ -7,7 +7,7 @@ import { sortImports, sortScopes } from "../sortImportMap/sortImportMap.js"
 export const normalizeImportMap = (importMap, baseUrl) => {
   assertImportMap(importMap)
   if (typeof baseUrl !== "string") {
-    throw new TypeError(writeBaseUrlMustBeAString({ baseUrl }))
+    throw new TypeError(formulateBaseUrlMustBeAString({ baseUrl }))
   }
 
   const { imports, scopes } = importMap
@@ -25,7 +25,7 @@ const normalizeImports = (imports, baseUrl) => {
 
     if (typeof address !== "string") {
       console.warn(
-        writeAddressMustBeAString({
+        formulateAddressMustBeAString({
           address,
           specifier,
         }),
@@ -38,7 +38,7 @@ const normalizeImports = (imports, baseUrl) => {
     const addressUrl = tryUrlResolution(address, baseUrl)
     if (addressUrl === null) {
       console.warn(
-        writeAdressResolutionFailed({
+        formulateAdressResolutionFailed({
           address,
           baseUrl,
           specifier,
@@ -49,7 +49,7 @@ const normalizeImports = (imports, baseUrl) => {
 
     if (specifier.endsWith("/") && !addressUrl.endsWith("/")) {
       console.warn(
-        writeAddressUrlRequiresTrailingSlash({
+        formulateAddressUrlRequiresTrailingSlash({
           addressUrl,
           address,
           specifier,
@@ -69,7 +69,7 @@ const normalizeScopes = (scopes, baseUrl) => {
     const scopeUrl = tryUrlResolution(scope, baseUrl)
     if (scopeUrl === null) {
       console.warn(
-        writeScopeResolutionFailed({
+        formulateScopeResolutionFailed({
           scope,
           baseUrl,
         }),
@@ -82,17 +82,17 @@ const normalizeScopes = (scopes, baseUrl) => {
   return sortScopes(scopesNormalized)
 }
 
-const writeBaseUrlMustBeAString = ({ baseUrl }) => `baseUrl must be a string.
+const formulateBaseUrlMustBeAString = ({ baseUrl }) => `baseUrl must be a string.
 --- base url ---
 ${baseUrl}`
 
-const writeAddressMustBeAString = ({ specifier, address }) => `Address must be a string.
+const formulateAddressMustBeAString = ({ specifier, address }) => `Address must be a string.
 --- address ---
 ${address}
 --- specifier ---
 ${specifier}`
 
-const writeAdressResolutionFailed = ({
+const formulateAdressResolutionFailed = ({
   address,
   baseUrl,
   specifier,
@@ -104,7 +104,7 @@ ${baseUrl}
 --- specifier ---
 ${specifier}`
 
-const writeAddressUrlRequiresTrailingSlash = ({
+const formulateAddressUrlRequiresTrailingSlash = ({
   addressURL,
   address,
   specifier,
@@ -116,7 +116,7 @@ ${address}
 --- specifier ---
 ${specifier}`
 
-const writeScopeResolutionFailed = ({ scope, baseUrl }) => `Scope url resolution failed.
+const formulateScopeResolutionFailed = ({ scope, baseUrl }) => `Scope url resolution failed.
 --- scope ---
 ${scope}
 --- base url ---
