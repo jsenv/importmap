@@ -16,7 +16,7 @@
  */
 
 import { assertImportMap } from "../assertImportMap.js"
-import { hasFetchScheme } from "../hasFetchScheme.js"
+import { hasScheme } from "../hasScheme.js"
 
 export const wrapImportMap = (importMap, folderRelativeName) => {
   assertImportMap(importMap)
@@ -168,7 +168,7 @@ const wrapSpecifier = (specifier, into) => {
     return specifier
   }
 
-  if (hasFetchScheme(specifier)) {
+  if (hasScheme(specifier)) {
     return specifier
   }
 

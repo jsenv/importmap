@@ -1,5 +1,5 @@
 import { assertImportMap } from "../assertImportMap.js"
-import { hasFetchScheme } from "../hasFetchScheme.js"
+import { hasScheme } from "../hasScheme.js"
 import { tryUrlResolution } from "../tryUrlResolution.js"
 import { resolveSpecifier } from "../resolveSpecifier/resolveSpecifier.js"
 
@@ -12,8 +12,8 @@ export const applyImportMap = ({ importMap, specifier, importer }) => {
     if (typeof importer !== "string") {
       throw new TypeError(writeImporterMustBeAString({ importer, specifier }))
     }
-    if (!hasFetchScheme(importer)) {
-      throw new Error(writeImporterMustUseFetchScheme({ importer, specifier }))
+    if (!hasScheme(importer)) {
+      throw new Error(writeImporterMustBeAbsolute({ importer, specifier }))
     }
   }
 
@@ -87,10 +87,7 @@ ${importer}
 --- specifier ---
 ${specifier}`
 
-const writeImporterMustUseFetchScheme = ({
-  importer,
-  specifier,
-}) => `importer must use a fecth scheme.
+const writeImporterMustBeAbsolute = ({ importer, specifier }) => `importer must be an absolute url.
 --- importer ---
 ${importer}
 --- specifier ---

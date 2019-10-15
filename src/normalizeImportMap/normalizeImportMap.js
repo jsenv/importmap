@@ -1,6 +1,5 @@
 import { assertImportMap } from "../assertImportMap.js"
 import { tryUrlResolution } from "../tryUrlResolution.js"
-import { hasFetchScheme } from "../hasFetchScheme.js"
 import { resolveSpecifier } from "../resolveSpecifier/resolveSpecifier.js"
 
 import { sortImports, sortScopes } from "../sortImportMap/sortImportMap.js"
@@ -77,16 +76,6 @@ const normalizeScopes = (scopes, baseUrl) => {
       )
       return
     }
-    if (!hasFetchScheme(scopeUrl)) {
-      console.warn(
-        writeScopeUrlMustUseFetchScheme({
-          scopeUrl,
-          scope,
-          baseUrl,
-        }),
-      )
-      return
-    }
     const scopeValueNormalized = normalizeImports(scopeValue, baseUrl)
     scopesNormalized[scopeUrl] = scopeValueNormalized
   })
@@ -131,16 +120,4 @@ const writeScopeResolutionFailed = ({ scope, baseUrl }) => `Scope url resolution
 --- scope ---
 ${scope}
 --- base url ---
-${baseUrl}`
-
-const writeScopeUrlMustUseFetchScheme = ({
-  scopeUrl,
-  scope,
-  baseUrl,
-}) => `Scope url must use a fetch scheme.
---- scope url ---
-${scopeUrl}
---- scope ---
-${scope}
---- baseUrl ---
 ${baseUrl}`

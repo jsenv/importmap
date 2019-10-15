@@ -1,4 +1,4 @@
-import { hasFetchScheme } from "../hasFetchScheme.js"
+import { hasScheme } from "../hasScheme.js"
 import { resolveUrl } from "../resolveUrl/resolveUrl.js"
 
 export const resolveSpecifier = (specifier, importer) => {
@@ -6,7 +6,7 @@ export const resolveSpecifier = (specifier, importer) => {
     return resolveUrl(specifier, importer)
   }
 
-  if (hasFetchScheme(specifier)) {
+  if (hasScheme(specifier)) {
     return specifier
   }
 
