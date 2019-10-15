@@ -1,122 +1,146 @@
 import { assert } from "@dmail/assert"
 import { wrapImportMap, normalizeImportMap, applyImportMap } from "../../index.js"
 
-const into = "folder"
-const scopePath = "special"
 const importMap = wrapImportMap(
   {
     imports: {
       "/": "/",
+      ding: "/dong",
     },
     scopes: {
-      [`/${scopePath}/`]: {
-        foo: "bar",
-        [`/${scopePath}/`]: `/${scopePath}/`,
-        "/": `/${scopePath}/`,
+      "/scope/": {
+        ding: "/dong-dong",
+        "/scope/": `/scope/`,
+        "/": `/scope/`,
       },
     },
   },
-  into,
+  "into",
 )
 
 {
   const actual = importMap
   const expected = {
     imports: {
-      [`/${into}/`]: `/${into}/`,
-      "/": `/${into}/`,
+      "/into/": "/into/",
+      ding: "/into/dong",
+      "/": `/into/`,
     },
     scopes: {
-      [`/${into}/${scopePath}/`]: {
-        [`/${into}/foo`]: `/${into}/bar`,
-        foo: `/${into}/bar`,
-        [`/${into}/${scopePath}/`]: `/${into}/${scopePath}/`,
-        [`/${scopePath}/`]: `/${into}/${scopePath}/`,
-        [`/${into}/`]: `/${into}/${scopePath}/`,
-        "/": `/${into}/${scopePath}/`,
+      "/into/scope/": {
+        ding: `/into/dong-dong`,
+        "/into/scope/": `/into/scope/`,
+        "/scope/": `/into/scope/`,
+        "/into/": `/into/scope/`,
+        "/": `/into/scope/`,
       },
-      [`/${scopePath}/`]: {
-        foo: `/${into}/bar`,
-        [`/${scopePath}/`]: `/${into}/${scopePath}/`,
-        "/": `/${into}/${scopePath}/`,
+      "/scope/": {
+        ding: `/into/dong-dong`,
+        "/into/scope/": `/into/scope/`,
+        "/scope/": `/into/scope/`,
+        "/into/": `/into/scope/`,
+        "/": `/into/scope/`,
       },
-      [`/${into}/`]: {
-        [`/${into}/`]: `/${into}/`,
-        "/": `/${into}/`,
+      "/into/": {
+        "/into/": `/into/`,
       },
     },
   }
   assert({ actual, expected })
 }
 
-const noImporter = undefined
-const origin = "http://example.com"
-const importerRemapped = `${origin}/${scopePath}/whatever.js`
-const importerWrapped = `${origin}/${into}/whatever.js`
-const importMapNormalized = normalizeImportMap(importMap, origin)
+const importMapNormalized = normalizeImportMap(importMap, "http://example.com")
 
-// scoped remapping outside
+// file remapping
 {
-  const hrefOutsideWithScopedRemapping = `${origin}/foo`
-  {
-    const actual = applyImportMap({
-      importMap: importMapNormalized,
-      specifier: hrefOutsideWithScopedRemapping,
-      importer: noImporter,
-    })
-    // no importer, so we expect to fallback to top level remapping
-    const expected = `${origin}/${into}/foo`
-    assert({ actual, expected })
-  }
-  {
-    const actual = applyImportMap({
-      importMap: importMapNormalized,
-      specifier: hrefOutsideWithScopedRemapping,
-      importer: importerRemapped,
-    })
-    const expected = `${origin}/${into}/bar`
-    assert({ actual, expected })
-  }
-  {
-    const actual = applyImportMap({
-      importMap: importMapNormalized,
-      specifier: hrefOutsideWithScopedRemapping,
-      importer: importerWrapped,
-    })
-    const expected = `${origin}/${into}/foo`
-    assert({ actual, expected })
-  }
+  const actual = applyImportMap({
+    importMap: importMapNormalized,
+    specifier: "http://example.com/file.js",
+    importer: undefined,
+  })
+  const expected = "http://example.com/into/file.js"
+  assert({ actual, expected })
+}
+{
+  const actual = applyImportMap({
+    importMap: importMapNormalized,
+    specifier: "./file.js",
+    importer: "http://example.com/into/importer.js",
+  })
+  const expected = "http://example.com/into/file.js"
+  assert({ actual, expected })
+}
+{
+  const actual = applyImportMap({
+    importMap: importMapNormalized,
+    specifier: "./file.js",
+    importer: "http://example.com/scope/importer.js",
+  })
+  const expected = "http://example.com/into/scope/file.js"
+  assert({ actual, expected })
+}
+{
+  const actual = applyImportMap({
+    importMap: importMapNormalized,
+    specifier: "./file.js",
+    importer: "http://example.com/into/scope/importer.js",
+  })
+  const expected = "http://example.com/into/scope/file.js"
+  assert({ actual, expected })
+}
+{
+  const actual = applyImportMap({
+    importMap: importMapNormalized,
+    specifier: "./file.js",
+    importer: "http://example.com/scope/into/importer.js",
+  })
+  const expected = "http://example.com/into/scope/into/file.js"
+  assert({ actual, expected })
 }
 
-// scoped remapping inside
+// bare specifier remapping
 {
-  const hrefInsideWithScopedRemapping = "http://example.com/folder/foo"
-  {
-    const actual = applyImportMap({
-      importMap: importMapNormalized,
-      specifier: hrefInsideWithScopedRemapping,
-      importer: noImporter,
-    })
-    // no importer, so we expect to fallback to top level remapping
-    const expected = `${origin}/${into}/foo`
-    assert({ actual, expected })
-  }
-  {
-    const actual = applyImportMap({
-      importMap: importMapNormalized,
-      specifier: hrefInsideWithScopedRemapping,
-      importer: importerRemapped,
-    })
-    const expected = `${origin}/${into}/${scopePath}/${into}/foo`
-    assert({ actual, expected })
-  }
-  {
-    const actual = applyImportMap({
-      importMap: importMapNormalized,
-      specifier: hrefInsideWithScopedRemapping,
-      importer: importerWrapped,
-    })
-    const expected = `${origin}/${into}/foo`
-    assert({ actual, expected })
-  }
+  const actual = applyImportMap({
+    importMap: importMapNormalized,
+    specifier: "ding",
+    importer: undefined,
+  })
+  const expected = "http://example.com/into/dong"
+  assert({ actual, expected })
+}
+{
+  const actual = applyImportMap({
+    importMap: importMapNormalized,
+    specifier: "ding",
+    importer: "http://example.com/into/importer.js",
+  })
+  const expected = "http://example.com/into/dong"
+  assert({ actual, expected })
+}
+{
+  const actual = applyImportMap({
+    importMap: importMapNormalized,
+    specifier: "ding",
+    importer: "http://example.com/scope/importer.js",
+  })
+  const expected = "http://example.com/into/dong-dong"
+  assert({ actual, expected })
+}
+{
+  const actual = applyImportMap({
+    importMap: importMapNormalized,
+    specifier: "ding",
+    importer: "http://example.com/into/scope/importer.js",
+  })
+  const expected = "http://example.com/into/dong-dong"
+  assert({ actual, expected })
+}
+{
+  const actual = applyImportMap({
+    importMap: importMapNormalized,
+    specifier: "ding",
+    importer: "http://example.com/scope/into/importer.js",
+  })
+  const expected = "http://example.com/into/dong-dong"
+  assert({ actual, expected })
 }

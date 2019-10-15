@@ -17,17 +17,17 @@ export const resolveImport = ({ specifier, importer, importMap, defaultExtension
   })
 }
 
-const applyDefaultExtension = ({ url, importer, extension }) => {
-  if (typeof extension === "string") {
+const applyDefaultExtension = ({ url, importer, defaultExtension }) => {
+  if (typeof defaultExtension === "string") {
     const extension = pathnameToExtension(url)
     if (extension === "") {
-      return `${url}${extension}`
+      return `${url}${defaultExtension}`
     }
     return url
   }
 
-  if (extension === true) {
-    const extension = pathnameToExtension(importer)
+  if (defaultExtension === true) {
+    const extension = pathnameToExtension(url)
     if (extension === "" && importer) {
       const importerPathname = hrefToPathname(importer)
       const importerExtension = pathnameToExtension(importerPathname)

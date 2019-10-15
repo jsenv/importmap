@@ -7,11 +7,7 @@ import { resolveImport } from "../../index.js"
     importer: `file:///C:/folder/file.js`,
     defaultExtension: false,
   })
-  // import 'foo' from 'file:///C:/folder/file.js'
-  // must resolve to 'file:///foo' to be spec compliant
-  // it won't resolve to 'file:///C:/foo'
-  // it's not a big deal there is zero real world scenario for this
-  const expected = `file:///foo`
+  const expected = `file:///C:/folder/foo`
   assert({ actual, expected })
 }
 
@@ -22,7 +18,7 @@ import { resolveImport } from "../../index.js"
     importer: origin,
     importMap: {
       imports: {
-        [`${origin}/foo`]: `${origin}/node_modules/foo/src/foo.js`,
+        foo: `${origin}/node_modules/foo/src/foo.js`,
       },
     },
   })
@@ -37,7 +33,7 @@ import { resolveImport } from "../../index.js"
     importer: origin,
     importMap: {
       imports: {
-        [`${origin}/foo/`]: `${origin}/node_modules/foo/`,
+        "foo/": `${origin}/node_modules/foo/`,
       },
     },
   })
