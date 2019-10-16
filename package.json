@@ -1,7 +1,7 @@
 {
   "name": "@jsenv/import-map",
   "description": "Helpers to implement importMap",
-  "version": "6.0.0",
+  "version": "6.0.1",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -19,7 +19,7 @@
     "/index.js"
   ],
   "exports": {
-    "/": "/"
+    "./": "./"
   },
   "scripts": {
     "test": "node ./script/test/test.js",
