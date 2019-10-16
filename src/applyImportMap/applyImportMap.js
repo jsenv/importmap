@@ -46,7 +46,7 @@ export const applyImportMap = ({ importMap, specifier, importer }) => {
     return specifierUrl
   }
 
-  throw new Error(writeBareSpecifierMustBeRemapped({ specifier }))
+  throw new Error(writeBareSpecifierMustBeRemapped({ specifier, importer }))
 }
 
 const applyImports = (specifier, imports) => {
