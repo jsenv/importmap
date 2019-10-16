@@ -1,21 +1,33 @@
 import { assertImportMap } from "../assertImportMap.js"
-import { assertUrlLike } from "../assertUrlLike.js"
+import { hasScheme } from "../hasScheme.js"
+import { tryUrlResolution } from "../tryUrlResolution.js"
+import { resolveSpecifier } from "../resolveSpecifier/resolveSpecifier.js"
 
-export const applyImportMap = ({ importMap, href, importerHref }) => {
+export const applyImportMap = ({ importMap, specifier, importer }) => {
   assertImportMap(importMap)
-  assertUrlLike(href, "href")
-  if (importerHref) {
-    assertUrlLike(importerHref, "importerHref")
+  if (typeof specifier !== "string") {
+    throw new TypeError(writeSpecifierMustBeAString({ specifier, importer }))
+  }
+  if (importer) {
+    if (typeof importer !== "string") {
+      throw new TypeError(writeImporterMustBeAString({ importer, specifier }))
+    }
+    if (!hasScheme(importer)) {
+      throw new Error(writeImporterMustBeAbsolute({ importer, specifier }))
+    }
   }
 
+  const specifierUrl = resolveSpecifier(specifier, importer)
+  const specifierNormalized = specifierUrl || specifier
+
   const { scopes } = importMap
-  if (scopes && importerHref) {
+  if (scopes && importer) {
     const scopeKeyMatching = Object.keys(scopes).find((scopeKey) => {
-      return scopeKey === importerHref || specifierIsPrefixOf(scopeKey, importerHref)
+      return scopeKey === importer || specifierIsPrefixOf(scopeKey, importer)
     })
     if (scopeKeyMatching) {
       const scopeValue = scopes[scopeKeyMatching]
-      const remappingFromScopeImports = applyImports(href, scopeValue)
+      const remappingFromScopeImports = applyImports(specifierNormalized, scopeValue)
       if (remappingFromScopeImports !== null) {
         return remappingFromScopeImports
       }
@@ -24,30 +36,35 @@ export const applyImportMap = ({ importMap, href, importerHref }) => {
 
   const { imports } = importMap
   if (imports) {
-    const remappingFromImports = applyImports(href, imports)
+    const remappingFromImports = applyImports(specifierNormalized, imports)
     if (remappingFromImports !== null) {
       return remappingFromImports
     }
   }
 
-  return href
+  if (specifierUrl) {
+    return specifierUrl
+  }
+
+  throw new Error(writeBareSpecifierMustBeRemapped({ specifier }))
 }
 
-const applyImports = (href, imports) => {
+const applyImports = (specifier, imports) => {
   const importKeyArray = Object.keys(imports)
 
   let i = 0
   while (i < importKeyArray.length) {
     const importKey = importKeyArray[i]
     i++
-    if (importKey === href) {
+    if (importKey === specifier) {
       const importValue = imports[importKey]
       return importValue
     }
-    if (specifierIsPrefixOf(importKey, href)) {
+    if (specifierIsPrefixOf(importKey, specifier)) {
       const importValue = imports[importKey]
-      const afterImportKey = href.slice(importKey.length)
-      return importValue + afterImportKey
+      const afterImportKey = specifier.slice(importKey.length)
+
+      return tryUrlResolution(afterImportKey, importValue)
     }
   }
 
@@ -57,3 +74,27 @@ const applyImports = (href, imports) => {
 const specifierIsPrefixOf = (specifierHref, href) => {
   return specifierHref[specifierHref.length - 1] === "/" && href.startsWith(specifierHref)
 }
+
+const writeSpecifierMustBeAString = ({ specifier, importer }) => `specifier must be a string.
+--- specifier ---
+${specifier}
+--- importer ---
+${importer}`
+
+const writeImporterMustBeAString = ({ importer, specifier }) => `importer must be a string.
+--- importer ---
+${importer}
+--- specifier ---
+${specifier}`
+
+const writeImporterMustBeAbsolute = ({ importer, specifier }) => `importer must be an absolute url.
+--- importer ---
+${importer}
+--- specifier ---
+${specifier}`
+
+const writeBareSpecifierMustBeRemapped = ({ specifier, importer }) => `Unmapped bare specifier.
+--- specifier ---
+${specifier}
+--- importer ---
+${importer}`

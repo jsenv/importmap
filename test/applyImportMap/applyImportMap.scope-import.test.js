@@ -16,8 +16,8 @@ const importMap = {
 {
   const actual = applyImportMap({
     importMap,
-    href: `${origin}/foo.js`,
-    importerHref: `${origin}/file.js`,
+    specifier: `${origin}/foo.js`,
+    importer: `${origin}/file.js`,
   })
   const expected = `${origin}/bar.js`
   assert({ actual, expected })
@@ -25,8 +25,8 @@ const importMap = {
 {
   const actual = applyImportMap({
     importMap,
-    href: `${origin}/foo.js`,
-    importerHref: `${origin}/folder/file.js`,
+    specifier: `${origin}/foo.js`,
+    importer: `${origin}/folder/file.js`,
   })
   const expected = `${origin}/whatever.js`
   assert({ actual, expected })

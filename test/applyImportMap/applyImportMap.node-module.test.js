@@ -10,8 +10,8 @@ const actual = applyImportMap({
       },
     },
   },
-  href: `${origin}/node_modules/bar/src/bar.js`,
-  importerHref: `${origin}/node_modules/foo/src/foo.js`,
+  specifier: `${origin}/node_modules/bar/src/bar.js`,
+  importer: `${origin}/node_modules/foo/src/foo.js`,
 })
 const expected = `${origin}/node_modules/foo/node_modules/bar/src/bar.js`
 assert({ actual, expected })

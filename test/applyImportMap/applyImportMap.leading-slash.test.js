@@ -13,8 +13,8 @@ const origin = "http://example.com"
         },
       },
     },
-    href: `${origin}/.dist/best/bar.js`,
-    importerHref: `${origin}/.dist/best/foo.js`,
+    specifier: `${origin}/.dist/best/bar.js`,
+    importer: `${origin}/.dist/best/foo.js`,
   })
   // order is important: here .dist/best is appended twice
   const expected = `${origin}/.dist/best/.dist/best/bar.js`
@@ -31,8 +31,8 @@ const origin = "http://example.com"
         },
       },
     },
-    href: `${origin}/.dist/best/bar.js`,
-    importerHref: `${origin}/.dist/best/foo.js`,
+    specifier: `${origin}/.dist/best/bar.js`,
+    importer: `${origin}/.dist/best/foo.js`,
   })
   const expected = `${origin}/.dist/best/bar.js`
   assert({ actual, expected })

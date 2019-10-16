@@ -15,42 +15,39 @@
  *
  */
 
-import { isOriginRelativeSpecifier } from "../resolveSpecifier/originRelativeSpecifier.js"
-import { isBareSpecifier } from "../resolveSpecifier/bareSpecifier.js"
 import { assertImportMap } from "../assertImportMap.js"
+import { hasScheme } from "../hasScheme.js"
 
-export const wrapImportMap = (importMap, folderRelativeName) => {
+export const wrapImportMap = (importMap, folderRelativeName, ensureInto = true) => {
   assertImportMap(importMap)
   if (typeof folderRelativeName !== "string") {
-    throw new TypeError(`folderRelativeName must be a string, got ${folderRelativeName}`)
+    throw new TypeError(formulateFolderRelativeNameMustBeAString({ folderRelativeName }))
   }
 
   const into = `/${folderRelativeName}/`
   const { imports, scopes } = importMap
 
   let importsForWrapping
-  let scopesForWrapping
+  if (imports) {
+    importsForWrapping = wrapTopLevelImports(imports, into)
+  } else {
+    importsForWrapping = {}
+  }
 
+  let scopesForWrapping
   if (scopes) {
     scopesForWrapping = wrapScopes(scopes, into)
   } else {
     scopesForWrapping = {}
   }
 
-  if (imports) {
-    importsForWrapping = wrapTopLevelImports(imports, into)
-    scopesForWrapping[into] = wrapTopLevelImports(imports, into)
-  } else {
-    importsForWrapping = {}
-    scopesForWrapping[into] = {}
+  if (ensureInto) {
+    // ensure anything not directly remapped is remapped inside into
+    importsForWrapping[into] = into
+    importsForWrapping["/"] = into
+    // and when already into, you stay inside
+    scopesForWrapping[into] = { [into]: into }
   }
-
-  // ensure anything not directly remapped is remapped inside into
-  importsForWrapping[into] = into
-  importsForWrapping["/"] = into
-  // and when already into, you stay inside
-  scopesForWrapping[into][into] = into
-  scopesForWrapping[into]["/"] = into
 
   return {
     imports: importsForWrapping,
@@ -59,55 +56,50 @@ export const wrapImportMap = (importMap, folderRelativeName) => {
 }
 
 const wrapScopes = (scopes, into) => {
-  const scopesKeyWrapped = {}
-  const scopesRemaining = {}
+  const scopesWrapped = {}
 
   Object.keys(scopes).forEach((scopeKey) => {
     const scopeValue = scopes[scopeKey]
-    const scopeKeyWrapped = wrapSpecifier(scopeKey, into)
+    const scopeKeyWrapped = wrapAddress(scopeKey, into)
 
-    if (scopeKeyWrapped === scopeKey) {
-      scopesRemaining[scopeKey] = scopeValue
-    } else {
-      const { importsWithKeyWrapped, importsRemaining } = wrapImports(scopeValue, into)
+    const { importsWrapped, importsRemaining } = wrapImports(scopeValue, into)
 
-      let scopeValueWrapped
-      if (scopeHasLeadingSlashScopedRemapping(scopeValue, scopeKey)) {
-        const leadingSlashSpecifier = `${into}${scopeKey.slice(1)}`
-        scopeValueWrapped = {}
-        // put everything except the leading slash remapping
-        Object.keys(importsWithKeyWrapped).forEach((importKeyWrapped) => {
-          if (importKeyWrapped === leadingSlashSpecifier || importKeyWrapped === into) {
-            return
-          }
-          scopeValueWrapped[importKeyWrapped] = importsWithKeyWrapped[importKeyWrapped]
-        })
-        Object.keys(importsRemaining).forEach((importKey) => {
-          if (importKey === scopeKey || importKey === "/") {
-            return
-          }
-          scopeValueWrapped[importKey] = importsRemaining[importKey]
-        })
-        // now put leading slash remapping to ensure it comes last
-        scopeValueWrapped[leadingSlashSpecifier] = leadingSlashSpecifier
-        scopeValueWrapped[scopeKey] = leadingSlashSpecifier
-        scopeValueWrapped[into] = leadingSlashSpecifier
-        scopeValueWrapped["/"] = leadingSlashSpecifier
-      } else {
-        scopeValueWrapped = {
-          ...importsWithKeyWrapped,
-          ...importsRemaining,
+    let scopeValueWrapped
+    if (scopeHasLeadingSlashScopedRemapping(scopeValue, scopeKey)) {
+      const leadingSlashSpecifier = `${into}${scopeKey.slice(1)}`
+      scopeValueWrapped = {}
+      // put everything except the leading slash remapping
+      Object.keys(importsWrapped).forEach((importKeyWrapped) => {
+        if (importKeyWrapped === leadingSlashSpecifier || importKeyWrapped === into) {
+          return
         }
+        scopeValueWrapped[importKeyWrapped] = importsWrapped[importKeyWrapped]
+      })
+      Object.keys(importsRemaining).forEach((importKey) => {
+        if (importKey === scopeKey || importKey === "/") {
+          return
+        }
+        scopeValueWrapped[importKey] = importsRemaining[importKey]
+      })
+      // now put leading slash remapping to ensure it comes last
+      scopeValueWrapped[leadingSlashSpecifier] = leadingSlashSpecifier
+      scopeValueWrapped[scopeKey] = leadingSlashSpecifier
+      scopeValueWrapped[into] = leadingSlashSpecifier
+      scopeValueWrapped["/"] = leadingSlashSpecifier
+    } else {
+      scopeValueWrapped = {
+        ...importsWrapped,
+        ...importsRemaining,
       }
+    }
 
-      scopesKeyWrapped[scopeKeyWrapped] = scopeValueWrapped
-      scopesRemaining[scopeKey] = importsRemaining
+    scopesWrapped[scopeKeyWrapped] = scopeValueWrapped
+    if (scopeKeyWrapped !== scopeKey) {
+      scopesWrapped[scopeKey] = { ...scopeValueWrapped }
     }
   })
-  return {
-    ...scopesKeyWrapped,
-    ...scopesRemaining,
-  }
+
+  return scopesWrapped
 }
 
 const scopeHasLeadingSlashScopedRemapping = (scopeImports, scopeKey) => {
@@ -120,44 +112,80 @@ const scopeHasLeadingSlashScopedRemapping = (scopeImports, scopeKey) => {
 }
 
 const wrapImports = (imports, into) => {
-  const importsWithKeyWrapped = {}
+  const importsWrapped = {}
   const importsRemaining = {}
 
   Object.keys(imports).forEach((importKey) => {
     const importValue = imports[importKey]
     const importKeyWrapped = wrapSpecifier(importKey, into)
-    const importValueWrapped = wrapSpecifier(importValue, into)
+    const importValueWrapped = wrapAddress(importValue, into)
 
-    if (importKeyWrapped === importKey) {
-      importsRemaining[importKey] = importValue
-    } else if (importValueWrapped === importValue) {
-      importsWithKeyWrapped[importKeyWrapped] = importValue
+    const keyChanged = importKeyWrapped !== importKey
+    const valueChanged = importValueWrapped !== importValue
+    if (keyChanged || valueChanged) {
+      importsWrapped[importKeyWrapped] = importValueWrapped
     } else {
-      importsWithKeyWrapped[importKeyWrapped] = importValueWrapped
-      importsRemaining[importKey] = importValueWrapped
+      importsRemaining[importKey] = importValue
     }
   })
 
   return {
-    importsWithKeyWrapped,
+    importsWrapped,
     importsRemaining,
   }
 }
 
 const wrapTopLevelImports = (imports, into) => {
-  const { importsWithKeyWrapped, importsRemaining } = wrapImports(imports, into)
+  const { importsWrapped, importsRemaining } = wrapImports(imports, into)
   return {
-    ...importsWithKeyWrapped,
+    ...importsWrapped,
     ...importsRemaining,
   }
 }
 
 const wrapSpecifier = (specifier, into) => {
-  if (isOriginRelativeSpecifier(specifier)) {
+  if (specifier.startsWith("//")) {
+    return specifier
+  }
+
+  if (specifier[0] === "/") {
     return `${into}${specifier.slice(1)}`
   }
-  if (isBareSpecifier(specifier)) {
-    return `${into}${specifier}`
+
+  if (specifier.startsWith("./")) {
+    return `./${into}${specifier.slice(2)}`
   }
+
   return specifier
 }
+
+const wrapAddress = (string, into) => {
+  if (string.startsWith("//")) {
+    return string
+  }
+
+  if (string[0] === "/") {
+    return `${into}${string.slice(1)}`
+  }
+
+  if (string.startsWith("./")) {
+    return `./${into}${string.slice(2)}`
+  }
+
+  if (string.startsWith("../")) {
+    return string
+  }
+
+  if (hasScheme(string)) {
+    return string
+  }
+
+  // bare
+  return `${into}${string}`
+}
+
+const formulateFolderRelativeNameMustBeAString = ({
+  folderRelativeName,
+}) => `folderRelativeName must be a string.
+--- folder relative name ---
+${folderRelativeName}`

@@ -4,29 +4,35 @@
 // when this one gets bundled
 import { hrefToPathname } from "@jsenv/href/src/hrefToPathname/hrefToPathname.js"
 import { pathnameToExtension } from "@jsenv/href/src/pathnameToExtension/pathnameToExtension.js"
-import { resolveSpecifier } from "../resolveSpecifier/resolveSpecifier.js"
+import { resolveUrl } from "../resolveUrl/resolveUrl.js"
 import { applyImportMap } from "../applyImportMap/applyImportMap.js"
 
 export const resolveImport = ({ specifier, importer, importMap, defaultExtension = true }) => {
-  const specifierResolved = resolveSpecifier(specifier, importer)
-  const specifierRemapped = importMap
-    ? applyImportMap({ importMap, href: specifierResolved, importerHref: importer })
-    : specifierResolved
+  return applyDefaultExtension({
+    url: importMap
+      ? applyImportMap({ importMap, specifier, importer })
+      : resolveUrl(specifier, importer),
+    importer,
+    defaultExtension,
+  })
+}
+
+const applyDefaultExtension = ({ url, importer, defaultExtension }) => {
   if (typeof defaultExtension === "string") {
-    const extension = pathnameToExtension(specifierRemapped)
+    const extension = pathnameToExtension(url)
     if (extension === "") {
-      return `${specifierRemapped}${defaultExtension}`
+      return `${url}${defaultExtension}`
     }
+    return url
   }
+
   if (defaultExtension === true) {
-    const extension = pathnameToExtension(specifierRemapped)
-    if (extension === "") {
-      if (importer) {
-        const importerPathname = hrefToPathname(importer)
-        const importerExtension = pathnameToExtension(importerPathname)
-        return `${specifierRemapped}${importerExtension}`
-      }
+    const extension = pathnameToExtension(url)
+    if (extension === "" && importer) {
+      const importerPathname = hrefToPathname(importer)
+      const importerExtension = pathnameToExtension(importerPathname)
+      return `${url}${importerExtension}`
     }
   }
-  return specifierRemapped
+  return url
 }
