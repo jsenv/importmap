@@ -5,6 +5,8 @@
 [![github ci](https://github.com/jsenv/jsenv-import-map/workflows/ci/badge.svg)](https://github.com/jsenv/jsenv-import-map/actions?workflow=ci)
 [![codecov coverage](https://codecov.io/gh/jsenv/jsenv-import-map/branch/master/graph/badge.svg)](https://codecov.io/gh/jsenv/jsenv-import-map)
 
+Helpers to implement importMap
+
 ## Table of contents
 
 - [Presentation](#Presentation)
