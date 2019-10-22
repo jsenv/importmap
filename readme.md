@@ -1,31 +1,33 @@
 # jsenv-import-map
 
-[![github package](https://img.shields.io/github/package-json/v/jsenv/jsenv-import-map.svg?label=package&logo=github)](https://github.com/jsenv/jsenv-import-map/packages)
-[![workflow status](https://github.com/jsenv/jsenv-node-module-import-map/workflows/continuous%20testing/badge.svg)](https://github.com/jsenv/jsenv-node-module-import-map/actions?workflow=continuous+testing)
-[![codecov](https://codecov.io/gh/jsenv/jsenv-import-map/branch/master/graph/badge.svg)](https://codecov.io/gh/jsenv/jsenv-import-map)
-
-## Introduction
-
-`@jsenv/import-map` can be used to implement the behaviour of importMap as described in the specification. It is written using es modules and is compatible with Node.js.<br />
-
-— see [importMap spec](https://github.com/WICG/import-maps)
+[![github package](https://img.shields.io/github/package-json/v/jsenv/jsenv-import-map.svg?logo=github&label=package)](https://github.com/jsenv/jsenv-import-map/packages)
+[![npm package](https://img.shields.io/npm/v/@jsenv/import-map.svg?logo=npm&label=package)](https://www.npmjs.com/package/@jsenv/import-map)
+[![github ci](https://github.com/jsenv/jsenv-import-map/workflows/ci/badge.svg)](https://github.com/jsenv/jsenv-import-map/actions?workflow=ci)
+[![codecov coverage](https://codecov.io/gh/jsenv/jsenv-import-map/branch/master/graph/badge.svg)](https://codecov.io/gh/jsenv/jsenv-import-map)
 
 ## Table of contents
 
-- [api](#api)
+- [Presentation](#Presentation)
+- [Usage](#Usage)
   - [composeTwoImportMaps](#composetwoimportmaps)
   - [normalizeImportMap](#normalizeimportmap)
   - [resolveImport](#resolveimport)
 - [Installation](#installation)
 
-## api
+## Presentation
+
+`@jsenv/import-map` can be used to implement the behaviour of importMap as described in the specification. It is written using es modules and is compatible with Node.js.<br />
+
+— see [importMap spec](https://github.com/WICG/import-maps)
+
+## Usage
 
 `@jsenv/import-map` exports are documented in this section.
 
 ### composeTwoImportMaps
 
 > `composeTwoImportMaps` takes two `importMap` and return a single `importMap` being the composition of the two.<br />
-> see source in [./src/composeTwoImportMaps/composeTwoImportMaps.js](./src/composeTwoImportMaps/composeTwoImportMaps.js)
+> Implemented by [src/composeTwoImportMaps/composeTwoImportMaps.js](src/composeTwoImportMaps/composeTwoImportMaps.js)
 
 ```js
 import { composeTwoImportMaps } from "@jsenv/import-map"
@@ -57,7 +59,7 @@ console.log(JSON.stringify(importMap, null, "  "))
 ### normalizeImportMap
 
 > `normalizeImportMap` returns an `importMap` resolved against an `url` and sorted.<br />
-> see source in [./src/normalizeImportMap/normalizeImportMap.js](./src/normalizeImportMap/normalizeImportMap.js)
+> Implemented by [src/normalizeImportMap/normalizeImportMap.js](src/normalizeImportMap/normalizeImportMap.js)
 
 ```js
 import { normalizeImportMap } from "@jsenv/import-map"
@@ -87,7 +89,7 @@ console.log(JSON.stringify(importMap, null, '  ')
 ### resolveImport
 
 > `resolveImport` returns an import `url` applying an `importMap` to `specifier` and `importer`.<br />
-> see source in [./src/resolveImport/resolveImport.js](./src/resolveImport/resolveImport.js)
+> Implemented by [src/resolveImport/resolveImport.js](src/resolveImport/resolveImport.js)
 
 ```js
 import { resolveImport } from "@jsenv/import-map"
@@ -118,9 +120,9 @@ If you never installed a jsenv package, read [Installing a jsenv package](https:
 This documentation is up-to-date with a specific version so prefer any of the following commands
 
 ```console
-npm install --save-dev @jsenv/import-map@6.0.0
+npm install --save-dev @jsenv/import-map@6.2.0
 ```
 
 ```console
-yarn add --dev @jsenv/import-map@6.0.0
+yarn add --dev @jsenv/import-map@6.2.0
 ```

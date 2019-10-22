@@ -1,11 +1,14 @@
 {
   "name": "@jsenv/import-map",
   "description": "Helpers to implement importMap",
-  "version": "6.1.0",
+  "version": "6.2.0",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/jsenv/jsenv-import-map"
+  },
+  "engines": {
+    "node": ">=12.0.0"
   },
   "publishConfig": {
     "access": "public",
@@ -37,21 +40,21 @@
     "postpublish": "node ./script/transform-package/restore-postinstall.js"
   },
   "dependencies": {
-    "@jsenv/href": "1.1.0",
-    "@jsenv/operating-system-path": "2.5.1"
+    "@jsenv/href": "1.2.0",
+    "@jsenv/operating-system-path": "2.7.0"
   },
   "devDependencies": {
     "@dmail/assert": "3.14.0",
-    "@jsenv/bundling": "6.7.1",
+    "@jsenv/auto-publish": "1.9.0",
+    "@jsenv/bundling": "7.6.2",
     "@jsenv/codecov-upload": "2.0.0",
-    "@jsenv/continuous-size-reporting": "1.1.0",
     "@jsenv/eslint-config": "10.2.0",
-    "@jsenv/execution": "6.2.0",
-    "@jsenv/node-launcher": "4.21.0",
-    "@jsenv/node-module-import-map": "7.2.3",
+    "@jsenv/execution": "6.11.0",
+    "@jsenv/node-launcher": "4.26.0",
+    "@jsenv/node-module-import-map": "8.2.1",
     "@jsenv/prettier-config": "1.0.1",
     "@jsenv/prettier-check-project": "3.5.0",
-    "@jsenv/testing": "3.7.0",
+    "@jsenv/testing": "3.9.0",
     "babel-eslint": "11.0.0-beta.0",
     "eslint": "6.5.1",
     "prettier": "1.18.2",
