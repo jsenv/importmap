@@ -1,6 +1,7 @@
 import { operatingSystemPathToPathname } from "@jsenv/operating-system-path"
 import { hrefToOrigin, hrefToPathname, pathnameToRelativePath } from "@jsenv/href"
 import { hasScheme } from "../hasScheme.js"
+import { resolveUrl } from "../resolveUrl/resolveUrl.js"
 import { resolveImport } from "../resolveImport/resolveImport.js"
 import { escapeRegexpSpecialCharacters } from "./escapeRegexpSpecialCharacters.js"
 
@@ -60,9 +61,23 @@ export const resolveImportForProject = ({
     importerForProject = importerHref
   }
 
-  let importResolved
+  if (insideProjectForcing && hrefUseFileProtocol(importer)) {
+    const fileUrl = resolveUrl(specifier, importer)
+    if (fileUrl !== projectHref && !fileUrl.startsWith(`${projectHref}/`)) {
+      throw new Error(
+        formulateImportMustBeInsideProject({
+          projectPath,
+          specifier,
+          importer,
+          importUrl: fileUrl,
+        }),
+      )
+    }
+  }
+
+  let importUrl
   try {
-    importResolved = resolveImport({
+    importUrl = resolveImport({
       specifier,
       importer: importerForProject,
       importMap,
@@ -83,26 +98,26 @@ export const resolveImportForProject = ({
     insideProjectForcing &&
     // only if use file protocol because
     // it's ok to have an external import like "https://cdn.com/jquery.js"
-    hrefUseFileProtocol(importResolved) &&
-    importResolved !== projectHref &&
-    !importResolved.startsWith(`${projectHref}/`)
+    hrefUseFileProtocol(importUrl) &&
+    importUrl !== projectHref &&
+    !importUrl.startsWith(`${projectHref}/`)
   ) {
     throw new Error(
       formulateImportMustBeInsideProject({
         projectPath,
         specifier,
         importer,
-        importResolved,
+        importUrl,
       }),
     )
   }
 
-  if (httpResolutionForcing && hrefToOrigin(importResolved) === httpResolutionOrigin) {
-    const importRelativePath = hrefToPathname(importResolved)
+  if (httpResolutionForcing && hrefToOrigin(importUrl) === httpResolutionOrigin) {
+    const importRelativePath = hrefToPathname(importUrl)
     return `${projectHref}${importRelativePath}`
   }
 
-  return importResolved
+  return importUrl
 }
 
 const hrefUseFileProtocol = (specifier) => specifier.startsWith("file://")
@@ -120,13 +135,13 @@ const formulateImportMustBeInsideProject = ({
   projectPath,
   specifier,
   importer,
-  importResolved,
+  importUrl,
 }) => `import must be inside project.
+--- import url ---
+${importUrl}
+--- project path ---
+${projectPath}
 --- specifier ---
 ${specifier}
 --- importer ---
-${importer}
---- resolved import ---
-${importResolved}
---- project path ---
-${projectPath}`
+${importer}`
