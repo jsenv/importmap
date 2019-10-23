@@ -608,42 +608,83 @@ const startsWithWindowsDriveLetter = string => {
   return true;
 };
 
-const replaceSlashesWithBackSlashes = string => string.replace(/\//g, "\\");
+const isWindowsPath = path => startsWithWindowsDriveLetter(path) && path[2] === "\\";
 
-const pathnameToOperatingSystemPath = pathname => {
-  if (pathname[0] !== "/") throw new Error(`pathname must start with /, got ${pathname}`);
-  const pathnameWithoutLeadingSlash = pathname.slice(1);
+const replaceBackSlashesWithSlashes = string => string.replace(/\\/g, "/");
 
-  if (startsWithWindowsDriveLetter(pathnameWithoutLeadingSlash) && pathnameWithoutLeadingSlash[2] === "/") {
-    return replaceSlashesWithBackSlashes(pathnameWithoutLeadingSlash);
-  } // linux mac pathname === operatingSystemFilename
+const operatingSystemPathToPathname = operatingSystemPath => {
+  if (typeof operatingSystemPath !== "string") {
+    throw new TypeError(`operatingSystemPath must be a string, got ${operatingSystemPath}`);
+  }
+
+  if (operatingSystemPath.startsWith("file://")) {
+    const pathname = operatingSystemPath.slice("file://".length);
+
+    if (pathname.endsWith("/")) {
+      return pathname.slice(0, -1);
+    }
+
+    return pathname;
+  }
+
+  if (isWindowsPath(operatingSystemPath)) {
+    return `/${replaceBackSlashesWithSlashes(operatingSystemPath)}`;
+  } // linux and mac operatingSystemFilename === pathname
 
 
-  return pathname;
+  if (operatingSystemPath.endsWith("/")) {
+    return operatingSystemPath.slice(0, -1);
+  }
+
+  return operatingSystemPath;
 };
 
 const pathnameToRelativePath = (pathname, otherPathname) => pathname.slice(otherPathname.length);
 
+// https://github.com/benjamingr/RegExp.escape/blob/master/polyfill.js
+const escapeRegexpSpecialCharacters = string => {
+  string = String(string);
+  let i = 0;
+  let escapedString = "";
+
+  while (i < string.length) {
+    const char = string[i];
+    i++;
+    escapedString += isRegExpSpecialChar(char) ? `\\${char}` : char;
+  }
+
+  return escapedString;
+};
+
+const isRegExpSpecialChar = char => regexpSpecialChars.indexOf(char) > -1;
+
+const regexpSpecialChars = ["/", "^", "\\", "[", "]", "(", ")", "{", "}", "?", "+", "*", ".", "|", "$"];
+
 const resolveImportForProject = ({
-  projectPathname,
+  projectPath,
   specifier,
   importer = projectPathname,
-  importMap,
+  importMap = {},
   importDefaultExtension,
   httpResolutionForcing = true,
   httpResolutionOrigin = "http://fake_origin_unlikely_to_collide.ext",
   insideProjectForcing = true
 }) => {
-  if (typeof projectPathname !== "string") {
-    throw new TypeError(`projectPathname must be a string, got ${projectPathname}`);
+  if (typeof projectPath !== "string") {
+    throw new TypeError(`projectPath must be a string, got ${projectPath}`);
   }
 
+  if (importer && !hasScheme(importer)) {
+    throw new Error(`importer must have a scheme, got ${importer}`);
+  }
+
+  const projectPathname = operatingSystemPathToPathname(projectPath);
   const projectHref = `file://${projectPathname}`;
   const importerHref = importer || projectHref;
 
   if (insideProjectForcing && importer !== projectHref && hrefUseFileProtocol(importerHref) && !importerHref.startsWith(`${projectHref}/`)) {
     throw new Error(formulateImporterMustBeInsideProject({
-      projectPathname,
+      projectPath,
       importer
     }));
   }
@@ -669,70 +710,92 @@ const resolveImportForProject = ({
     importerForProject = importerHref;
   }
 
-  let importResolved;
+  if (hrefUseFileProtocol(importer) && !isOriginRelativeSpecifier(specifier)) {
+    const url = resolveUrl(specifier, importer);
+
+    if (hrefUseFileProtocol(url)) {
+      const isOutsideProject = url !== projectHref && !url.startsWith(`${projectHref}/`);
+
+      if (isOutsideProject) {
+        if (insideProjectForcing) {
+          throw new Error(formulateImportMustBeInsideProject({
+            projectPath,
+            specifier,
+            importer,
+            importUrl: url
+          }));
+        }
+
+        return url;
+      }
+    }
+  }
+
+  let importUrl;
 
   try {
-    importResolved = resolveImport({
+    importUrl = resolveImport({
       specifier,
       importer: importerForProject,
       importMap,
       defaultExtension: importDefaultExtension
     });
   } catch (e) {
-    if (e.message.startsWith("Unmapped bare specifier")) {
-      e.message = writeBareSpecifierMustBeRemapped({
-        specifier,
-        importer
-      });
-    }
-
+    const httpResolutionOriginRegExp = new RegExp(escapeRegexpSpecialCharacters(httpResolutionOrigin), "g");
+    const projectOrigin = `file://${projectPathname}`;
+    e.stack = e.stack.replace(httpResolutionOriginRegExp, projectOrigin);
+    e.message = e.message.replace(httpResolutionOriginRegExp, projectOrigin);
     throw e;
   }
 
   if (insideProjectForcing && // only if use file protocol because
   // it's ok to have an external import like "https://cdn.com/jquery.js"
-  hrefUseFileProtocol(importResolved) && importResolved !== projectHref && !importResolved.startsWith(`${projectHref}/`)) {
+  hrefUseFileProtocol(importUrl) && importUrl !== projectHref && !importUrl.startsWith(`${projectHref}/`)) {
     throw new Error(formulateImportMustBeInsideProject({
-      projectPathname,
+      projectPath,
       specifier,
       importer,
-      importResolved
+      importUrl
     }));
   }
 
-  if (httpResolutionForcing && hrefToOrigin(importResolved) === httpResolutionOrigin) {
-    const importRelativePath = hrefToPathname(importResolved);
+  if (httpResolutionForcing && hrefToOrigin(importUrl) === httpResolutionOrigin) {
+    const importRelativePath = hrefToPathname(importUrl);
     return `${projectHref}${importRelativePath}`;
   }
 
-  return importResolved;
+  return importUrl;
+};
+
+const isOriginRelativeSpecifier = specifier => {
+  return specifier[0] === "/" && specifier[1] !== "/";
 };
 
 const hrefUseFileProtocol = specifier => specifier.startsWith("file://");
 
 const formulateImporterMustBeInsideProject = ({
-  projectPathname,
+  projectPath,
   importer
 }) => `importer must be inside project.
 --- importer ---
 ${importer}
---- project ---
-${pathnameToOperatingSystemPath(projectPathname)}`;
+--- project path ---
+${projectPath}`;
 
 const formulateImportMustBeInsideProject = ({
-  projectPathname,
+  projectPath,
   specifier,
   importer,
-  importResolved
+  importUrl
 }) => `import must be inside project.
+--- import url ---
+${importUrl}
+--- project path ---
+${projectPath}
 --- specifier ---
 ${specifier}
 --- importer ---
-${importer}
---- resolved import ---
-${importResolved}
---- project path ---
-${pathnameToOperatingSystemPath(projectPathname)}`;
+${importer}`;
 
 const resolveSpecifierForProject = (specifier, projectPathname, httpResolutionOrigin = "http://fake_origin_unlikely_to_collide.ext") => {
   const specifierHttpResolved = resolveSpecifier(specifier, httpResolutionOrigin);

@@ -61,7 +61,7 @@ export const resolveImportForProject = ({
     importerForProject = importerHref
   }
 
-  if (hrefUseFileProtocol(importer)) {
+  if (hrefUseFileProtocol(importer) && !isOriginRelativeSpecifier(specifier)) {
     const url = resolveUrl(specifier, importer)
 
     if (hrefUseFileProtocol(url)) {
@@ -127,6 +127,10 @@ export const resolveImportForProject = ({
   }
 
   return importUrl
+}
+
+const isOriginRelativeSpecifier = (specifier) => {
+  return specifier[0] === "/" && specifier[1] !== "/"
 }
 
 const hrefUseFileProtocol = (specifier) => specifier.startsWith("file://")
