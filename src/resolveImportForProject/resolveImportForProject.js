@@ -61,17 +61,26 @@ export const resolveImportForProject = ({
     importerForProject = importerHref
   }
 
-  if (insideProjectForcing && hrefUseFileProtocol(importer)) {
-    const fileUrl = resolveUrl(specifier, importer)
-    if (fileUrl !== projectHref && !fileUrl.startsWith(`${projectHref}/`)) {
-      throw new Error(
-        formulateImportMustBeInsideProject({
-          projectPath,
-          specifier,
-          importer,
-          importUrl: fileUrl,
-        }),
-      )
+  if (hrefUseFileProtocol(importer)) {
+    const url = resolveUrl(specifier, importer)
+
+    if (hrefUseFileProtocol(url)) {
+      const isOutsideProject = url !== projectHref && !url.startsWith(`${projectHref}/`)
+
+      if (isOutsideProject) {
+        if (insideProjectForcing) {
+          throw new Error(
+            formulateImportMustBeInsideProject({
+              projectPath,
+              specifier,
+              importer,
+              importUrl: url,
+            }),
+          )
+        }
+
+        return url
+      }
     }
   }
 

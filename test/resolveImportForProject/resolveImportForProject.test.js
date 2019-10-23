@@ -42,3 +42,24 @@ ${projectPath}
 ${importer}`)
   assert({ actual, expected })
 }
+
+{
+  const actual = resolveImportForProject({
+    projectPath,
+    specifier: "http://example.com",
+    importer,
+  })
+  const expected = "http://example.com"
+  assert({ actual, expected })
+}
+
+{
+  const actual = resolveImportForProject({
+    projectPath,
+    specifier: "../file.js",
+    importer,
+    insideProjectForcing: false,
+  })
+  const expected = resolveUrl("../file.js", import.meta.url)
+  assert({ actual, expected })
+}
