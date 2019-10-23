@@ -3,6 +3,46 @@ import { resolveImport } from "../../index.js"
 
 {
   const actual = resolveImport({
+    specifier: "../",
+    importer: "http://example.com/folder/file.js",
+    defaultExtension: ".js",
+  })
+  const expected = "http://example.com/"
+  assert({ actual, expected })
+}
+
+{
+  const actual = resolveImport({
+    specifier: "../",
+    importer: "https://domain.com/folder/subfolder/file.js",
+    defaultExtension: ".js",
+  })
+  const expected = "https://domain.com/folder/"
+  assert({ actual, expected })
+}
+
+{
+  const actual = resolveImport({
+    specifier: "./",
+    importer: "http://example.com",
+    defaultExtension: ".js",
+  })
+  const expected = "http://example.com/"
+  assert({ actual, expected })
+}
+
+{
+  const actual = resolveImport({
+    specifier: ".",
+    importer: "http://example.com",
+    defaultExtension: ".js",
+  })
+  const expected = "http://example.com/"
+  assert({ actual, expected })
+}
+
+{
+  const actual = resolveImport({
     specifier: "logic.v2.min.js",
     importer: "http://example.com",
     defaultExtension: ".ts",

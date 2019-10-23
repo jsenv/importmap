@@ -37,6 +37,11 @@ export const resolveUrl = (specifier, baseUrl) => {
   const baseOrigin = hrefToOrigin(baseUrl)
   const basePathname = hrefToPathname(baseUrl)
 
+  if (specifier === ".") {
+    const baseDirname = pathnameToDirname(basePathname)
+    return `${baseOrigin}${baseDirname}/`
+  }
+
   // pathname relative inside
   if (specifier.slice(0, 2) === "./") {
     const baseDirname = pathnameToDirname(basePathname)
@@ -50,12 +55,12 @@ export const resolveUrl = (specifier, baseUrl) => {
     importerFolders.pop()
 
     while (unresolvedPathname.slice(0, 3) === "../") {
+      unresolvedPathname = unresolvedPathname.slice(3)
       // when there is no folder left to resolved
       // we just ignore '../'
       if (importerFolders.length) {
         importerFolders.pop()
       }
-      unresolvedPathname = unresolvedPathname.slice(3)
     }
 
     const resolvedPathname = `${importerFolders.join("/")}/${unresolvedPathname}`

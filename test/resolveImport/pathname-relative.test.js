@@ -32,6 +32,15 @@ const root = `http://example.com/folder`
 
 {
   const actual = resolveImport({
+    specifier: "../",
+    importer: `${root}/subfolder/file.js`,
+  })
+  const expected = `${root}/`
+  assert({ actual, expected })
+}
+
+{
+  const actual = resolveImport({
     specifier: "../../../foo.js",
     importer: "file:///Users/file.js",
   })

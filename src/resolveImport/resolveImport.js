@@ -18,6 +18,14 @@ export const resolveImport = ({ specifier, importer, importMap, defaultExtension
 }
 
 const applyDefaultExtension = ({ url, importer, defaultExtension }) => {
+  if (hrefToPathname(url) === "/") {
+    return url
+  }
+
+  if (url.endsWith("/")) {
+    return url
+  }
+
   if (typeof defaultExtension === "string") {
     const extension = pathnameToExtension(url)
     if (extension === "") {
