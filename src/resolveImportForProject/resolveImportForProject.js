@@ -1,21 +1,28 @@
-import { pathnameToOperatingSystemPath } from "@jsenv/operating-system-path"
+import { operatingSystemPathToPathname } from "@jsenv/operating-system-path"
 import { hrefToOrigin, hrefToPathname, pathnameToRelativePath } from "@jsenv/href"
+import { hasScheme } from "../hasScheme.js"
 import { resolveImport } from "../resolveImport/resolveImport.js"
+import { escapeRegexpSpecialCharacters } from "./escapeRegexpSpecialCharacters.js"
 
 export const resolveImportForProject = ({
-  projectPathname,
+  projectPath,
   specifier,
   importer = projectPathname,
-  importMap,
+  importMap = {},
   importDefaultExtension,
   httpResolutionForcing = true,
   httpResolutionOrigin = "http://fake_origin_unlikely_to_collide.ext",
   insideProjectForcing = true,
 }) => {
-  if (typeof projectPathname !== "string") {
-    throw new TypeError(`projectPathname must be a string, got ${projectPathname}`)
+  if (typeof projectPath !== "string") {
+    throw new TypeError(`projectPath must be a string, got ${projectPath}`)
   }
 
+  if (importer && !hasScheme(importer)) {
+    throw new Error(`importer must have a scheme, got ${importer}`)
+  }
+
+  const projectPathname = operatingSystemPathToPathname(projectPath)
   const projectHref = `file://${projectPathname}`
   const importerHref = importer || projectHref
 
@@ -27,7 +34,7 @@ export const resolveImportForProject = ({
   ) {
     throw new Error(
       formulateImporterMustBeInsideProject({
-        projectPathname,
+        projectPath,
         importer,
       }),
     )
@@ -53,12 +60,24 @@ export const resolveImportForProject = ({
     importerForProject = importerHref
   }
 
-  const importResolved = resolveImport({
-    specifier,
-    importer: importerForProject,
-    importMap,
-    defaultExtension: importDefaultExtension,
-  })
+  let importResolved
+  try {
+    importResolved = resolveImport({
+      specifier,
+      importer: importerForProject,
+      importMap,
+      defaultExtension: importDefaultExtension,
+    })
+  } catch (e) {
+    const httpResolutionOriginRegExp = new RegExp(
+      escapeRegexpSpecialCharacters(httpResolutionOrigin),
+      "g",
+    )
+    const projectOrigin = `file://${projectPathname}`
+    e.stack = e.stack.replace(httpResolutionOriginRegExp, projectOrigin)
+    e.message = e.message.replace(httpResolutionOriginRegExp, projectOrigin)
+    throw e
+  }
 
   if (
     insideProjectForcing &&
@@ -70,7 +89,7 @@ export const resolveImportForProject = ({
   ) {
     throw new Error(
       formulateImportMustBeInsideProject({
-        projectPathname,
+        projectPath,
         specifier,
         importer,
         importResolved,
@@ -89,16 +108,16 @@ export const resolveImportForProject = ({
 const hrefUseFileProtocol = (specifier) => specifier.startsWith("file://")
 
 const formulateImporterMustBeInsideProject = ({
-  projectPathname,
+  projectPath,
   importer,
 }) => `importer must be inside project.
 --- importer ---
 ${importer}
---- project ---
-${pathnameToOperatingSystemPath(projectPathname)}`
+--- project path ---
+${projectPath}`
 
 const formulateImportMustBeInsideProject = ({
-  projectPathname,
+  projectPath,
   specifier,
   importer,
   importResolved,
@@ -110,4 +129,4 @@ ${importer}
 --- resolved import ---
 ${importResolved}
 --- project path ---
-${pathnameToOperatingSystemPath(projectPathname)}`
+${projectPath}`
