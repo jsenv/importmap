@@ -1,7 +1,7 @@
 {
   "name": "@jsenv/import-map",
   "description": "Helpers to implement importMap",
-  "version": "6.5.1",
+  "version": "6.6.0",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -40,23 +40,22 @@
     "postpublish": "node ./script/transform-package/restore-postinstall.js"
   },
   "dependencies": {
-    "@jsenv/href": "1.2.0",
-    "@jsenv/operating-system-path": "3.1.0"
+    "@jsenv/href": "1.2.0"
   },
   "devDependencies": {
     "@dmail/assert": "3.14.0",
-    "@jsenv/auto-publish": "1.9.0",
-    "@jsenv/bundling": "7.6.2",
+    "@jsenv/auto-publish": "2.0.0",
+    "@jsenv/bundling": "7.7.1",
     "@jsenv/codecov-upload": "2.0.0",
-    "@jsenv/eslint-config": "10.2.0",
+    "@jsenv/eslint-config": "11.3.0",
     "@jsenv/execution": "6.11.0",
     "@jsenv/node-launcher": "4.26.0",
-    "@jsenv/node-module-import-map": "8.2.1",
+    "@jsenv/node-module-import-map": "8.3.0",
     "@jsenv/prettier-config": "1.0.1",
     "@jsenv/prettier-check-project": "3.5.0",
     "@jsenv/testing": "3.9.0",
     "babel-eslint": "11.0.0-beta.0",
-    "eslint": "6.5.1",
+    "eslint": "6.6.0",
     "prettier": "1.18.2",
     "rimraf": "3.0.0"
   }
