@@ -1,4 +1,4 @@
-import { assertImportMap } from "../assertImportMap.js"
+import { assertImportMap } from "./internal/assertImportMap.js"
 
 export const sortImportMap = (importMap) => {
   assertImportMap(importMap)

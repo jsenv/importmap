@@ -1,4 +1,4 @@
-import { assert } from "@dmail/assert"
+import { assert } from "@jsenv/assert"
 import { composeTwoImportMaps } from "../../index.js"
 
 const actual = composeTwoImportMaps(

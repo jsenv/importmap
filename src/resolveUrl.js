@@ -1,10 +1,10 @@
 // could be useful: https://url.spec.whatwg.org/#url-miscellaneous
 
-import { hasScheme } from "../hasScheme.js"
-import { hrefToScheme } from "@jsenv/href/src/hrefToScheme/hrefToScheme.js"
-import { hrefToPathname } from "@jsenv/href/src/hrefToPathname/hrefToPathname.js"
-import { hrefToOrigin } from "@jsenv/href/src/hrefToOrigin/hrefToOrigin.js"
-import { pathnameToDirname } from "@jsenv/href/src/pathnameToDirname/pathnameToDirname.js"
+import { urlToScheme } from "./internal/urlToScheme.js"
+import { urlToPathname } from "./internal/urlToPathname.js"
+import { urlToOrigin } from "./internal/urlToOrigin.js"
+import { pathnameToDirectoryPathname } from "./internal/pathnameToDirectoryPathname.js"
+import { hasScheme } from "./internal/hasScheme.js"
 
 export const resolveUrl = (specifier, baseUrl) => {
   if (baseUrl) {
@@ -26,26 +26,26 @@ export const resolveUrl = (specifier, baseUrl) => {
 
   // scheme relative
   if (specifier.slice(0, 2) === "//") {
-    return `${hrefToScheme(baseUrl)}:${specifier}`
+    return `${urlToScheme(baseUrl)}:${specifier}`
   }
 
   // origin relative
   if (specifier[0] === "/") {
-    return `${hrefToOrigin(baseUrl)}${specifier}`
+    return `${urlToScheme(baseUrl)}${specifier}`
   }
 
-  const baseOrigin = hrefToOrigin(baseUrl)
-  const basePathname = hrefToPathname(baseUrl)
+  const baseOrigin = urlToOrigin(baseUrl)
+  const basePathname = urlToPathname(baseUrl)
 
   if (specifier === ".") {
-    const baseDirname = pathnameToDirname(basePathname)
-    return `${baseOrigin}${baseDirname}/`
+    const baseDirectoryPathname = pathnameToDirectoryPathname(basePathname)
+    return `${baseOrigin}${baseDirectoryPathname}/`
   }
 
   // pathname relative inside
   if (specifier.slice(0, 2) === "./") {
-    const baseDirname = pathnameToDirname(basePathname)
-    return `${baseOrigin}${baseDirname}/${specifier.slice(2)}`
+    const baseDirectoryPathname = pathnameToDirectoryPathname(basePathname)
+    return `${baseOrigin}${baseDirectoryPathname}/${specifier.slice(2)}`
   }
 
   // pathname relative outside
@@ -74,7 +74,7 @@ export const resolveUrl = (specifier, baseUrl) => {
   if (basePathname[basePathname.length] === "/") {
     return `${baseOrigin}${basePathname}${specifier}`
   }
-  return `${baseOrigin}${pathnameToDirname(basePathname)}/${specifier}`
+  return `${baseOrigin}${pathnameToDirectoryPathname(basePathname)}/${specifier}`
 }
 
 const writeBaseUrlMustBeAString = ({ baseUrl, specifier }) => `baseUrl must be a string.

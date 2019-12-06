@@ -1,5 +1,5 @@
-import { hasScheme } from "../hasScheme.js"
-import { resolveUrl } from "../resolveUrl/resolveUrl.js"
+import { hasScheme } from "./internal/hasScheme.js"
+import { resolveUrl } from "./resolveUrl.js"
 
 export const resolveSpecifier = (specifier, importer) => {
   if (specifier[0] === "/" || specifier.startsWith("./") || specifier.startsWith("../")) {

@@ -1,4 +1,4 @@
-import { assert } from "@dmail/assert"
+import { assert } from "@jsenv/assert"
 import { wrapImportMap, normalizeImportMap, applyImportMap } from "../../index.js"
 
 const importMap = wrapImportMap(
@@ -21,9 +21,9 @@ const importMap = wrapImportMap(
   const actual = importMap
   const expected = {
     imports: {
-      ding: "/into/dong",
-      a: "/into/b",
-      into: "/into/whatever",
+      "ding": "/into/dong",
+      "a": "/into/b",
+      "into": "/into/whatever",
       "/into/": "/into/",
       "/": "/into/",
     },

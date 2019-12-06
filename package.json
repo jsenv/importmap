@@ -1,7 +1,7 @@
 {
   "name": "@jsenv/import-map",
   "description": "Helpers to implement importMap",
-  "version": "6.6.0",
+  "version": "6.6.1",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -26,9 +26,9 @@
   },
   "scripts": {
     "test": "node ./script/test/test.js",
+    "test-with-coverage": "node ./script/test/test.js --coverage",
     "eslint-check": "eslint .",
     "prettier-check": "node ./script/prettier-check/prettier-check.js",
-    "generate-coverage": "node ./script/generate-coverage/generate-coverage.js",
     "upload-coverage": "node ./script/upload-coverage/upload-coverage.js",
     "generate-commonjs-bundle": "node ./script/generate-commonjs-bundle/generate-commonjs-bundle.js",
     "generate-import-map": "node ./script/generate-import-map/generate-import-map.js",
@@ -39,24 +39,19 @@
     "prepublishOnly": "node ./script/transform-package/remove-postinstall.js && npm run dist",
     "postpublish": "node ./script/transform-package/restore-postinstall.js"
   },
-  "dependencies": {
-    "@jsenv/href": "1.2.0"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@dmail/assert": "3.14.0",
-    "@jsenv/auto-publish": "2.0.0",
-    "@jsenv/bundling": "7.7.1",
+    "@jsenv/assert": "1.1.1",
     "@jsenv/codecov-upload": "2.0.0",
+    "@jsenv/core": "10.0.0-alpha.11",
     "@jsenv/eslint-config": "11.3.0",
-    "@jsenv/execution": "6.11.0",
-    "@jsenv/node-launcher": "4.26.0",
-    "@jsenv/node-module-import-map": "8.3.0",
-    "@jsenv/prettier-config": "1.0.1",
-    "@jsenv/prettier-check-project": "3.5.0",
-    "@jsenv/testing": "3.9.0",
-    "babel-eslint": "11.0.0-beta.0",
-    "eslint": "6.6.0",
-    "prettier": "1.18.2",
+    "@jsenv/github-release-package": "1.1.1",
+    "@jsenv/node-module-import-map": "8.6.0",
+    "@jsenv/package-publish": "1.0.0",
+    "@jsenv/prettier-check-project": "4.0.0",
+    "@jsenv/prettier-config": "1.1.0",
+    "eslint": "6.7.2",
+    "prettier": "1.19.1",
     "rimraf": "3.0.0"
   }
 }

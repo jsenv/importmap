@@ -1,4 +1,4 @@
-import { assert } from "@dmail/assert"
+import { assert } from "@jsenv/assert"
 import { resolveImport } from "../../index.js"
 
 const root = `http://example.com/folder`
