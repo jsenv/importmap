@@ -1,4 +1,4 @@
-import { assert } from "@dmail/assert"
+import { assert } from "@jsenv/assert"
 import { applyImportMap } from "../../index.js"
 
 const origin = "file://"

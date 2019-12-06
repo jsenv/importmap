@@ -15,8 +15,8 @@
  *
  */
 
-import { assertImportMap } from "../assertImportMap.js"
-import { hasScheme } from "../hasScheme.js"
+import { assertImportMap } from "./internal/assertImportMap.js"
+import { hasScheme } from "./internal/hasScheme.js"
 
 export const wrapImportMap = (importMap, folderRelativeName, ensureInto = true) => {
   assertImportMap(importMap)

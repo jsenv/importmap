@@ -1,8 +1,7 @@
-import { assertImportMap } from "../assertImportMap.js"
-import { tryUrlResolution } from "../tryUrlResolution.js"
-import { resolveSpecifier } from "../resolveSpecifier/resolveSpecifier.js"
-
-import { sortImports, sortScopes } from "../sortImportMap/sortImportMap.js"
+import { assertImportMap } from "./internal/assertImportMap.js"
+import { tryUrlResolution } from "./internal/tryUrlResolution.js"
+import { resolveSpecifier } from "./resolveSpecifier.js"
+import { sortImports, sortScopes } from "./sortImportMap.js"
 
 export const normalizeImportMap = (importMap, baseUrl) => {
   assertImportMap(importMap)

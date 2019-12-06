@@ -1,9 +1,8 @@
-const { execute } = require("@jsenv/execution")
-const { launchNode } = require("@jsenv/node-launcher")
-const { projectPath } = require("../../jsenv.config.js")
+const { execute, launchNode } = require("@jsenv/core")
+const jsenvConfig = require("../../jsenv.config.js")
 
 execute({
-  projectPath,
-  launch: (options) => launchNode({ ...options, debugPort: 40000 }),
-  fileRelativePath: `/${process.argv[2]}`,
+  ...jsenvConfig,
+  launch: launchNode,
+  fileRelativeUrl: process.argv[2],
 })

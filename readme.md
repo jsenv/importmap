@@ -29,7 +29,7 @@ Helpers to implement importMap
 ### composeTwoImportMaps
 
 > `composeTwoImportMaps` takes two `importMap` and return a single `importMap` being the composition of the two.<br />
-> Implemented by [src/composeTwoImportMaps/composeTwoImportMaps.js](src/composeTwoImportMaps/composeTwoImportMaps.js)
+> Implemented by [src/composeTwoImportMaps.js](src/composeTwoImportMaps.js)
 
 ```js
 import { composeTwoImportMaps } from "@jsenv/import-map"
@@ -61,7 +61,7 @@ console.log(JSON.stringify(importMap, null, "  "))
 ### normalizeImportMap
 
 > `normalizeImportMap` returns an `importMap` resolved against an `url` and sorted.<br />
-> Implemented by [src/normalizeImportMap/normalizeImportMap.js](src/normalizeImportMap/normalizeImportMap.js)
+> Implemented by [src/normalizeImportMap.js](src/normalizeImportMap.js)
 
 ```js
 import { normalizeImportMap } from "@jsenv/import-map"
@@ -91,7 +91,7 @@ console.log(JSON.stringify(importMap, null, '  ')
 ### resolveImport
 
 > `resolveImport` returns an import `url` applying an `importMap` to `specifier` and `importer`.<br />
-> Implemented by [src/resolveImport/resolveImport.js](src/resolveImport/resolveImport.js)
+> Implemented by [src/resolveImport.js](src/resolveImport.js)
 
 ```js
 import { resolveImport } from "@jsenv/import-map"

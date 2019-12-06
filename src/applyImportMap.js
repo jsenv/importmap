@@ -1,7 +1,7 @@
-import { assertImportMap } from "../assertImportMap.js"
-import { hasScheme } from "../hasScheme.js"
-import { tryUrlResolution } from "../tryUrlResolution.js"
-import { resolveSpecifier } from "../resolveSpecifier/resolveSpecifier.js"
+import { assertImportMap } from "./internal/assertImportMap.js"
+import { hasScheme } from "./internal/hasScheme.js"
+import { tryUrlResolution } from "./internal/tryUrlResolution.js"
+import { resolveSpecifier } from "./resolveSpecifier.js"
 
 export const applyImportMap = ({ importMap, specifier, importer }) => {
   assertImportMap(importMap)
