@@ -2,95 +2,105 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-const assertImportMap = value => {
+var nativeTypeOf = function nativeTypeOf(obj) {
+  return typeof obj;
+};
+
+var customTypeOf = function customTypeOf(obj) {
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+};
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? nativeTypeOf : customTypeOf;
+
+var assertImportMap = function assertImportMap(value) {
   if (value === null) {
-    throw new TypeError(`an importMap must be an object, got null`);
+    throw new TypeError("an importMap must be an object, got null");
   }
 
-  const type = typeof value;
+  var type = _typeof(value);
 
   if (type !== "object") {
-    throw new TypeError(`an importMap must be an object, received ${value}`);
+    throw new TypeError("an importMap must be an object, received ".concat(value));
   }
 
   if (Array.isArray(value)) {
-    throw new TypeError(`an importMap must be an object, received array ${value}`);
+    throw new TypeError("an importMap must be an object, received array ".concat(value));
   }
 };
 
-const hasScheme = string => {
+var hasScheme = function hasScheme(string) {
   return /^[a-zA-Z]{2,}:/.test(string);
 };
 
-const hrefToScheme = href => {
-  const colonIndex = href.indexOf(":");
+var urlToScheme = function urlToScheme(urlString) {
+  var colonIndex = urlString.indexOf(":");
   if (colonIndex === -1) return "";
-  return href.slice(0, colonIndex);
+  return urlString.slice(0, colonIndex);
 };
 
-const hrefToPathname = href => {
-  return ressourceToPathname(hrefToRessource(href));
+var urlToPathname = function urlToPathname(urlString) {
+  return ressourceToPathname(urlToRessource(urlString));
 };
 
-const hrefToRessource = href => {
-  const scheme = hrefToScheme(href);
+var urlToRessource = function urlToRessource(urlString) {
+  var scheme = urlToScheme(urlString);
 
   if (scheme === "file") {
-    return href.slice("file://".length);
+    return urlString.slice("file://".length);
   }
 
   if (scheme === "https" || scheme === "http") {
     // remove origin
-    const afterProtocol = href.slice(scheme.length + "://".length);
-    const pathnameSlashIndex = afterProtocol.indexOf("/", "://".length);
+    var afterProtocol = urlString.slice(scheme.length + "://".length);
+    var pathnameSlashIndex = afterProtocol.indexOf("/", "://".length);
     return afterProtocol.slice(pathnameSlashIndex);
   }
 
-  return href.slice(scheme.length + 1);
+  return urlString.slice(scheme.length + 1);
 };
 
-const ressourceToPathname = ressource => {
-  const searchSeparatorIndex = ressource.indexOf("?");
+var ressourceToPathname = function ressourceToPathname(ressource) {
+  var searchSeparatorIndex = ressource.indexOf("?");
   return searchSeparatorIndex === -1 ? ressource : ressource.slice(0, searchSeparatorIndex);
 };
 
-const hrefToOrigin = href => {
-  const scheme = hrefToScheme(href);
+var urlToOrigin = function urlToOrigin(urlString) {
+  var scheme = urlToScheme(urlString);
 
   if (scheme === "file") {
     return "file://";
   }
 
   if (scheme === "http" || scheme === "https") {
-    const secondProtocolSlashIndex = scheme.length + "://".length;
-    const pathnameSlashIndex = href.indexOf("/", secondProtocolSlashIndex);
-    if (pathnameSlashIndex === -1) return href;
-    return href.slice(0, pathnameSlashIndex);
+    var secondProtocolSlashIndex = scheme.length + "://".length;
+    var pathnameSlashIndex = urlString.indexOf("/", secondProtocolSlashIndex);
+    if (pathnameSlashIndex === -1) return urlString;
+    return urlString.slice(0, pathnameSlashIndex);
   }
 
-  return href.slice(0, scheme.length + 1);
+  return urlString.slice(0, scheme.length + 1);
 };
 
-const pathnameToDirname = pathname => {
-  const slashLastIndex = pathname.lastIndexOf("/");
+var pathnameToDirectoryPathname = function pathnameToDirectoryPathname(pathname) {
+  var slashLastIndex = pathname.lastIndexOf("/");
   if (slashLastIndex === -1) return "";
   return pathname.slice(0, slashLastIndex);
 };
 
 // could be useful: https://url.spec.whatwg.org/#url-miscellaneous
-const resolveUrl = (specifier, baseUrl) => {
+var resolveUrl = function resolveUrl(specifier, baseUrl) {
   if (baseUrl) {
     if (typeof baseUrl !== "string") {
       throw new TypeError(writeBaseUrlMustBeAString({
-        baseUrl,
-        specifier
+        baseUrl: baseUrl,
+        specifier: specifier
       }));
     }
 
     if (!hasScheme(baseUrl)) {
       throw new Error(writeBaseUrlMustBeAbsolute({
-        baseUrl,
-        specifier
+        baseUrl: baseUrl,
+        specifier: specifier
       }));
     }
   }
@@ -101,39 +111,40 @@ const resolveUrl = (specifier, baseUrl) => {
 
   if (!baseUrl) {
     throw new Error(writeBaseUrlRequired({
-      baseUrl,
-      specifier
+      baseUrl: baseUrl,
+      specifier: specifier
     }));
   } // scheme relative
 
 
   if (specifier.slice(0, 2) === "//") {
-    return `${hrefToScheme(baseUrl)}:${specifier}`;
+    return "".concat(urlToScheme(baseUrl), ":").concat(specifier);
   } // origin relative
 
 
   if (specifier[0] === "/") {
-    return `${hrefToOrigin(baseUrl)}${specifier}`;
+    return "".concat(urlToOrigin(baseUrl)).concat(specifier);
   }
 
-  const baseOrigin = hrefToOrigin(baseUrl);
-  const basePathname = hrefToPathname(baseUrl);
+  var baseOrigin = urlToOrigin(baseUrl);
+  var basePathname = urlToPathname(baseUrl);
 
   if (specifier === ".") {
-    const baseDirname = pathnameToDirname(basePathname);
-    return `${baseOrigin}${baseDirname}/`;
+    var baseDirectoryPathname = pathnameToDirectoryPathname(basePathname);
+    return "".concat(baseOrigin).concat(baseDirectoryPathname, "/");
   } // pathname relative inside
 
 
   if (specifier.slice(0, 2) === "./") {
-    const baseDirname = pathnameToDirname(basePathname);
-    return `${baseOrigin}${baseDirname}/${specifier.slice(2)}`;
+    var _baseDirectoryPathname = pathnameToDirectoryPathname(basePathname);
+
+    return "".concat(baseOrigin).concat(_baseDirectoryPathname, "/").concat(specifier.slice(2));
   } // pathname relative outside
 
 
   if (specifier.slice(0, 3) === "../") {
-    let unresolvedPathname = specifier;
-    const importerFolders = basePathname.split("/");
+    var unresolvedPathname = specifier;
+    var importerFolders = basePathname.split("/");
     importerFolders.pop();
 
     while (unresolvedPathname.slice(0, 3) === "../") {
@@ -145,55 +156,46 @@ const resolveUrl = (specifier, baseUrl) => {
       }
     }
 
-    const resolvedPathname = `${importerFolders.join("/")}/${unresolvedPathname}`;
-    return `${baseOrigin}${resolvedPathname}`;
+    var resolvedPathname = "".concat(importerFolders.join("/"), "/").concat(unresolvedPathname);
+    return "".concat(baseOrigin).concat(resolvedPathname);
   } // bare
 
 
   if (basePathname === "") {
-    return `${baseOrigin}/${specifier}`;
+    return "".concat(baseOrigin, "/").concat(specifier);
   }
 
   if (basePathname[basePathname.length] === "/") {
-    return `${baseOrigin}${basePathname}${specifier}`;
+    return "".concat(baseOrigin).concat(basePathname).concat(specifier);
   }
 
-  return `${baseOrigin}${pathnameToDirname(basePathname)}/${specifier}`;
+  return "".concat(baseOrigin).concat(pathnameToDirectoryPathname(basePathname), "/").concat(specifier);
 };
 
-const writeBaseUrlMustBeAString = ({
-  baseUrl,
-  specifier
-}) => `baseUrl must be a string.
---- base url ---
-${baseUrl}
---- specifier ---
-${specifier}`;
+var writeBaseUrlMustBeAString = function writeBaseUrlMustBeAString(_ref) {
+  var baseUrl = _ref.baseUrl,
+      specifier = _ref.specifier;
+  return "baseUrl must be a string.\n--- base url ---\n".concat(baseUrl, "\n--- specifier ---\n").concat(specifier);
+};
 
-const writeBaseUrlMustBeAbsolute = ({
-  baseUrl,
-  specifier
-}) => `baseUrl must be absolute.
---- base url ---
-${baseUrl}
---- specifier ---
-${specifier}`;
+var writeBaseUrlMustBeAbsolute = function writeBaseUrlMustBeAbsolute(_ref2) {
+  var baseUrl = _ref2.baseUrl,
+      specifier = _ref2.specifier;
+  return "baseUrl must be absolute.\n--- base url ---\n".concat(baseUrl, "\n--- specifier ---\n").concat(specifier);
+};
 
-const writeBaseUrlRequired = ({
-  baseUrl,
-  specifier
-}) => `baseUrl required to resolve relative specifier.
---- base url ---
-${baseUrl}
---- specifier ---
-${specifier}`;
+var writeBaseUrlRequired = function writeBaseUrlRequired(_ref3) {
+  var baseUrl = _ref3.baseUrl,
+      specifier = _ref3.specifier;
+  return "baseUrl required to resolve relative specifier.\n--- base url ---\n".concat(baseUrl, "\n--- specifier ---\n").concat(specifier);
+};
 
-const tryUrlResolution = (string, url) => {
-  const result = resolveUrl(string, url);
+var tryUrlResolution = function tryUrlResolution(string, url) {
+  var result = resolveUrl(string, url);
   return hasScheme(result) ? result : null;
 };
 
-const resolveSpecifier = (specifier, importer) => {
+var resolveSpecifier = function resolveSpecifier(specifier, importer) {
   if (specifier[0] === "/" || specifier.startsWith("./") || specifier.startsWith("../")) {
     return resolveUrl(specifier, importer);
   }
@@ -205,50 +207,47 @@ const resolveSpecifier = (specifier, importer) => {
   return null;
 };
 
-const applyImportMap = ({
-  importMap,
-  specifier,
-  importer
-}) => {
+var applyImportMap = function applyImportMap(_ref) {
+  var importMap = _ref.importMap,
+      specifier = _ref.specifier,
+      importer = _ref.importer;
   assertImportMap(importMap);
 
   if (typeof specifier !== "string") {
     throw new TypeError(writeSpecifierMustBeAString({
-      specifier,
-      importer
+      specifier: specifier,
+      importer: importer
     }));
   }
 
   if (importer) {
     if (typeof importer !== "string") {
       throw new TypeError(writeImporterMustBeAString({
-        importer,
-        specifier
+        importer: importer,
+        specifier: specifier
       }));
     }
 
     if (!hasScheme(importer)) {
       throw new Error(writeImporterMustBeAbsolute({
-        importer,
-        specifier
+        importer: importer,
+        specifier: specifier
       }));
     }
   }
 
-  const specifierUrl = resolveSpecifier(specifier, importer);
-  const specifierNormalized = specifierUrl || specifier;
-  const {
-    scopes
-  } = importMap;
+  var specifierUrl = resolveSpecifier(specifier, importer);
+  var specifierNormalized = specifierUrl || specifier;
+  var scopes = importMap.scopes;
 
   if (scopes && importer) {
-    const scopeKeyMatching = Object.keys(scopes).find(scopeKey => {
+    var scopeKeyMatching = Object.keys(scopes).find(function (scopeKey) {
       return scopeKey === importer || specifierIsPrefixOf(scopeKey, importer);
     });
 
     if (scopeKeyMatching) {
-      const scopeValue = scopes[scopeKeyMatching];
-      const remappingFromScopeImports = applyImports(specifierNormalized, scopeValue);
+      var scopeValue = scopes[scopeKeyMatching];
+      var remappingFromScopeImports = applyImports(specifierNormalized, scopeValue);
 
       if (remappingFromScopeImports !== null) {
         return remappingFromScopeImports;
@@ -256,12 +255,10 @@ const applyImportMap = ({
     }
   }
 
-  const {
-    imports
-  } = importMap;
+  var imports = importMap.imports;
 
   if (imports) {
-    const remappingFromImports = applyImports(specifierNormalized, imports);
+    var remappingFromImports = applyImports(specifierNormalized, imports);
 
     if (remappingFromImports !== null) {
       return remappingFromImports;
@@ -273,76 +270,123 @@ const applyImportMap = ({
   }
 
   throw new Error(writeBareSpecifierMustBeRemapped({
-    specifier,
-    importer
+    specifier: specifier,
+    importer: importer
   }));
 };
 
-const applyImports = (specifier, imports) => {
-  const importKeyArray = Object.keys(imports);
-  let i = 0;
+var applyImports = function applyImports(specifier, imports) {
+  var importKeyArray = Object.keys(imports);
+  var i = 0;
 
   while (i < importKeyArray.length) {
-    const importKey = importKeyArray[i];
+    var importKey = importKeyArray[i];
     i++;
 
     if (importKey === specifier) {
-      const importValue = imports[importKey];
+      var importValue = imports[importKey];
       return importValue;
     }
 
     if (specifierIsPrefixOf(importKey, specifier)) {
-      const importValue = imports[importKey];
-      const afterImportKey = specifier.slice(importKey.length);
-      return tryUrlResolution(afterImportKey, importValue);
+      var _importValue = imports[importKey];
+      var afterImportKey = specifier.slice(importKey.length);
+      return tryUrlResolution(afterImportKey, _importValue);
     }
   }
 
   return null;
 };
 
-const specifierIsPrefixOf = (specifierHref, href) => {
+var specifierIsPrefixOf = function specifierIsPrefixOf(specifierHref, href) {
   return specifierHref[specifierHref.length - 1] === "/" && href.startsWith(specifierHref);
 };
 
-const writeSpecifierMustBeAString = ({
-  specifier,
-  importer
-}) => `specifier must be a string.
---- specifier ---
-${specifier}
---- importer ---
-${importer}`;
+var writeSpecifierMustBeAString = function writeSpecifierMustBeAString(_ref2) {
+  var specifier = _ref2.specifier,
+      importer = _ref2.importer;
+  return "specifier must be a string.\n--- specifier ---\n".concat(specifier, "\n--- importer ---\n").concat(importer);
+};
 
-const writeImporterMustBeAString = ({
-  importer,
-  specifier
-}) => `importer must be a string.
---- importer ---
-${importer}
---- specifier ---
-${specifier}`;
+var writeImporterMustBeAString = function writeImporterMustBeAString(_ref3) {
+  var importer = _ref3.importer,
+      specifier = _ref3.specifier;
+  return "importer must be a string.\n--- importer ---\n".concat(importer, "\n--- specifier ---\n").concat(specifier);
+};
 
-const writeImporterMustBeAbsolute = ({
-  importer,
-  specifier
-}) => `importer must be an absolute url.
---- importer ---
-${importer}
---- specifier ---
-${specifier}`;
+var writeImporterMustBeAbsolute = function writeImporterMustBeAbsolute(_ref4) {
+  var importer = _ref4.importer,
+      specifier = _ref4.specifier;
+  return "importer must be an absolute url.\n--- importer ---\n".concat(importer, "\n--- specifier ---\n").concat(specifier);
+};
 
-const writeBareSpecifierMustBeRemapped = ({
-  specifier,
-  importer
-}) => `Unmapped bare specifier.
---- specifier ---
-${specifier}
---- importer ---
-${importer}`;
+var writeBareSpecifierMustBeRemapped = function writeBareSpecifierMustBeRemapped(_ref5) {
+  var specifier = _ref5.specifier,
+      importer = _ref5.importer;
+  return "Unmapped bare specifier.\n--- specifier ---\n".concat(specifier, "\n--- importer ---\n").concat(importer);
+};
 
-// https://github.com/systemjs/systemjs/blob/89391f92dfeac33919b0223bbf834a1f4eea5750/src/common.js#L136
-const composeTwoImportMaps = (leftImportMap, rightImportMap) => {
+var _defineProperty = (function (obj, key, value) {
+  // Shortcircuit the slow defineProperty path when possible.
+  // We are trying to avoid issues where setters defined on the
+  // prototype cause side effects under the fast path of simple
+  // assignment. By checking for existence of the property with
+  // the in operator, we can optimize most of this overhead away.
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+});
+
+function _objectSpread (target) {
+  for (var i = 1; i < arguments.length; i++) {
+    // eslint-disable-next-line prefer-rest-params
+    var source = arguments[i] === null ? {} : arguments[i];
+
+    if (i % 2) {
+      // eslint-disable-next-line no-loop-func
+      ownKeys(source, true).forEach(function (key) {
+        _defineProperty(target, key, source[key]);
+      });
+    } else if (Object.getOwnPropertyDescriptors) {
+      Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+    } else {
+      // eslint-disable-next-line no-loop-func
+      ownKeys(source).forEach(function (key) {
+        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+      });
+    }
+  }
+
+  return target;
+} // This function is different to "Reflect.ownKeys". The enumerableOnly
+// filters on symbol properties only. Returned string properties are always
+// enumerable. It is good to use in objectSpread.
+
+function ownKeys(object, enumerableOnly) {
+  var keys = Object.keys(object);
+
+  if (Object.getOwnPropertySymbols) {
+    var symbols = Object.getOwnPropertySymbols(object);
+    if (enumerableOnly) symbols = symbols.filter(function (sym) {
+      return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+    }); // eslint-disable-next-line prefer-spread
+
+    keys.push.apply(keys, symbols);
+  }
+
+  return keys;
+}
+
+var composeTwoImportMaps = function composeTwoImportMaps(leftImportMap, rightImportMap) {
   assertImportMap(leftImportMap);
   assertImportMap(rightImportMap);
   return {
@@ -351,107 +395,103 @@ const composeTwoImportMaps = (leftImportMap, rightImportMap) => {
   };
 };
 
-const composeTwoImports = (leftImports = {}, rightImports = {}) => {
-  return { ...leftImports,
-    ...rightImports
-  };
+var composeTwoImports = function composeTwoImports() {
+  var leftImports = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var rightImports = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  return _objectSpread({}, leftImports, {}, rightImports);
 };
 
-const composeTwoScopes = (leftScopes = {}, rightScopes = {}) => {
-  const scopes = { ...leftScopes
-  };
-  Object.keys(rightScopes).forEach(scopeKey => {
+var composeTwoScopes = function composeTwoScopes() {
+  var leftScopes = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var rightScopes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  var scopes = _objectSpread({}, leftScopes);
+
+  Object.keys(rightScopes).forEach(function (scopeKey) {
     if (scopes.hasOwnProperty(scopeKey)) {
-      scopes[scopeKey] = { ...scopes[scopeKey],
-        ...rightScopes[scopeKey]
-      };
+      scopes[scopeKey] = _objectSpread({}, scopes[scopeKey], {}, rightScopes[scopeKey]);
     } else {
-      scopes[scopeKey] = { ...rightScopes[scopeKey]
-      };
+      scopes[scopeKey] = _objectSpread({}, rightScopes[scopeKey]);
     }
   });
   return scopes;
 };
 
-const sortImportMap = importMap => {
+var sortImportMap = function sortImportMap(importMap) {
   assertImportMap(importMap);
-  const {
-    imports,
-    scopes
-  } = importMap;
+  var imports = importMap.imports,
+      scopes = importMap.scopes;
   return {
     imports: imports ? sortImports(imports) : undefined,
     scopes: scopes ? sortScopes(scopes) : undefined
   };
 };
-const sortImports = imports => {
-  const importsSorted = {};
-  Object.keys(imports).sort(compareLengthOrLocaleCompare).forEach(name => {
+var sortImports = function sortImports(imports) {
+  var importsSorted = {};
+  Object.keys(imports).sort(compareLengthOrLocaleCompare).forEach(function (name) {
     importsSorted[name] = imports[name];
   });
   return importsSorted;
 };
-const sortScopes = scopes => {
-  const scopesSorted = {};
-  Object.keys(scopes).sort(compareLengthOrLocaleCompare).forEach(scopeName => {
+var sortScopes = function sortScopes(scopes) {
+  var scopesSorted = {};
+  Object.keys(scopes).sort(compareLengthOrLocaleCompare).forEach(function (scopeName) {
     scopesSorted[scopeName] = sortImports(scopes[scopeName]);
   });
   return scopesSorted;
 };
 
-const compareLengthOrLocaleCompare = (a, b) => {
+var compareLengthOrLocaleCompare = function compareLengthOrLocaleCompare(a, b) {
   return b.length - a.length || a.localeCompare(b);
 };
 
-const normalizeImportMap = (importMap, baseUrl) => {
+var normalizeImportMap = function normalizeImportMap(importMap, baseUrl) {
   assertImportMap(importMap);
 
   if (typeof baseUrl !== "string") {
     throw new TypeError(formulateBaseUrlMustBeAString({
-      baseUrl
+      baseUrl: baseUrl
     }));
   }
 
-  const {
-    imports,
-    scopes
-  } = importMap;
+  var imports = importMap.imports,
+      scopes = importMap.scopes;
   return {
     imports: imports ? normalizeImports(imports, baseUrl) : undefined,
     scopes: scopes ? normalizeScopes(scopes, baseUrl) : undefined
   };
 };
 
-const normalizeImports = (imports, baseUrl) => {
-  const importsNormalized = {};
-  Object.keys(imports).forEach(specifier => {
-    const address = imports[specifier];
+var normalizeImports = function normalizeImports(imports, baseUrl) {
+  var importsNormalized = {};
+  Object.keys(imports).forEach(function (specifier) {
+    var address = imports[specifier];
 
     if (typeof address !== "string") {
       console.warn(formulateAddressMustBeAString({
-        address,
-        specifier
+        address: address,
+        specifier: specifier
       }));
       return;
     }
 
-    const specifierResolved = resolveSpecifier(specifier, baseUrl) || specifier;
-    const addressUrl = tryUrlResolution(address, baseUrl);
+    var specifierResolved = resolveSpecifier(specifier, baseUrl) || specifier;
+    var addressUrl = tryUrlResolution(address, baseUrl);
 
     if (addressUrl === null) {
       console.warn(formulateAdressResolutionFailed({
-        address,
-        baseUrl,
-        specifier
+        address: address,
+        baseUrl: baseUrl,
+        specifier: specifier
       }));
       return;
     }
 
     if (specifier.endsWith("/") && !addressUrl.endsWith("/")) {
       console.warn(formulateAddressUrlRequiresTrailingSlash({
-        addressUrl,
-        address,
-        specifier
+        addressUrl: addressUrl,
+        address: address,
+        specifier: specifier
       }));
       return;
     }
@@ -461,384 +501,133 @@ const normalizeImports = (imports, baseUrl) => {
   return sortImports(importsNormalized);
 };
 
-const normalizeScopes = (scopes, baseUrl) => {
-  const scopesNormalized = {};
-  Object.keys(scopes).forEach(scope => {
-    const scopeValue = scopes[scope];
-    const scopeUrl = tryUrlResolution(scope, baseUrl);
+var normalizeScopes = function normalizeScopes(scopes, baseUrl) {
+  var scopesNormalized = {};
+  Object.keys(scopes).forEach(function (scope) {
+    var scopeValue = scopes[scope];
+    var scopeUrl = tryUrlResolution(scope, baseUrl);
 
     if (scopeUrl === null) {
       console.warn(formulateScopeResolutionFailed({
-        scope,
-        baseUrl
+        scope: scope,
+        baseUrl: baseUrl
       }));
       return;
     }
 
-    const scopeValueNormalized = normalizeImports(scopeValue, baseUrl);
+    var scopeValueNormalized = normalizeImports(scopeValue, baseUrl);
     scopesNormalized[scopeUrl] = scopeValueNormalized;
   });
   return sortScopes(scopesNormalized);
 };
 
-const formulateBaseUrlMustBeAString = ({
-  baseUrl
-}) => `baseUrl must be a string.
---- base url ---
-${baseUrl}`;
-
-const formulateAddressMustBeAString = ({
-  specifier,
-  address
-}) => `Address must be a string.
---- address ---
-${address}
---- specifier ---
-${specifier}`;
-
-const formulateAdressResolutionFailed = ({
-  address,
-  baseUrl,
-  specifier
-}) => `Address url resolution failed.
---- address ---
-${address}
---- base url ---
-${baseUrl}
---- specifier ---
-${specifier}`;
-
-const formulateAddressUrlRequiresTrailingSlash = ({
-  addressURL,
-  address,
-  specifier
-}) => `Address must end with /.
---- address url ---
-${addressURL}
---- address ---
-${address}
---- specifier ---
-${specifier}`;
-
-const formulateScopeResolutionFailed = ({
-  scope,
-  baseUrl
-}) => `Scope url resolution failed.
---- scope ---
-${scope}
---- base url ---
-${baseUrl}`;
-
-const normalizeImportMapForProject = (importMap, httpResolutionOrigin = "http://fake_origin_unlikely_to_collide.ext") => {
-  return normalizeImportMap(importMap, httpResolutionOrigin);
+var formulateBaseUrlMustBeAString = function formulateBaseUrlMustBeAString(_ref) {
+  var baseUrl = _ref.baseUrl;
+  return "baseUrl must be a string.\n--- base url ---\n".concat(baseUrl);
 };
 
-const pathnameToExtension = pathname => {
-  const slashLastIndex = pathname.lastIndexOf("/");
+var formulateAddressMustBeAString = function formulateAddressMustBeAString(_ref2) {
+  var specifier = _ref2.specifier,
+      address = _ref2.address;
+  return "Address must be a string.\n--- address ---\n".concat(address, "\n--- specifier ---\n").concat(specifier);
+};
+
+var formulateAdressResolutionFailed = function formulateAdressResolutionFailed(_ref3) {
+  var address = _ref3.address,
+      baseUrl = _ref3.baseUrl,
+      specifier = _ref3.specifier;
+  return "Address url resolution failed.\n--- address ---\n".concat(address, "\n--- base url ---\n").concat(baseUrl, "\n--- specifier ---\n").concat(specifier);
+};
+
+var formulateAddressUrlRequiresTrailingSlash = function formulateAddressUrlRequiresTrailingSlash(_ref4) {
+  var addressURL = _ref4.addressURL,
+      address = _ref4.address,
+      specifier = _ref4.specifier;
+  return "Address must end with /.\n--- address url ---\n".concat(addressURL, "\n--- address ---\n").concat(address, "\n--- specifier ---\n").concat(specifier);
+};
+
+var formulateScopeResolutionFailed = function formulateScopeResolutionFailed(_ref5) {
+  var scope = _ref5.scope,
+      baseUrl = _ref5.baseUrl;
+  return "Scope url resolution failed.\n--- scope ---\n".concat(scope, "\n--- base url ---\n").concat(baseUrl);
+};
+
+var pathnameToExtension = function pathnameToExtension(pathname) {
+  var slashLastIndex = pathname.lastIndexOf("/");
 
   if (slashLastIndex !== -1) {
     pathname = pathname.slice(slashLastIndex + 1);
   }
 
-  const dotLastIndex = pathname.lastIndexOf(".");
+  var dotLastIndex = pathname.lastIndexOf(".");
   if (dotLastIndex === -1) return ""; // if (dotLastIndex === pathname.length - 1) return ""
 
   return pathname.slice(dotLastIndex);
 };
 
-// directly target the files because this code
-const resolveImport = ({
-  specifier,
-  importer,
-  importMap,
-  defaultExtension = true
-}) => {
+var resolveImport = function resolveImport(_ref) {
+  var specifier = _ref.specifier,
+      importer = _ref.importer,
+      importMap = _ref.importMap,
+      _ref$defaultExtension = _ref.defaultExtension,
+      defaultExtension = _ref$defaultExtension === void 0 ? true : _ref$defaultExtension;
   return applyDefaultExtension({
     url: importMap ? applyImportMap({
-      importMap,
-      specifier,
-      importer
+      importMap: importMap,
+      specifier: specifier,
+      importer: importer
     }) : resolveUrl(specifier, importer),
-    importer,
-    defaultExtension
+    importer: importer,
+    defaultExtension: defaultExtension
   });
 };
 
-const applyDefaultExtension = ({
-  url,
-  importer,
-  defaultExtension
-}) => {
-  if (hrefToPathname(url) === "/") {
-    return url;
-  }
+var applyDefaultExtension = function applyDefaultExtension(_ref2) {
+  var url = _ref2.url,
+      importer = _ref2.importer,
+      defaultExtension = _ref2.defaultExtension;
 
-  if (url.endsWith("/")) {
+  if (urlToPathname(url).endsWith("/")) {
     return url;
   }
 
   if (typeof defaultExtension === "string") {
-    const extension = pathnameToExtension(url);
+    var extension = pathnameToExtension(url);
 
     if (extension === "") {
-      return `${url}${defaultExtension}`;
+      return "".concat(url).concat(defaultExtension);
     }
 
     return url;
   }
 
   if (defaultExtension === true) {
-    const extension = pathnameToExtension(url);
+    var _extension = pathnameToExtension(url);
 
-    if (extension === "" && importer) {
-      const importerPathname = hrefToPathname(importer);
-      const importerExtension = pathnameToExtension(importerPathname);
-      return `${url}${importerExtension}`;
+    if (_extension === "" && importer) {
+      var importerPathname = urlToPathname(importer);
+      var importerExtension = pathnameToExtension(importerPathname);
+      return "".concat(url).concat(importerExtension);
     }
   }
 
   return url;
 };
 
-const startsWithWindowsDriveLetter = string => {
-  const firstChar = string[0];
-  if (!/[a-zA-Z]/.test(firstChar)) return false;
-  const secondChar = string[1];
-  if (secondChar !== ":") return false;
-  return true;
-};
-
-const isWindowsPath = path => startsWithWindowsDriveLetter(path) && path[2] === "\\";
-
-const replaceBackSlashesWithSlashes = string => string.replace(/\\/g, "/");
-
-const operatingSystemPathToPathname = operatingSystemPath => {
-  if (typeof operatingSystemPath !== "string") {
-    throw new TypeError(`operatingSystemPath must be a string, got ${operatingSystemPath}`);
-  }
-
-  if (operatingSystemPath.startsWith("file://")) {
-    const pathname = operatingSystemPath.slice("file://".length);
-
-    if (pathname.endsWith("/")) {
-      return pathname.slice(0, -1);
-    }
-
-    return pathname;
-  }
-
-  if (isWindowsPath(operatingSystemPath)) {
-    return `/${replaceBackSlashesWithSlashes(operatingSystemPath)}`;
-  } // linux and mac operatingSystemFilename === pathname
-
-
-  if (operatingSystemPath.endsWith("/")) {
-    return operatingSystemPath.slice(0, -1);
-  }
-
-  return operatingSystemPath;
-};
-
-const pathnameToRelativePath = (pathname, otherPathname) => pathname.slice(otherPathname.length);
-
-// https://github.com/benjamingr/RegExp.escape/blob/master/polyfill.js
-const escapeRegexpSpecialCharacters = string => {
-  string = String(string);
-  let i = 0;
-  let escapedString = "";
-
-  while (i < string.length) {
-    const char = string[i];
-    i++;
-    escapedString += isRegExpSpecialChar(char) ? `\\${char}` : char;
-  }
-
-  return escapedString;
-};
-
-const isRegExpSpecialChar = char => regexpSpecialChars.indexOf(char) > -1;
-
-const regexpSpecialChars = ["/", "^", "\\", "[", "]", "(", ")", "{", "}", "?", "+", "*", ".", "|", "$"];
-
-const resolveImportForProject = ({
-  projectPath,
-  specifier,
-  importer = projectPathname,
-  importMap = {},
-  importDefaultExtension,
-  httpResolutionForcing = true,
-  httpResolutionOrigin = "http://fake_origin_unlikely_to_collide.ext",
-  insideProjectForcing = true
-}) => {
-  if (typeof projectPath !== "string") {
-    throw new TypeError(`projectPath must be a string, got ${projectPath}`);
-  }
-
-  if (importer && !hasScheme(importer)) {
-    throw new Error(`importer must have a scheme, got ${importer}`);
-  }
-
-  const projectPathname = operatingSystemPathToPathname(projectPath);
-  const projectHref = `file://${projectPathname}`;
-  const importerHref = importer || projectHref;
-
-  if (insideProjectForcing && importer !== projectHref && hrefUseFileProtocol(importerHref) && !importerHref.startsWith(`${projectHref}/`)) {
-    throw new Error(formulateImporterMustBeInsideProject({
-      projectPath,
-      importer
-    }));
-  }
-
-  let importerForProject;
-
-  if (httpResolutionForcing) {
-    if (importerHref === projectHref) {
-      importerForProject = `${httpResolutionOrigin}`;
-    } else if (importerHref.startsWith(`${projectHref}/`)) {
-      const importerPathname = hrefToPathname(importerHref);
-      const importerRelativePath = pathnameToRelativePath(importerPathname, projectPathname); // 99% of the time importer is an operating system path
-      // here we ensure / is resolved against project by forcing an url resolution
-      // prefixing with origin
-
-      importerForProject = `${httpResolutionOrigin}${importerRelativePath}`;
-    } else {
-      // there is already a scheme (http, https, file), keep it
-      // it means there is an absolute import starting with file:// or http:// for instance.
-      importerForProject = importerHref;
-    }
-  } else {
-    importerForProject = importerHref;
-  }
-
-  if (hrefUseFileProtocol(importer) && !isOriginRelativeSpecifier(specifier)) {
-    const url = resolveUrl(specifier, importer);
-
-    if (hrefUseFileProtocol(url)) {
-      const isOutsideProject = url !== projectHref && !url.startsWith(`${projectHref}/`);
-
-      if (isOutsideProject) {
-        if (insideProjectForcing) {
-          throw new Error(formulateImportMustBeInsideProject({
-            projectPath,
-            specifier,
-            importer,
-            importUrl: url
-          }));
-        }
-
-        return url;
-      }
-    }
-  }
-
-  let importUrl;
-
-  try {
-    importUrl = resolveImport({
-      specifier,
-      importer: importerForProject,
-      importMap,
-      defaultExtension: importDefaultExtension
-    });
-  } catch (e) {
-    const httpResolutionOriginRegExp = new RegExp(escapeRegexpSpecialCharacters(httpResolutionOrigin), "g");
-    const projectOrigin = `file://${projectPathname}`;
-    e.stack = e.stack.replace(httpResolutionOriginRegExp, projectOrigin);
-    e.message = e.message.replace(httpResolutionOriginRegExp, projectOrigin);
-    throw e;
-  }
-
-  if (insideProjectForcing && // only if use file protocol because
-  // it's ok to have an external import like "https://cdn.com/jquery.js"
-  hrefUseFileProtocol(importUrl) && importUrl !== projectHref && !importUrl.startsWith(`${projectHref}/`)) {
-    throw new Error(formulateImportMustBeInsideProject({
-      projectPath,
-      specifier,
-      importer,
-      importUrl
-    }));
-  }
-
-  if (httpResolutionForcing && hrefToOrigin(importUrl) === httpResolutionOrigin) {
-    const importRelativePath = hrefToPathname(importUrl);
-    return `${projectHref}${importRelativePath}`;
-  }
-
-  return importUrl;
-};
-
-const isOriginRelativeSpecifier = specifier => {
-  return specifier[0] === "/" && specifier[1] !== "/";
-};
-
-const hrefUseFileProtocol = specifier => specifier.startsWith("file://");
-
-const formulateImporterMustBeInsideProject = ({
-  projectPath,
-  importer
-}) => `importer must be inside project.
---- importer ---
-${importer}
---- project path ---
-${projectPath}`;
-
-const formulateImportMustBeInsideProject = ({
-  projectPath,
-  specifier,
-  importer,
-  importUrl
-}) => `import must be inside project.
---- import url ---
-${importUrl}
---- project path ---
-${projectPath}
---- specifier ---
-${specifier}
---- importer ---
-${importer}`;
-
-const resolveSpecifierForProject = (specifier, projectPathname, httpResolutionOrigin = "http://fake_origin_unlikely_to_collide.ext") => {
-  const specifierHttpResolved = resolveSpecifier(specifier, httpResolutionOrigin);
-
-  if (hrefToOrigin(specifierHttpResolved) === httpResolutionOrigin) {
-    const specifierRelativePath = hrefToPathname(specifierHttpResolved);
-    return `file://${projectPathname}${specifierRelativePath}`;
-  }
-
-  return specifierHttpResolved;
-};
-
-/**
- * wrapImportMap can be used to remap all your imports under a folder.
- *
- * It is used by jsenv to import from a compiled folder instead of source folder.
- *
- * wrapImportMap must preserve the import map order so that
- * applyImportMap can still match the most specific pattern first.
- *
- * Because order is directly connected to the pattern length
- * prefixing every pattern with something does not means we have to sort
- * the wrappedImportMap.
- *
- * However we must absolutely ensure if an import like '/' exists in imports
- * or scoped imports. It must remain the last when being prefixed.
- *
- */
-const wrapImportMap = (importMap, folderRelativeName, ensureInto = true) => {
+var wrapImportMap = function wrapImportMap(importMap, folderRelativeName) {
+  var ensureInto = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
   assertImportMap(importMap);
 
   if (typeof folderRelativeName !== "string") {
     throw new TypeError(formulateFolderRelativeNameMustBeAString({
-      folderRelativeName
+      folderRelativeName: folderRelativeName
     }));
   }
 
-  const into = `/${folderRelativeName}/`;
-  const {
-    imports,
-    scopes
-  } = importMap;
-  let importsForWrapping;
+  var into = "/".concat(folderRelativeName, "/");
+  var imports = importMap.imports,
+      scopes = importMap.scopes;
+  var importsForWrapping;
 
   if (imports) {
     importsForWrapping = wrapTopLevelImports(imports, into);
@@ -846,7 +635,7 @@ const wrapImportMap = (importMap, folderRelativeName, ensureInto = true) => {
     importsForWrapping = {};
   }
 
-  let scopesForWrapping;
+  var scopesForWrapping;
 
   if (scopes) {
     scopesForWrapping = wrapScopes(scopes, into);
@@ -859,9 +648,7 @@ const wrapImportMap = (importMap, folderRelativeName, ensureInto = true) => {
     importsForWrapping[into] = into;
     importsForWrapping["/"] = into; // and when already into, you stay inside
 
-    scopesForWrapping[into] = {
-      [into]: into
-    };
+    scopesForWrapping[into] = _defineProperty({}, into, into);
   }
 
   return {
@@ -870,29 +657,30 @@ const wrapImportMap = (importMap, folderRelativeName, ensureInto = true) => {
   };
 };
 
-const wrapScopes = (scopes, into) => {
-  const scopesWrapped = {};
-  Object.keys(scopes).forEach(scopeKey => {
-    const scopeValue = scopes[scopeKey];
-    const scopeKeyWrapped = wrapAddress(scopeKey, into);
-    const {
-      importsWrapped,
-      importsRemaining
-    } = wrapImports(scopeValue, into);
-    let scopeValueWrapped;
+var wrapScopes = function wrapScopes(scopes, into) {
+  var scopesWrapped = {};
+  Object.keys(scopes).forEach(function (scopeKey) {
+    var scopeValue = scopes[scopeKey];
+    var scopeKeyWrapped = wrapAddress(scopeKey, into);
+
+    var _wrapImports = wrapImports(scopeValue, into),
+        importsWrapped = _wrapImports.importsWrapped,
+        importsRemaining = _wrapImports.importsRemaining;
+
+    var scopeValueWrapped;
 
     if (scopeHasLeadingSlashScopedRemapping(scopeValue, scopeKey)) {
-      const leadingSlashSpecifier = `${into}${scopeKey.slice(1)}`;
+      var leadingSlashSpecifier = "".concat(into).concat(scopeKey.slice(1));
       scopeValueWrapped = {}; // put everything except the leading slash remapping
 
-      Object.keys(importsWrapped).forEach(importKeyWrapped => {
+      Object.keys(importsWrapped).forEach(function (importKeyWrapped) {
         if (importKeyWrapped === leadingSlashSpecifier || importKeyWrapped === into) {
           return;
         }
 
         scopeValueWrapped[importKeyWrapped] = importsWrapped[importKeyWrapped];
       });
-      Object.keys(importsRemaining).forEach(importKey => {
+      Object.keys(importsRemaining).forEach(function (importKey) {
         if (importKey === scopeKey || importKey === "/") {
           return;
         }
@@ -905,34 +693,31 @@ const wrapScopes = (scopes, into) => {
       scopeValueWrapped[into] = leadingSlashSpecifier;
       scopeValueWrapped["/"] = leadingSlashSpecifier;
     } else {
-      scopeValueWrapped = { ...importsWrapped,
-        ...importsRemaining
-      };
+      scopeValueWrapped = _objectSpread({}, importsWrapped, {}, importsRemaining);
     }
 
     scopesWrapped[scopeKeyWrapped] = scopeValueWrapped;
 
     if (scopeKeyWrapped !== scopeKey) {
-      scopesWrapped[scopeKey] = { ...scopeValueWrapped
-      };
+      scopesWrapped[scopeKey] = _objectSpread({}, scopeValueWrapped);
     }
   });
   return scopesWrapped;
 };
 
-const scopeHasLeadingSlashScopedRemapping = (scopeImports, scopeKey) => {
+var scopeHasLeadingSlashScopedRemapping = function scopeHasLeadingSlashScopedRemapping(scopeImports, scopeKey) {
   return scopeKey in scopeImports && scopeImports[scopeKey] === scopeKey && "/" in scopeImports && scopeImports["/"] === scopeKey;
 };
 
-const wrapImports = (imports, into) => {
-  const importsWrapped = {};
-  const importsRemaining = {};
-  Object.keys(imports).forEach(importKey => {
-    const importValue = imports[importKey];
-    const importKeyWrapped = wrapSpecifier(importKey, into);
-    const importValueWrapped = wrapAddress(importValue, into);
-    const keyChanged = importKeyWrapped !== importKey;
-    const valueChanged = importValueWrapped !== importValue;
+var wrapImports = function wrapImports(imports, into) {
+  var importsWrapped = {};
+  var importsRemaining = {};
+  Object.keys(imports).forEach(function (importKey) {
+    var importValue = imports[importKey];
+    var importKeyWrapped = wrapSpecifier(importKey, into);
+    var importValueWrapped = wrapAddress(importValue, into);
+    var keyChanged = importKeyWrapped !== importKey;
+    var valueChanged = importValueWrapped !== importValue;
 
     if (keyChanged || valueChanged) {
       importsWrapped[importKeyWrapped] = importValueWrapped;
@@ -941,48 +726,46 @@ const wrapImports = (imports, into) => {
     }
   });
   return {
-    importsWrapped,
-    importsRemaining
+    importsWrapped: importsWrapped,
+    importsRemaining: importsRemaining
   };
 };
 
-const wrapTopLevelImports = (imports, into) => {
-  const {
-    importsWrapped,
-    importsRemaining
-  } = wrapImports(imports, into);
-  return { ...importsWrapped,
-    ...importsRemaining
-  };
+var wrapTopLevelImports = function wrapTopLevelImports(imports, into) {
+  var _wrapImports2 = wrapImports(imports, into),
+      importsWrapped = _wrapImports2.importsWrapped,
+      importsRemaining = _wrapImports2.importsRemaining;
+
+  return _objectSpread({}, importsWrapped, {}, importsRemaining);
 };
 
-const wrapSpecifier = (specifier, into) => {
+var wrapSpecifier = function wrapSpecifier(specifier, into) {
   if (specifier.startsWith("//")) {
     return specifier;
   }
 
   if (specifier[0] === "/") {
-    return `${into}${specifier.slice(1)}`;
+    return "".concat(into).concat(specifier.slice(1));
   }
 
   if (specifier.startsWith("./")) {
-    return `./${into}${specifier.slice(2)}`;
+    return "./".concat(into).concat(specifier.slice(2));
   }
 
   return specifier;
 };
 
-const wrapAddress = (string, into) => {
+var wrapAddress = function wrapAddress(string, into) {
   if (string.startsWith("//")) {
     return string;
   }
 
   if (string[0] === "/") {
-    return `${into}${string.slice(1)}`;
+    return "".concat(into).concat(string.slice(1));
   }
 
   if (string.startsWith("./")) {
-    return `./${into}${string.slice(2)}`;
+    return "./".concat(into).concat(string.slice(2));
   }
 
   if (string.startsWith("../")) {
@@ -994,23 +777,19 @@ const wrapAddress = (string, into) => {
   } // bare
 
 
-  return `${into}${string}`;
+  return "".concat(into).concat(string);
 };
 
-const formulateFolderRelativeNameMustBeAString = ({
-  folderRelativeName
-}) => `folderRelativeName must be a string.
---- folder relative name ---
-${folderRelativeName}`;
+var formulateFolderRelativeNameMustBeAString = function formulateFolderRelativeNameMustBeAString(_ref) {
+  var folderRelativeName = _ref.folderRelativeName;
+  return "folderRelativeName must be a string.\n--- folder relative name ---\n".concat(folderRelativeName);
+};
 
 exports.applyImportMap = applyImportMap;
 exports.composeTwoImportMaps = composeTwoImportMaps;
 exports.normalizeImportMap = normalizeImportMap;
-exports.normalizeImportMapForProject = normalizeImportMapForProject;
 exports.resolveImport = resolveImport;
-exports.resolveImportForProject = resolveImportForProject;
 exports.resolveSpecifier = resolveSpecifier;
-exports.resolveSpecifierForProject = resolveSpecifierForProject;
 exports.resolveUrl = resolveUrl;
 exports.sortImportMap = sortImportMap;
 exports.wrapImportMap = wrapImportMap;

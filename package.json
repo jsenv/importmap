@@ -47,7 +47,7 @@
     "@jsenv/eslint-config": "11.3.0",
     "@jsenv/github-release-package": "1.1.1",
     "@jsenv/node-module-import-map": "8.6.0",
-    "@jsenv/package-publish": "1.0.0",
+    "@jsenv/package-publish": "1.1.0",
     "@jsenv/prettier-check-project": "4.0.0",
     "@jsenv/prettier-config": "1.1.0",
     "eslint": "6.7.2",
