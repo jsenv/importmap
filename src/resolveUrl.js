@@ -31,7 +31,7 @@ export const resolveUrl = (specifier, baseUrl) => {
 
   // origin relative
   if (specifier[0] === "/") {
-    return `${urlToScheme(baseUrl)}${specifier}`
+    return `${urlToOrigin(baseUrl)}${specifier}`
   }
 
   const baseOrigin = urlToOrigin(baseUrl)
