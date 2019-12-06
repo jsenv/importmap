@@ -14,11 +14,7 @@ export const resolveImport = ({ specifier, importer, importMap, defaultExtension
 }
 
 const applyDefaultExtension = ({ url, importer, defaultExtension }) => {
-  if (urlToPathname(url) === "/") {
-    return url
-  }
-
-  if (url.endsWith("/")) {
+  if (urlToPathname(url).endsWith("/")) {
     return url
   }
 
