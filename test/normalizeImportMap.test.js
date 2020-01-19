@@ -1,5 +1,5 @@
 import { assert } from "@jsenv/assert"
-import { normalizeImportMap } from "../../index.js"
+import { normalizeImportMap } from "../index.js"
 
 const actual = normalizeImportMap(
   {
