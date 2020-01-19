@@ -326,7 +326,7 @@ var writeBareSpecifierMustBeRemapped = function writeBareSpecifierMustBeRemapped
   return "Unmapped bare specifier.\n--- specifier ---\n".concat(specifier, "\n--- importer ---\n").concat(importer);
 };
 
-var _defineProperty = (function (obj, key, value) {
+var defineProperty = (function (obj, key, value) {
   // Shortcircuit the slow defineProperty path when possible.
   // We are trying to avoid issues where setters defined on the
   // prototype cause side effects under the fast path of simple
@@ -353,14 +353,14 @@ function _objectSpread (target) {
 
     if (i % 2) {
       // eslint-disable-next-line no-loop-func
-      ownKeys(source, true).forEach(function (key) {
-        _defineProperty(target, key, source[key]);
+      ownKeys(Object(source), true).forEach(function (key) {
+        defineProperty(target, key, source[key]);
       });
     } else if (Object.getOwnPropertyDescriptors) {
       Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
     } else {
       // eslint-disable-next-line no-loop-func
-      ownKeys(source).forEach(function (key) {
+      ownKeys(Object(source)).forEach(function (key) {
         Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
       });
     }
@@ -614,177 +614,6 @@ var applyDefaultExtension = function applyDefaultExtension(_ref2) {
   return url;
 };
 
-var wrapImportMap = function wrapImportMap(importMap, folderRelativeName) {
-  var ensureInto = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
-  assertImportMap(importMap);
-
-  if (typeof folderRelativeName !== "string") {
-    throw new TypeError(formulateFolderRelativeNameMustBeAString({
-      folderRelativeName: folderRelativeName
-    }));
-  }
-
-  var into = "/".concat(folderRelativeName, "/");
-  var imports = importMap.imports,
-      scopes = importMap.scopes;
-  var importsForWrapping;
-
-  if (imports) {
-    importsForWrapping = wrapTopLevelImports(imports, into);
-  } else {
-    importsForWrapping = {};
-  }
-
-  var scopesForWrapping;
-
-  if (scopes) {
-    scopesForWrapping = wrapScopes(scopes, into);
-  } else {
-    scopesForWrapping = {};
-  }
-
-  if (ensureInto) {
-    // ensure anything not directly remapped is remapped inside into
-    importsForWrapping[into] = into;
-    importsForWrapping["/"] = into; // and when already into, you stay inside
-
-    scopesForWrapping[into] = _defineProperty({}, into, into);
-  }
-
-  return {
-    imports: importsForWrapping,
-    scopes: scopesForWrapping
-  };
-};
-
-var wrapScopes = function wrapScopes(scopes, into) {
-  var scopesWrapped = {};
-  Object.keys(scopes).forEach(function (scopeKey) {
-    var scopeValue = scopes[scopeKey];
-    var scopeKeyWrapped = wrapAddress(scopeKey, into);
-
-    var _wrapImports = wrapImports(scopeValue, into),
-        importsWrapped = _wrapImports.importsWrapped,
-        importsRemaining = _wrapImports.importsRemaining;
-
-    var scopeValueWrapped;
-
-    if (scopeHasLeadingSlashScopedRemapping(scopeValue, scopeKey)) {
-      var leadingSlashSpecifier = "".concat(into).concat(scopeKey.slice(1));
-      scopeValueWrapped = {}; // put everything except the leading slash remapping
-
-      Object.keys(importsWrapped).forEach(function (importKeyWrapped) {
-        if (importKeyWrapped === leadingSlashSpecifier || importKeyWrapped === into) {
-          return;
-        }
-
-        scopeValueWrapped[importKeyWrapped] = importsWrapped[importKeyWrapped];
-      });
-      Object.keys(importsRemaining).forEach(function (importKey) {
-        if (importKey === scopeKey || importKey === "/") {
-          return;
-        }
-
-        scopeValueWrapped[importKey] = importsRemaining[importKey];
-      }); // now put leading slash remapping to ensure it comes last
-
-      scopeValueWrapped[leadingSlashSpecifier] = leadingSlashSpecifier;
-      scopeValueWrapped[scopeKey] = leadingSlashSpecifier;
-      scopeValueWrapped[into] = leadingSlashSpecifier;
-      scopeValueWrapped["/"] = leadingSlashSpecifier;
-    } else {
-      scopeValueWrapped = _objectSpread({}, importsWrapped, {}, importsRemaining);
-    }
-
-    scopesWrapped[scopeKeyWrapped] = scopeValueWrapped;
-
-    if (scopeKeyWrapped !== scopeKey) {
-      scopesWrapped[scopeKey] = _objectSpread({}, scopeValueWrapped);
-    }
-  });
-  return scopesWrapped;
-};
-
-var scopeHasLeadingSlashScopedRemapping = function scopeHasLeadingSlashScopedRemapping(scopeImports, scopeKey) {
-  return scopeKey in scopeImports && scopeImports[scopeKey] === scopeKey && "/" in scopeImports && scopeImports["/"] === scopeKey;
-};
-
-var wrapImports = function wrapImports(imports, into) {
-  var importsWrapped = {};
-  var importsRemaining = {};
-  Object.keys(imports).forEach(function (importKey) {
-    var importValue = imports[importKey];
-    var importKeyWrapped = wrapSpecifier(importKey, into);
-    var importValueWrapped = wrapAddress(importValue, into);
-    var keyChanged = importKeyWrapped !== importKey;
-    var valueChanged = importValueWrapped !== importValue;
-
-    if (keyChanged || valueChanged) {
-      importsWrapped[importKeyWrapped] = importValueWrapped;
-    } else {
-      importsRemaining[importKey] = importValue;
-    }
-  });
-  return {
-    importsWrapped: importsWrapped,
-    importsRemaining: importsRemaining
-  };
-};
-
-var wrapTopLevelImports = function wrapTopLevelImports(imports, into) {
-  var _wrapImports2 = wrapImports(imports, into),
-      importsWrapped = _wrapImports2.importsWrapped,
-      importsRemaining = _wrapImports2.importsRemaining;
-
-  return _objectSpread({}, importsWrapped, {}, importsRemaining);
-};
-
-var wrapSpecifier = function wrapSpecifier(specifier, into) {
-  if (specifier.startsWith("//")) {
-    return specifier;
-  }
-
-  if (specifier[0] === "/") {
-    return "".concat(into).concat(specifier.slice(1));
-  }
-
-  if (specifier.startsWith("./")) {
-    return "./".concat(into).concat(specifier.slice(2));
-  }
-
-  return specifier;
-};
-
-var wrapAddress = function wrapAddress(string, into) {
-  if (string.startsWith("//")) {
-    return string;
-  }
-
-  if (string[0] === "/") {
-    return "".concat(into).concat(string.slice(1));
-  }
-
-  if (string.startsWith("./")) {
-    return "./".concat(into).concat(string.slice(2));
-  }
-
-  if (string.startsWith("../")) {
-    return string;
-  }
-
-  if (hasScheme(string)) {
-    return string;
-  } // bare
-
-
-  return "".concat(into).concat(string);
-};
-
-var formulateFolderRelativeNameMustBeAString = function formulateFolderRelativeNameMustBeAString(_ref) {
-  var folderRelativeName = _ref.folderRelativeName;
-  return "folderRelativeName must be a string.\n--- folder relative name ---\n".concat(folderRelativeName);
-};
-
 exports.applyImportMap = applyImportMap;
 exports.composeTwoImportMaps = composeTwoImportMaps;
 exports.normalizeImportMap = normalizeImportMap;
@@ -792,5 +621,4 @@ exports.resolveImport = resolveImport;
 exports.resolveSpecifier = resolveSpecifier;
 exports.resolveUrl = resolveUrl;
 exports.sortImportMap = sortImportMap;
-exports.wrapImportMap = wrapImportMap;
 //# sourceMappingURL=main.js.map
