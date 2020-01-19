@@ -1,6 +1,6 @@
 # import-map
 
-Helpers to implement importMap.
+Helpers to implement importmaps.
 
 [![github package](https://img.shields.io/github/package-json/v/jsenv/jsenv-import-map.svg?logo=github&label=package)](https://github.com/jsenv/jsenv-import-map/packages)
 [![npm package](https://img.shields.io/npm/v/@jsenv/import-map.svg?logo=npm&label=package)](https://www.npmjs.com/package/@jsenv/import-map)
@@ -34,7 +34,7 @@ npm install --save-dev @jsenv/import-map@6.7.0
 
 ## composeTwoImportMaps
 
- `composeTwoImportMaps` takes two `importMap` and return a single `importMap` being the composition of the two.
+`composeTwoImportMaps` takes two `importMap` and return a single `importMap` being the composition of the two.
 
 ```js
 import { composeTwoImportMaps } from "@jsenv/import-map"
