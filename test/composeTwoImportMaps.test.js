@@ -1,5 +1,5 @@
 import { assert } from "@jsenv/assert"
-import { composeTwoImportMaps } from "../../index.js"
+import { composeTwoImportMaps } from "../index.js"
 
 const actual = composeTwoImportMaps(
   {
