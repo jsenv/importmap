@@ -25,7 +25,7 @@ Helpers to implement importmaps.
 # Installation
 
 ```console
-npm install --save-dev @jsenv/import-map@6.7.0
+npm install --save-dev @jsenv/import-map@6.7.2
 ```
 
 # Documentation
