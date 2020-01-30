@@ -51,11 +51,11 @@
   "devDependencies": {
     "@jsenv/assert": "1.2.2",
     "@jsenv/codecov-upload": "3.2.0",
-    "@jsenv/core": "11.2.1",
+    "@jsenv/core": "11.2.4",
     "@jsenv/eslint-config": "12.2.0",
     "@jsenv/git-hooks": "1.2.0",
     "@jsenv/github-release-package": "1.1.1",
-    "@jsenv/node-module-import-map": "10.4.0",
+    "@jsenv/node-module-import-map": "11.0.0",
     "@jsenv/package-publish": "1.4.1",
     "@jsenv/prettier-check-project": "5.4.0",
     "@jsenv/prettier-config": "1.2.0",
