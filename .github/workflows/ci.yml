@@ -12,7 +12,7 @@ jobs:
   ci:
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest]
+        os: [ubuntu-latest]
       max-parallel: 1 # to ensure windows failure can prevent ubuntu from publishing package
       # https://github.community/t5/GitHub-Actions/Actions-Windows-quot-Terminate-Batch-Job-Y-N-quot/td-p/30642
       fail-fast: false
