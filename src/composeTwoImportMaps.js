@@ -12,16 +12,26 @@ export const composeTwoImportMaps = (leftImportMap, rightImportMap) => {
 }
 
 const composeTwoImports = (leftImports = {}, rightImports = {}) => {
-  return { ...leftImports, ...rightImports }
+  return {
+    ...leftImports,
+    ...rightImports,
+  }
 }
 
 const composeTwoScopes = (leftScopes = {}, rightScopes = {}) => {
-  const scopes = { ...leftScopes }
+  const scopes = {
+    ...leftScopes,
+  }
   Object.keys(rightScopes).forEach((scopeKey) => {
     if (scopes.hasOwnProperty(scopeKey)) {
-      scopes[scopeKey] = { ...scopes[scopeKey], ...rightScopes[scopeKey] }
+      scopes[scopeKey] = {
+        ...scopes[scopeKey],
+        ...rightScopes[scopeKey],
+      }
     } else {
-      scopes[scopeKey] = { ...rightScopes[scopeKey] }
+      scopes[scopeKey] = {
+        ...rightScopes[scopeKey],
+      }
     }
   })
   return scopes

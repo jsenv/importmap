@@ -29,6 +29,7 @@
     "/index.js"
   ],
   "scripts": {
+    "start-exploring": "node --no-warnings ./script/start-exploring/start-exploring.js",
     "test": "node --no-warnings ./script/test/test.js",
     "test-with-coverage": "node ./script/test/test.js --coverage",
     "eslint-check": "node ./node_modules/eslint/bin/eslint.js .",
