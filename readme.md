@@ -11,28 +11,23 @@ Helpers to implement importmaps.
 
 - [Presentation](#Presentation)
 - [Installation](#installation)
-- [Documentation](#Usage)
-  - [composeTwoImportMaps](#composetwoimportmaps)
-  - [normalizeImportMap](#normalizeimportmap)
-  - [resolveImport](#resolveimport)
+- [composeTwoImportMaps](#composetwoimportmaps)
+- [normalizeImportMap](#normalizeimportmap)
+- [resolveImport](#resolveimport)
 
 # Presentation
 
-`@jsenv/import-map` can be used to implement the behaviour of importMap as described in the specification. It is written using es modules and is compatible with Node.js.
+`@jsenv/import-map` can be used to implement the behaviour of importMap as described in the specification. It is written using es modules and compatible with browsers and Node.js.
 
 — see [importMap spec](https://github.com/WICG/import-maps)
 
 # Installation
 
 ```console
-npm install --save-dev @jsenv/import-map@6.7.2
+npm install --save-dev @jsenv/import-map
 ```
 
-# Documentation
-
-`@jsenv/import-map` exports are documented in this section.
-
-## composeTwoImportMaps
+# composeTwoImportMaps
 
 `composeTwoImportMaps` takes two `importMap` and return a single `importMap` being the composition of the two.
 
@@ -65,7 +60,7 @@ console.log(JSON.stringify(importMap, null, "  "))
 
 — source code at [src/composeTwoImportMaps.js](./src/composeTwoImportMaps.js).
 
-## normalizeImportMap
+# normalizeImportMap
 
 `normalizeImportMap` returns an `importMap` resolved against an `url` and sorted.
 
@@ -96,7 +91,7 @@ console.log(JSON.stringify(importMap, null, '  ')
 
 — source code at [src/normalizeImportMap.js](./src/normalizeImportMap.js).
 
-## resolveImport
+# resolveImport
 
 `resolveImport` returns an import `url` applying an `importMap` to `specifier` and `importer`. The provided `importMap` must be resolved and sorted to work as expected. You can use [normalizeImportMap](#normalizeimportmap) to do that.
 

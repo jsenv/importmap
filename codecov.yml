@@ -6,11 +6,11 @@ coverage:
     # same idea about coverage being nice to have:
     # a commit/pr decreasing coverage is still successful not matter how much
     # it decreases coverage
-    project: off
-    patch: off
+    project: false
+    patch: false
   parsers:
     javascript:
-      enable_partials: yes
+      enable_partials: true
 
 comment:
   layout: "header"
