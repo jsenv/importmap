@@ -17,14 +17,14 @@ Helpers to implement importmaps.
 
 # Presentation
 
-`@jsenv/import-map` can be used to implement the behaviour of importMap as described in the specification. It is written using es modules and compatible with browsers and Node.js.
+`@jsenv/import-map` can be used to implement the behaviour of importmap as described in the specification. It is written using es modules and compatible with browsers and Node.js.
 
 — see [importMap spec](https://github.com/WICG/import-maps)
 
 # Installation
 
 ```console
-npm install --save-dev @jsenv/import-map
+npm install @jsenv/import-map
 ```
 
 # composeTwoImportMaps
