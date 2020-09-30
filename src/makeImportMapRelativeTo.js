@@ -5,6 +5,11 @@ import { hasScheme } from "./internal/hasScheme.js"
 export const makeImportMapRelativeTo = (importMap, url) => {
   assertImportMap(importMap)
 
+  const slashCount = urlToPathname(url).slice(1).split("/").length - 1
+  if (slashCount === 0) {
+    return importMap
+  }
+
   const importMapRelative = {}
   const { imports } = importMap
   if (imports) {
@@ -109,9 +114,6 @@ const makeAddressRelativeTo = (address, url) => {
 }
 
 const makeRelativeTo = (string, url) => {
-  const slashCount = urlToPathname(url).slice(1).split("/").length
-  if (slashCount === 0) {
-    return string
-  }
+  const slashCount = urlToPathname(url).slice(1).split("/").length - 1
   return `${`../`.repeat(slashCount)}${string}`
 }

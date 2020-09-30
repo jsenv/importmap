@@ -1,5 +1,6 @@
 export { applyImportMap } from "./src/applyImportMap.js"
 export { composeTwoImportMaps } from "./src/composeTwoImportMaps.js"
+export { makeImportMapRelativeTo } from "./src/makeImportMapRelativeTo.js"
 export { normalizeImportMap } from "./src/normalizeImportMap.js"
 export { resolveImport } from "./src/resolveImport.js"
 export { resolveSpecifier } from "./src/resolveSpecifier.js"
