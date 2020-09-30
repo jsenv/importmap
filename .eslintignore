@@ -1,6 +1,4 @@
-!/.github/
-/.github/**/node_modules/
 /.jsenv/
-/dist/
 /coverage/
+/dist/
 /node_modules/
