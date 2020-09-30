@@ -11,6 +11,11 @@ executeTestPlan({
   ...jsenvConfig,
   testPlan: {
     "test/**/*.test.js": {
+      node: {
+        launch: launchNode,
+      },
+    },
+    "test/**/*.test.html": {
       chromium: {
         launch: launchChromiumTab,
       },
@@ -19,9 +24,6 @@ executeTestPlan({
       },
       webkit: {
         launch: launchWebkitTab,
-      },
-      node: {
-        launch: launchNode,
       },
     },
   },
