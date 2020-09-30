@@ -1,6 +1,6 @@
 {
   "name": "@jsenv/import-map",
-  "version": "6.7.4",
+  "version": "6.8.0",
   "description": "Helpers to implement importmaps.",
   "license": "MIT",
   "repository": {
@@ -29,7 +29,7 @@
   ],
   "scripts": {
     "start-exploring": "node --no-warnings ./script/start-exploring/start-exploring.js",
-    "test": "node --no-warnings ./script/test/test.js",
+    "test": "node --no-warnings --unhandled-rejections=strict ./script/test/test.js",
     "test-with-coverage": "npm run test -- --coverage",
     "eslint-check": "node ./node_modules/eslint/bin/eslint.js .",
     "prettier-format": "node --no-warnings ./script/prettier-format/prettier-format.js",
@@ -39,30 +39,26 @@
     "generate-esmodule-bundle": "node --no-warnings ./script/generate-esmodule-bundle/generate-esmodule-bundle.js",
     "generate-commonjs-bundle": "node ./script/generate-commonjs-bundle/generate-commonjs-bundle.js",
     "generate-import-map": "node --no-warnings ./script/generate-import-map/generate-import-map.js",
-    "install-git-hooks": "node --no-warnings ./script/install-git-hooks/install-git-hooks.js",
     "dist": "npm run generate-esmodule-bundle && npm run generate-commonjs-bundle",
-    "postinstall": "npm run generate-import-map && npm run install-git-hooks",
+    "postinstall": "npm run generate-import-map",
     "prepublishOnly": "node ./script/transform-package/remove-postinstall.js && npm run dist",
-    "postpublish": "node ./script/transform-package/restore-postinstall.js",
-    "git-hook-pre-commit": "npm run prettier-format-stage"
+    "postpublish": "node ./script/transform-package/restore-postinstall.js"
   },
   "dependencies": {},
   "devDependencies": {
-    "@jsenv/assert": "2.1.0",
-    "@jsenv/codecov-upload": "3.4.0",
-    "@jsenv/core": "13.0.0-alpha.3",
-    "@jsenv/eslint-config": "12.4.1",
-    "@jsenv/git-hooks": "1.3.3",
+    "@jsenv/assert": "2.2.1",
+    "@jsenv/codecov-upload": "3.4.2",
+    "@jsenv/core": "15.0.3",
+    "@jsenv/eslint-config": "12.5.0",
     "@jsenv/github-release-package": "1.2.2",
+    "@jsenv/node-module-import-map": "12.0.2",
     "@jsenv/package-publish": "1.5.1",
-    "@jsenv/node-module-import-map": "11.1.1",
-    "@jsenv/prettier-check-project": "5.6.0",
-    "@jsenv/prettier-config": "1.2.0",
+    "@jsenv/prettier-check-project": "5.6.1",
     "babel-eslint": "11.0.0-beta.0",
-    "eslint": "6.8.0",
-    "playwright-chromium": "0.11.1",
-    "playwright-firefox": "0.11.1",
-    "playwright-webkit": "0.11.1",
-    "prettier": "2.0.5"
+    "eslint": "7.10.0",
+    "playwright-chromium": "1.4.2",
+    "playwright-firefox": "1.4.2",
+    "playwright-webkit": "1.4.2",
+    "prettier": "2.1.2"
   }
 }
