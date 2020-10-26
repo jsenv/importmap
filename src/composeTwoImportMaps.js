@@ -5,20 +5,43 @@ export const composeTwoImportMaps = (leftImportMap, rightImportMap) => {
   assertImportMap(leftImportMap)
   assertImportMap(rightImportMap)
 
-  return {
-    imports: composeTwoImports(leftImportMap.imports, rightImportMap.imports),
-    scopes: composeTwoScopes(leftImportMap.scopes, rightImportMap.scopes),
+  const importMap = {}
+
+  const leftImports = leftImportMap.imports
+  const rightImports = rightImportMap.imports
+  const leftHasImports = Boolean(leftImports)
+  const rightHasImports = Boolean(rightImports)
+  if (leftHasImports && rightHasImports) {
+    importMap.imports = composeTwoImports(leftImports, rightImports)
+  } else if (leftHasImports) {
+    importMap.imports = { ...leftImports }
+  } else if (rightHasImports) {
+    importMap.imports = { ...rightImports }
   }
+
+  const leftScopes = leftImportMap.scopes
+  const rightScopes = rightImportMap.scopes
+  const leftHasScopes = Boolean(leftScopes)
+  const rightHasScopes = Boolean(rightScopes)
+  if (leftHasScopes && rightHasScopes) {
+    importMap.scopes = composeTwoScopes(leftScopes, rightScopes)
+  } else if (leftHasScopes) {
+    importMap.scopes = { ...leftScopes }
+  } else if (rightHasScopes) {
+    importMap.scopes = { ...rightScopes }
+  }
+
+  return importMap
 }
 
-const composeTwoImports = (leftImports = {}, rightImports = {}) => {
+const composeTwoImports = (leftImports, rightImports) => {
   return {
     ...leftImports,
     ...rightImports,
   }
 }
 
-const composeTwoScopes = (leftScopes = {}, rightScopes = {}) => {
+const composeTwoScopes = (leftScopes, rightScopes) => {
   const scopes = {
     ...leftScopes,
   }
