@@ -14,6 +14,7 @@ Helpers to implement importmaps.
 - [composeTwoImportMaps](#composetwoimportmaps)
 - [normalizeImportMap](#normalizeimportmap)
 - [resolveImport](#resolveimport)
+- [moveImportMap](#moveImportMap)
 
 # Presentation
 
@@ -116,3 +117,34 @@ http://domain.com/main.js
 ```
 
 — source code at [src/resolveImport.js](./src/resolveImport.js).
+
+# moveImportMap
+
+`moveImportMap` receives `importMap`, `fromUrl`, `toUrl` and return an importmap where all relative urls and specifiers becomes relative to `toUrl` instead of `fromUrl`.
+
+This function exists in case you need to move an importmap file somewhere else in the filesystem. This is not a common use case but might happen.
+
+```js
+import { moveImportMap } from "@jsenv/import-map"
+
+const importMapMoved = moveImportMap(
+  {
+    imports: {
+      foo: "./foo.js",
+    },
+  },
+  "file:///project/project.importmap",
+  "file:///project/dir/project.importmap",
+)
+console.log(JSON.stringify(importMap, null, '  ')
+```
+
+```console
+{
+  "imports": {
+    "foo": "../foo.js",
+  }
+}
+```
+
+— source code at [src/moveImportMap.js](./src/moveImportMap.js).

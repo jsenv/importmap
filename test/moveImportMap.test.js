@@ -40,7 +40,11 @@ import { moveImportMap } from "../src/moveImportMap.js"
       "./dir/foo.js": "../bar.js",
     },
   }
-  const actual = moveImportMap(importMap, "file:///project/test/dist/", "file:///project/test/")
+  const actual = moveImportMap(
+    importMap,
+    "file:///project/test/dist/",
+    "file:///project/test/dist/",
+  )
   const expected = importMap
   assert({ actual, expected })
 }
@@ -53,22 +57,22 @@ import { moveImportMap } from "../src/moveImportMap.js"
     },
     scopes: {
       "./dir/": {
-        hey: "./hey.js",
+        hey: "../hey.js",
       },
     },
   }
   const actual = moveImportMap(
     importMap,
-    "http://example.com/dir/project.importmap",
+    "http://example.com/test/project.importmap",
     "http://example.com/project.importmap",
   )
   const expected = {
     imports: {
-      foo: "../bar.js",
+      foo: "./test/bar.js",
     },
     scopes: {
-      "../dir/": {
-        hey: "../hey.js",
+      "./test/dir/": {
+        hey: "./hey.js",
       },
     },
   }
