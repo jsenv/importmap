@@ -3,7 +3,7 @@
 import { urlToScheme } from "./internal/urlToScheme.js"
 import { urlToPathname } from "./internal/urlToPathname.js"
 import { urlToOrigin } from "./internal/urlToOrigin.js"
-import { pathnameToDirectoryPathname } from "./internal/pathnameToDirectoryPathname.js"
+import { pathnameToParentPathname } from "./internal/pathnameToParentPathname.js"
 import { hasScheme } from "./internal/hasScheme.js"
 
 export const resolveUrl = (specifier, baseUrl) => {
@@ -38,14 +38,14 @@ export const resolveUrl = (specifier, baseUrl) => {
   const basePathname = urlToPathname(baseUrl)
 
   if (specifier === ".") {
-    const baseDirectoryPathname = pathnameToDirectoryPathname(basePathname)
-    return `${baseOrigin}${baseDirectoryPathname}/`
+    const baseDirectoryPathname = pathnameToParentPathname(basePathname)
+    return `${baseOrigin}${baseDirectoryPathname}`
   }
 
   // pathname relative inside
   if (specifier.slice(0, 2) === "./") {
-    const baseDirectoryPathname = pathnameToDirectoryPathname(basePathname)
-    return `${baseOrigin}${baseDirectoryPathname}/${specifier.slice(2)}`
+    const baseDirectoryPathname = pathnameToParentPathname(basePathname)
+    return `${baseOrigin}${baseDirectoryPathname}${specifier.slice(2)}`
   }
 
   // pathname relative outside
@@ -74,7 +74,7 @@ export const resolveUrl = (specifier, baseUrl) => {
   if (basePathname[basePathname.length] === "/") {
     return `${baseOrigin}${basePathname}${specifier}`
   }
-  return `${baseOrigin}${pathnameToDirectoryPathname(basePathname)}/${specifier}`
+  return `${baseOrigin}${pathnameToParentPathname(basePathname)}${specifier}`
 }
 
 const writeBaseUrlMustBeAString = ({ baseUrl, specifier }) => `baseUrl must be a string.
