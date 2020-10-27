@@ -2,7 +2,12 @@ import { hasScheme } from "./internal/hasScheme.js"
 import { resolveUrl } from "./resolveUrl.js"
 
 export const resolveSpecifier = (specifier, importer) => {
-  if (specifier[0] === "/" || specifier.startsWith("./") || specifier.startsWith("../")) {
+  if (
+    specifier === "." ||
+    specifier[0] === "/" ||
+    specifier.startsWith("./") ||
+    specifier.startsWith("../")
+  ) {
     return resolveUrl(specifier, importer)
   }
 
