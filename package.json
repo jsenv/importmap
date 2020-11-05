@@ -1,6 +1,6 @@
 {
   "name": "@jsenv/import-map",
-  "version": "6.9.0",
+  "version": "6.9.1",
   "description": "Helpers to implement importmaps.",
   "license": "MIT",
   "repository": {
@@ -36,7 +36,7 @@
     "prettier-format-stage": "npm run prettier-format -- --staged",
     "prettier-check": "npm run prettier-format -- --dry-run",
     "upload-coverage": "node ./script/upload-coverage/upload-coverage.js",
-    "generate-esmodule-bundle": "node --no-warnings ./script/generate-esmodule-bundle/generate-esmodule-bundle.js",
+    "generate-esmodule-bundle": "node ./script/generate-esmodule-bundle/generate-esmodule-bundle.js",
     "generate-commonjs-bundle": "node ./script/generate-commonjs-bundle/generate-commonjs-bundle.js",
     "generate-import-map": "node --no-warnings ./script/generate-import-map/generate-import-map.js",
     "dist": "npm run generate-esmodule-bundle && npm run generate-commonjs-bundle",
@@ -48,17 +48,17 @@
   "devDependencies": {
     "@jsenv/assert": "2.2.1",
     "@jsenv/codecov-upload": "3.4.2",
-    "@jsenv/core": "15.0.3",
-    "@jsenv/eslint-config": "12.5.0",
+    "@jsenv/core": "16.5.1",
+    "@jsenv/eslint-config": "12.6.0",
     "@jsenv/github-release-package": "1.2.2",
-    "@jsenv/node-module-import-map": "12.0.2",
+    "@jsenv/node-module-import-map": "12.2.0",
     "@jsenv/package-publish": "1.5.1",
     "@jsenv/prettier-check-project": "5.6.1",
     "babel-eslint": "11.0.0-beta.0",
-    "eslint": "7.10.0",
-    "playwright-chromium": "1.4.2",
-    "playwright-firefox": "1.4.2",
-    "playwright-webkit": "1.4.2",
+    "eslint": "7.12.1",
+    "playwright-chromium": "1.5.2",
+    "playwright-firefox": "1.5.2",
+    "playwright-webkit": "1.5.2",
     "prettier": "2.1.2"
   }
 }

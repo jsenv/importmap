@@ -4,9 +4,10 @@ export const sortImportMap = (importMap) => {
   assertImportMap(importMap)
 
   const { imports, scopes } = importMap
+
   return {
-    imports: imports ? sortImports(imports) : undefined,
-    scopes: scopes ? sortScopes(scopes) : undefined,
+    ...(imports ? { imports: sortImports(imports) } : {}),
+    ...(scopes ? { scopes: sortScopes(scopes) } : {}),
   }
 }
 

@@ -1,7 +1,8 @@
-import { generateEsModuleBundle } from "@jsenv/core"
+import { generateBundle } from "@jsenv/core"
 import * as jsenvConfig from "../../jsenv.config.js"
 
-generateEsModuleBundle({
+generateBundle({
   ...jsenvConfig,
+  format: "esm",
   bundleDirectoryClean: true,
 })
