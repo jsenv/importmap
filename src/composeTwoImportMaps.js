@@ -46,7 +46,7 @@ const composeTwoImports = (leftImports, rightImports) => {
     const rightSpecifier = Object.keys(rightImports).find((rightSpecifier) => {
       return compareAddressAndSpecifier(leftAddress, rightSpecifier)
     })
-    topLevelMappings[leftSpecifier] = rightSpecifier ? rightImports[rightSpecifier] : leftSpecifier
+    topLevelMappings[leftSpecifier] = rightSpecifier ? rightImports[rightSpecifier] : leftAddress
   })
 
   Object.keys(rightImports).forEach((rightSpecifier) => {

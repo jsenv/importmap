@@ -1,6 +1,6 @@
 {
   "name": "@jsenv/import-map",
-  "version": "6.9.1",
+  "version": "6.9.2",
   "description": "Helpers to implement importmaps.",
   "license": "MIT",
   "repository": {
@@ -47,14 +47,13 @@
   "dependencies": {},
   "devDependencies": {
     "@jsenv/assert": "2.2.1",
-    "@jsenv/codecov-upload": "3.4.2",
+    "@jsenv/codecov-upload": "3.4.3",
     "@jsenv/core": "16.5.1",
-    "@jsenv/eslint-config": "12.6.0",
+    "@jsenv/eslint-config": "12.7.0",
     "@jsenv/github-release-package": "1.2.2",
     "@jsenv/node-module-import-map": "12.2.0",
     "@jsenv/package-publish": "1.5.1",
     "@jsenv/prettier-check-project": "5.6.1",
-    "babel-eslint": "11.0.0-beta.0",
     "eslint": "7.12.1",
     "playwright-chromium": "1.5.2",
     "playwright-firefox": "1.5.2",

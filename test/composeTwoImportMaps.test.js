@@ -6,23 +6,23 @@ import { composeTwoImportMaps, sortImportMap } from "../index.js"
     composeTwoImportMaps(
       {
         imports: {
-          foo: "a",
-          a: "a",
+          foo: "foo-remap",
+          a: "a-remap",
         },
       },
       {
         imports: {
-          foo: "b",
-          b: "b",
+          foo: "foo-remap-2",
+          b: "b-remap",
         },
       },
     ),
   )
   const expected = {
     imports: {
-      foo: "b",
-      a: "a",
-      b: "b",
+      foo: "foo-remap-2",
+      a: "a-remap",
+      b: "b-remap",
     },
   }
   assert({ actual, expected })
@@ -33,26 +33,26 @@ import { composeTwoImportMaps, sortImportMap } from "../index.js"
     composeTwoImportMaps(
       {
         imports: {
-          foo: "a",
-          a: "a",
+          foo: "foo-remap",
+          a: "a-remap",
         },
         scopes: {
           foo: {
-            foo: "a",
-            a: "a",
+            foo: "foo-scoped-remap",
+            a: "a-scoped-remap",
           },
           a: {},
         },
       },
       {
         imports: {
-          foo: "b",
-          b: "b",
+          foo: "foo-remap-2",
+          b: "b-remap-2",
         },
         scopes: {
           foo: {
-            foo: "b",
-            b: "b",
+            foo: "foo-scoped-remap-2",
+            b: "b-scoped-remap-2",
           },
           b: {},
         },
@@ -61,18 +61,18 @@ import { composeTwoImportMaps, sortImportMap } from "../index.js"
   )
   const expected = {
     imports: {
-      foo: "b",
-      a: "a",
-      b: "b",
+      foo: "foo-remap-2",
+      a: "a-remap",
+      b: "b-remap-2",
     },
     scopes: {
-      foo: {
-        foo: "b",
-        a: "a",
-        b: "b",
+      "a-remap": {},
+      "foo": {
+        foo: "foo-scoped-remap-2",
+        a: "a-scoped-remap",
+        b: "b-scoped-remap-2",
       },
-      a: {},
-      b: {},
+      "b": {},
     },
   }
   assert({ actual, expected })
