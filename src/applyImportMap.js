@@ -8,14 +8,16 @@ export const applyImportMap = ({
   importMap,
   specifier,
   importer,
-  formatImporterForError = (importer) => importer,
+  createBareSpecifierError = ({ specifier, importer }) => {
+    return new Error(createDetailedMessage(`Unmapped bare specifier.`, { specifier, importer }))
+  },
 }) => {
   assertImportMap(importMap)
   if (typeof specifier !== "string") {
     throw new TypeError(
       createDetailedMessage("specifier must be a string.", {
         specifier,
-        importer: formatImporterForError(importer),
+        importer,
       }),
     )
   }
@@ -23,7 +25,7 @@ export const applyImportMap = ({
     if (typeof importer !== "string") {
       throw new TypeError(
         createDetailedMessage("importer must be a string.", {
-          importer: formatImporterForError(importer),
+          importer,
           specifier,
         }),
       )
@@ -31,7 +33,7 @@ export const applyImportMap = ({
     if (!hasScheme(importer)) {
       throw new Error(
         createDetailedMessage(`importer must be an absolute url.`, {
-          importer: formatImporterForError(importer),
+          importer,
           specifier,
         }),
       )
@@ -67,12 +69,7 @@ export const applyImportMap = ({
     return specifierUrl
   }
 
-  throw new Error(
-    createDetailedMessage(`Unmapped bare specifier.`, {
-      specifier,
-      importer: formatImporterForError(importer),
-    }),
-  )
+  throw new Error(createBareSpecifierError({ specifier, importer }))
 }
 
 const applyImports = (specifier, imports) => {
