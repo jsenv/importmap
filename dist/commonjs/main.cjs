@@ -214,28 +214,29 @@ const resolveSpecifier = (specifier, importer) => {
 const applyImportMap = ({
   importMap,
   specifier,
-  importer
+  importer,
+  formatImporterForError = importer => importer
 }) => {
   assertImportMap(importMap);
 
   if (typeof specifier !== "string") {
     throw new TypeError(logger.createDetailedMessage("specifier must be a string.", {
       specifier,
-      importer
+      importer: formatImporterForError(importer)
     }));
   }
 
   if (importer) {
     if (typeof importer !== "string") {
       throw new TypeError(logger.createDetailedMessage("importer must be a string.", {
-        importer,
+        importer: formatImporterForError(importer),
         specifier
       }));
     }
 
     if (!hasScheme(importer)) {
       throw new Error(logger.createDetailedMessage(`importer must be an absolute url.`, {
-        importer,
+        importer: formatImporterForError(importer),
         specifier
       }));
     }
@@ -280,7 +281,7 @@ const applyImportMap = ({
 
   throw new Error(logger.createDetailedMessage(`Unmapped bare specifier.`, {
     specifier,
-    importer
+    importer: formatImporterForError(importer)
   }));
 };
 
@@ -781,13 +782,15 @@ const resolveImport = ({
   specifier,
   importer,
   importMap,
-  defaultExtension = true
+  defaultExtension = true,
+  formatImporterForError
 }) => {
   return applyDefaultExtension({
     url: importMap ? applyImportMap({
       importMap,
       specifier,
-      importer
+      importer,
+      formatImporterForError
     }) : resolveUrl(specifier, importer),
     importer,
     defaultExtension
