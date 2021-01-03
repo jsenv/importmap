@@ -1,6 +1,6 @@
 {
   "name": "@jsenv/import-map",
-  "version": "6.9.2",
+  "version": "6.10.0",
   "description": "Helpers to implement importmaps.",
   "license": "MIT",
   "repository": {
@@ -28,36 +28,38 @@
     "/index.js"
   ],
   "scripts": {
-    "start-exploring": "node --no-warnings ./script/start-exploring/start-exploring.js",
-    "test": "node --no-warnings --unhandled-rejections=strict ./script/test/test.js",
-    "test-with-coverage": "npm run test -- --coverage",
     "eslint-check": "node ./node_modules/eslint/bin/eslint.js .",
-    "prettier-format": "node --no-warnings ./script/prettier-format/prettier-format.js",
+    "generate-import-map": "node ./script/generate-import-map/generate-import-map.js",
+    "dist": "npm run generate-esmodule-build && npm run generate-commonjs-build",
+    "generate-esmodule-build": "node ./script/generate-esmodule-build/generate-esmodule-build.js",
+    "generate-commonjs-build": "node ./script/generate-commonjs-build/generate-commonjs-build.js",
+    "start-exploring": "node ./script/start-exploring/start-exploring.js",
+    "test": "node --unhandled-rejections=strict ./script/test/test.js",
+    "test-with-coverage": "npm run test -- --coverage",
+    "prettier-format": "node ./script/prettier-format/prettier-format.js",
     "prettier-format-stage": "npm run prettier-format -- --staged",
     "prettier-check": "npm run prettier-format -- --dry-run",
     "upload-coverage": "node ./script/upload-coverage/upload-coverage.js",
-    "generate-esmodule-bundle": "node ./script/generate-esmodule-bundle/generate-esmodule-bundle.js",
-    "generate-commonjs-bundle": "node ./script/generate-commonjs-bundle/generate-commonjs-bundle.js",
-    "generate-import-map": "node --no-warnings ./script/generate-import-map/generate-import-map.js",
-    "dist": "npm run generate-esmodule-bundle && npm run generate-commonjs-bundle",
     "postinstall": "npm run generate-import-map",
     "prepublishOnly": "node ./script/transform-package/remove-postinstall.js && npm run dist",
     "postpublish": "node ./script/transform-package/restore-postinstall.js"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@jsenv/logger": "4.0.0"
+  },
   "devDependencies": {
-    "@jsenv/assert": "2.2.1",
+    "@jsenv/assert": "2.2.3",
     "@jsenv/codecov-upload": "3.4.3",
-    "@jsenv/core": "16.5.1",
-    "@jsenv/eslint-config": "12.7.0",
+    "@jsenv/core": "17.7.0",
+    "@jsenv/eslint-config": "12.8.0",
     "@jsenv/github-release-package": "1.2.2",
-    "@jsenv/node-module-import-map": "12.2.0",
-    "@jsenv/package-publish": "1.5.1",
+    "@jsenv/node-module-import-map": "12.3.0",
+    "@jsenv/package-publish": "1.5.2",
     "@jsenv/prettier-check-project": "5.6.1",
-    "eslint": "7.12.1",
-    "playwright-chromium": "1.5.2",
-    "playwright-firefox": "1.5.2",
-    "playwright-webkit": "1.5.2",
-    "prettier": "2.1.2"
+    "eslint": "7.17.0",
+    "playwright-chromium": "1.7.1",
+    "playwright-firefox": "1.7.1",
+    "playwright-webkit": "1.7.1",
+    "prettier": "2.2.1"
   }
 }

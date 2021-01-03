@@ -1,3 +1,13 @@
+var createDetailedMessage = function createDetailedMessage(message) {
+  var details = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  var string = "".concat(message);
+  Object.keys(details).forEach(function (key) {
+    var value = details[key];
+    string += "\n--- ".concat(key, " ---\n").concat(Array.isArray(value) ? value.join("\n") : value);
+  });
+  return string;
+};
+
 var nativeTypeOf = function nativeTypeOf(obj) {
   return typeof obj;
 };
@@ -214,7 +224,7 @@ var applyImportMap = function applyImportMap(_ref) {
   assertImportMap(importMap);
 
   if (typeof specifier !== "string") {
-    throw new TypeError(writeSpecifierMustBeAString({
+    throw new TypeError(createDetailedMessage("specifier must be a string.", {
       specifier: specifier,
       importer: importer
     }));
@@ -222,14 +232,14 @@ var applyImportMap = function applyImportMap(_ref) {
 
   if (importer) {
     if (typeof importer !== "string") {
-      throw new TypeError(writeImporterMustBeAString({
+      throw new TypeError(createDetailedMessage("importer must be a string.", {
         importer: importer,
         specifier: specifier
       }));
     }
 
     if (!hasScheme(importer)) {
-      throw new Error(writeImporterMustBeAbsolute({
+      throw new Error(createDetailedMessage("importer must be an absolute url.", {
         importer: importer,
         specifier: specifier
       }));
@@ -269,7 +279,7 @@ var applyImportMap = function applyImportMap(_ref) {
     return specifierUrl;
   }
 
-  throw new Error(writeBareSpecifierMustBeRemapped({
+  throw new Error(createDetailedMessage("Unmapped bare specifier.", {
     specifier: specifier,
     importer: importer
   }));
@@ -300,30 +310,6 @@ var applyImports = function applyImports(specifier, imports) {
 
 var specifierIsPrefixOf = function specifierIsPrefixOf(specifierHref, href) {
   return specifierHref[specifierHref.length - 1] === "/" && href.startsWith(specifierHref);
-};
-
-var writeSpecifierMustBeAString = function writeSpecifierMustBeAString(_ref2) {
-  var specifier = _ref2.specifier,
-      importer = _ref2.importer;
-  return "specifier must be a string.\n--- specifier ---\n".concat(specifier, "\n--- importer ---\n").concat(importer);
-};
-
-var writeImporterMustBeAString = function writeImporterMustBeAString(_ref3) {
-  var importer = _ref3.importer,
-      specifier = _ref3.specifier;
-  return "importer must be a string.\n--- importer ---\n".concat(importer, "\n--- specifier ---\n").concat(specifier);
-};
-
-var writeImporterMustBeAbsolute = function writeImporterMustBeAbsolute(_ref4) {
-  var importer = _ref4.importer,
-      specifier = _ref4.specifier;
-  return "importer must be an absolute url.\n--- importer ---\n".concat(importer, "\n--- specifier ---\n").concat(specifier);
-};
-
-var writeBareSpecifierMustBeRemapped = function writeBareSpecifierMustBeRemapped(_ref5) {
-  var specifier = _ref5.specifier,
-      importer = _ref5.importer;
-  return "Unmapped bare specifier.\n--- specifier ---\n".concat(specifier, "\n--- importer ---\n").concat(importer);
 };
 
 var defineProperty = (function (obj, key, value) {
@@ -431,7 +417,7 @@ var composeTwoImports = function composeTwoImports(leftImports, rightImports) {
     var rightSpecifier = Object.keys(rightImports).find(function (rightSpecifier) {
       return compareAddressAndSpecifier(leftAddress, rightSpecifier);
     });
-    topLevelMappings[leftSpecifier] = rightSpecifier ? rightImports[rightSpecifier] : leftSpecifier;
+    topLevelMappings[leftSpecifier] = rightSpecifier ? rightImports[rightSpecifier] : leftAddress;
   });
   Object.keys(rightImports).forEach(function (rightSpecifier) {
     topLevelMappings[rightSpecifier] = rightImports[rightSpecifier];

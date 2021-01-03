@@ -1,19 +1,40 @@
+import { createDetailedMessage } from "@jsenv/logger"
 import { assertImportMap } from "./internal/assertImportMap.js"
 import { hasScheme } from "./internal/hasScheme.js"
 import { tryUrlResolution } from "./internal/tryUrlResolution.js"
 import { resolveSpecifier } from "./resolveSpecifier.js"
 
-export const applyImportMap = ({ importMap, specifier, importer }) => {
+export const applyImportMap = ({
+  importMap,
+  specifier,
+  importer,
+  formatImporterForError = (importer) => importer,
+}) => {
   assertImportMap(importMap)
   if (typeof specifier !== "string") {
-    throw new TypeError(writeSpecifierMustBeAString({ specifier, importer }))
+    throw new TypeError(
+      createDetailedMessage("specifier must be a string.", {
+        specifier,
+        importer: formatImporterForError(importer),
+      }),
+    )
   }
   if (importer) {
     if (typeof importer !== "string") {
-      throw new TypeError(writeImporterMustBeAString({ importer, specifier }))
+      throw new TypeError(
+        createDetailedMessage("importer must be a string.", {
+          importer: formatImporterForError(importer),
+          specifier,
+        }),
+      )
     }
     if (!hasScheme(importer)) {
-      throw new Error(writeImporterMustBeAbsolute({ importer, specifier }))
+      throw new Error(
+        createDetailedMessage(`importer must be an absolute url.`, {
+          importer: formatImporterForError(importer),
+          specifier,
+        }),
+      )
     }
   }
 
@@ -46,7 +67,12 @@ export const applyImportMap = ({ importMap, specifier, importer }) => {
     return specifierUrl
   }
 
-  throw new Error(writeBareSpecifierMustBeRemapped({ specifier, importer }))
+  throw new Error(
+    createDetailedMessage(`Unmapped bare specifier.`, {
+      specifier,
+      importer: formatImporterForError(importer),
+    }),
+  )
 }
 
 const applyImports = (specifier, imports) => {
@@ -74,27 +100,3 @@ const applyImports = (specifier, imports) => {
 const specifierIsPrefixOf = (specifierHref, href) => {
   return specifierHref[specifierHref.length - 1] === "/" && href.startsWith(specifierHref)
 }
-
-const writeSpecifierMustBeAString = ({ specifier, importer }) => `specifier must be a string.
---- specifier ---
-${specifier}
---- importer ---
-${importer}`
-
-const writeImporterMustBeAString = ({ importer, specifier }) => `importer must be a string.
---- importer ---
-${importer}
---- specifier ---
-${specifier}`
-
-const writeImporterMustBeAbsolute = ({ importer, specifier }) => `importer must be an absolute url.
---- importer ---
-${importer}
---- specifier ---
-${specifier}`
-
-const writeBareSpecifierMustBeRemapped = ({ specifier, importer }) => `Unmapped bare specifier.
---- specifier ---
-${specifier}
---- importer ---
-${importer}`

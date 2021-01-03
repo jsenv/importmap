@@ -2,6 +2,8 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
+var logger = require('@jsenv/logger');
+
 const assertImportMap = value => {
   if (value === null) {
     throw new TypeError(`an importMap must be an object, got null`);
@@ -217,7 +219,7 @@ const applyImportMap = ({
   assertImportMap(importMap);
 
   if (typeof specifier !== "string") {
-    throw new TypeError(writeSpecifierMustBeAString({
+    throw new TypeError(logger.createDetailedMessage("specifier must be a string.", {
       specifier,
       importer
     }));
@@ -225,14 +227,14 @@ const applyImportMap = ({
 
   if (importer) {
     if (typeof importer !== "string") {
-      throw new TypeError(writeImporterMustBeAString({
+      throw new TypeError(logger.createDetailedMessage("importer must be a string.", {
         importer,
         specifier
       }));
     }
 
     if (!hasScheme(importer)) {
-      throw new Error(writeImporterMustBeAbsolute({
+      throw new Error(logger.createDetailedMessage(`importer must be an absolute url.`, {
         importer,
         specifier
       }));
@@ -276,7 +278,7 @@ const applyImportMap = ({
     return specifierUrl;
   }
 
-  throw new Error(writeBareSpecifierMustBeRemapped({
+  throw new Error(logger.createDetailedMessage(`Unmapped bare specifier.`, {
     specifier,
     importer
   }));
@@ -308,42 +310,6 @@ const applyImports = (specifier, imports) => {
 const specifierIsPrefixOf = (specifierHref, href) => {
   return specifierHref[specifierHref.length - 1] === "/" && href.startsWith(specifierHref);
 };
-
-const writeSpecifierMustBeAString = ({
-  specifier,
-  importer
-}) => `specifier must be a string.
---- specifier ---
-${specifier}
---- importer ---
-${importer}`;
-
-const writeImporterMustBeAString = ({
-  importer,
-  specifier
-}) => `importer must be a string.
---- importer ---
-${importer}
---- specifier ---
-${specifier}`;
-
-const writeImporterMustBeAbsolute = ({
-  importer,
-  specifier
-}) => `importer must be an absolute url.
---- importer ---
-${importer}
---- specifier ---
-${specifier}`;
-
-const writeBareSpecifierMustBeRemapped = ({
-  specifier,
-  importer
-}) => `Unmapped bare specifier.
---- specifier ---
-${specifier}
---- importer ---
-${importer}`;
 
 // https://github.com/systemjs/systemjs/blob/89391f92dfeac33919b0223bbf834a1f4eea5750/src/common.js#L136
 const composeTwoImportMaps = (leftImportMap, rightImportMap) => {
@@ -395,7 +361,7 @@ const composeTwoImports = (leftImports, rightImports) => {
     const rightSpecifier = Object.keys(rightImports).find(rightSpecifier => {
       return compareAddressAndSpecifier(leftAddress, rightSpecifier);
     });
-    topLevelMappings[leftSpecifier] = rightSpecifier ? rightImports[rightSpecifier] : leftSpecifier;
+    topLevelMappings[leftSpecifier] = rightSpecifier ? rightImports[rightSpecifier] : leftAddress;
   });
   Object.keys(rightImports).forEach(rightSpecifier => {
     topLevelMappings[rightSpecifier] = rightImports[rightSpecifier];

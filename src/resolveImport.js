@@ -3,10 +3,16 @@ import { pathnameToExtension } from "./internal/pathnameToExtension.js"
 import { resolveUrl } from "./resolveUrl.js"
 import { applyImportMap } from "./applyImportMap.js"
 
-export const resolveImport = ({ specifier, importer, importMap, defaultExtension = true }) => {
+export const resolveImport = ({
+  specifier,
+  importer,
+  importMap,
+  defaultExtension = true,
+  formatImporterForError,
+}) => {
   return applyDefaultExtension({
     url: importMap
-      ? applyImportMap({ importMap, specifier, importer })
+      ? applyImportMap({ importMap, specifier, importer, formatImporterForError })
       : resolveUrl(specifier, importer),
     importer,
     defaultExtension,
