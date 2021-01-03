@@ -221,30 +221,35 @@ var applyImportMap = function applyImportMap(_ref) {
   var importMap = _ref.importMap,
       specifier = _ref.specifier,
       importer = _ref.importer,
-      _ref$formatImporterFo = _ref.formatImporterForError,
-      formatImporterForError = _ref$formatImporterFo === void 0 ? function (importer) {
-    return importer;
-  } : _ref$formatImporterFo;
+      _ref$createBareSpecif = _ref.createBareSpecifierError,
+      createBareSpecifierError = _ref$createBareSpecif === void 0 ? function (_ref2) {
+    var specifier = _ref2.specifier,
+        importer = _ref2.importer;
+    return new Error(createDetailedMessage("Unmapped bare specifier.", {
+      specifier: specifier,
+      importer: importer
+    }));
+  } : _ref$createBareSpecif;
   assertImportMap(importMap);
 
   if (typeof specifier !== "string") {
     throw new TypeError(createDetailedMessage("specifier must be a string.", {
       specifier: specifier,
-      importer: formatImporterForError(importer)
+      importer: importer
     }));
   }
 
   if (importer) {
     if (typeof importer !== "string") {
       throw new TypeError(createDetailedMessage("importer must be a string.", {
-        importer: formatImporterForError(importer),
+        importer: importer,
         specifier: specifier
       }));
     }
 
     if (!hasScheme(importer)) {
       throw new Error(createDetailedMessage("importer must be an absolute url.", {
-        importer: formatImporterForError(importer),
+        importer: importer,
         specifier: specifier
       }));
     }
@@ -283,9 +288,9 @@ var applyImportMap = function applyImportMap(_ref) {
     return specifierUrl;
   }
 
-  throw new Error(createDetailedMessage("Unmapped bare specifier.", {
+  throw new Error(createBareSpecifierError({
     specifier: specifier,
-    importer: formatImporterForError(importer)
+    importer: importer
   }));
 };
 
@@ -809,13 +814,13 @@ var resolveImport = function resolveImport(_ref) {
       importMap = _ref.importMap,
       _ref$defaultExtension = _ref.defaultExtension,
       defaultExtension = _ref$defaultExtension === void 0 ? true : _ref$defaultExtension,
-      formatImporterForError = _ref.formatImporterForError;
+      createBareSpecifierError = _ref.createBareSpecifierError;
   return applyDefaultExtension({
     url: importMap ? applyImportMap({
       importMap: importMap,
       specifier: specifier,
       importer: importer,
-      formatImporterForError: formatImporterForError
+      createBareSpecifierError: createBareSpecifierError
     }) : resolveUrl(specifier, importer),
     importer: importer,
     defaultExtension: defaultExtension
