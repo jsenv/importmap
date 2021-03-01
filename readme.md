@@ -18,9 +18,10 @@ Helpers to implement importmaps.
 
 # Presentation
 
-`@jsenv/import-map` can be used to implement the behaviour of importmap as described in the specification. It is written using es modules and compatible with browsers and Node.js.
+`@jsenv/import-map` can be used to implement the behaviour of importmap as described in the specification. It is written using es modules and compatible with browsers and Node.js. For instance, this repository is used to make ESLint compatible with importmaps.
 
-— see [importMap spec](https://github.com/WICG/import-maps)
+- [jsenv-importmap-eslint-resolver](https://github.com/jsenv/jsenv-importmap-eslint-resolver): ESLint plugin for importmaps
+- [import maps spec](https://github.com/WICG/import-maps): WICG specs about import maps on GitHub
 
 # Installation
 
