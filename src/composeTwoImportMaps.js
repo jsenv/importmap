@@ -13,7 +13,7 @@ export const composeTwoImportMaps = (leftImportMap, rightImportMap) => {
   const leftHasImports = Boolean(leftImports)
   const rightHasImports = Boolean(rightImports)
   if (leftHasImports && rightHasImports) {
-    importMap.imports = composeTwoImports(leftImports, rightImports)
+    importMap.imports = composeTwoMappings(leftImports, rightImports)
   } else if (leftHasImports) {
     importMap.imports = { ...leftImports }
   } else if (rightHasImports) {
@@ -35,25 +35,26 @@ export const composeTwoImportMaps = (leftImportMap, rightImportMap) => {
   return importMap
 }
 
-const composeTwoImports = (leftImports, rightImports) => {
-  const topLevelMappings = {}
-  Object.keys(leftImports).forEach((leftSpecifier) => {
-    if (objectHasKey(rightImports, leftSpecifier)) {
+const composeTwoMappings = (leftMappings, rightMappings) => {
+  const mappings = {}
+
+  Object.keys(leftMappings).forEach((leftSpecifier) => {
+    if (objectHasKey(rightMappings, leftSpecifier)) {
       // will be overidden
       return
     }
-    const leftAddress = leftImports[leftSpecifier]
-    const rightSpecifier = Object.keys(rightImports).find((rightSpecifier) => {
+    const leftAddress = leftMappings[leftSpecifier]
+    const rightSpecifier = Object.keys(rightMappings).find((rightSpecifier) => {
       return compareAddressAndSpecifier(leftAddress, rightSpecifier)
     })
-    topLevelMappings[leftSpecifier] = rightSpecifier ? rightImports[rightSpecifier] : leftAddress
+    mappings[leftSpecifier] = rightSpecifier ? rightMappings[rightSpecifier] : leftAddress
   })
 
-  Object.keys(rightImports).forEach((rightSpecifier) => {
-    topLevelMappings[rightSpecifier] = rightImports[rightSpecifier]
+  Object.keys(rightMappings).forEach((rightSpecifier) => {
+    mappings[rightSpecifier] = rightMappings[rightSpecifier]
   })
 
-  return topLevelMappings
+  return mappings
 }
 
 const objectHasKey = (object, key) => Object.prototype.hasOwnProperty.call(object, key)
@@ -64,35 +65,34 @@ const compareAddressAndSpecifier = (address, specifier) => {
   return addressUrl === specifierUrl
 }
 
-const composeTwoScopes = (leftScopes, rightScopes, topLevelRemappings) => {
-  const scopedRemappings = {}
+const composeTwoScopes = (leftScopes, rightScopes, imports) => {
+  const scopes = {}
+
   Object.keys(leftScopes).forEach((leftScopeKey) => {
     if (objectHasKey(rightScopes, leftScopeKey)) {
       // will be merged
-      scopedRemappings[leftScopeKey] = leftScopes[leftScopeKey]
+      scopes[leftScopeKey] = leftScopes[leftScopeKey]
       return
     }
-    const topLevelSpecifier = Object.keys(topLevelRemappings).find((topLevelSpecifierCandidate) => {
+    const topLevelSpecifier = Object.keys(imports).find((topLevelSpecifierCandidate) => {
       return compareAddressAndSpecifier(leftScopeKey, topLevelSpecifierCandidate)
     })
     if (topLevelSpecifier) {
-      scopedRemappings[topLevelRemappings[topLevelSpecifier]] = leftScopes[leftScopeKey]
+      scopes[imports[topLevelSpecifier]] = leftScopes[leftScopeKey]
     } else {
-      scopedRemappings[leftScopeKey] = leftScopes[leftScopeKey]
+      scopes[leftScopeKey] = leftScopes[leftScopeKey]
     }
   })
 
   Object.keys(rightScopes).forEach((rightScopeKey) => {
-    if (objectHasKey(scopedRemappings, rightScopeKey)) {
-      scopedRemappings[rightScopeKey] = composeTwoImports(
-        scopedRemappings[rightScopeKey],
-        rightScopes[rightScopeKey],
-      )
+    if (objectHasKey(scopes, rightScopeKey)) {
+      scopes[rightScopeKey] = composeTwoMappings(scopes[rightScopeKey], rightScopes[rightScopeKey])
     } else {
-      scopedRemappings[rightScopeKey] = {
+      scopes[rightScopeKey] = {
         ...rightScopes[rightScopeKey],
       }
     }
   })
-  return scopedRemappings
+
+  return scopes
 }

@@ -35,12 +35,12 @@ export const moveImportMap = (importMap, fromUrl, toUrl) => {
   const importMapRelative = {}
   const { imports } = importMap
   if (imports) {
-    importMapRelative.imports = makeImportsRelativeTo(imports, makeRelativeTo) || imports
+    importMapRelative.imports = makeMappingsRelativeTo(imports, makeRelativeTo) || imports
   }
 
   const { scopes } = importMap
   if (scopes) {
-    importMapRelative.scopes = makeScopedRemappingRelativeTo(scopes, makeRelativeTo) || scopes
+    importMapRelative.scopes = makeScopesRelativeTo(scopes, makeRelativeTo) || scopes
   }
 
   // nothing changed
@@ -50,46 +50,46 @@ export const moveImportMap = (importMap, fromUrl, toUrl) => {
   return importMapRelative
 }
 
-const makeScopedRemappingRelativeTo = (scopes, makeRelativeTo) => {
+const makeMappingsRelativeTo = (mappings, makeRelativeTo) => {
+  const mappingsTransformed = {}
+  const mappingsRemaining = {}
+  let transformed = false
+  Object.keys(mappings).forEach((specifier) => {
+    const address = mappings[specifier]
+    const specifierRelative = makeRelativeTo(specifier, "specifier")
+    const addressRelative = makeRelativeTo(address, "address")
+
+    if (specifierRelative) {
+      transformed = true
+      mappingsTransformed[specifierRelative] = addressRelative || address
+    } else if (addressRelative) {
+      transformed = true
+      mappingsTransformed[specifier] = addressRelative
+    } else {
+      mappingsRemaining[specifier] = address
+    }
+  })
+  return transformed ? { ...mappingsTransformed, ...mappingsRemaining } : null
+}
+
+const makeScopesRelativeTo = (scopes, makeRelativeTo) => {
   const scopesTransformed = {}
   const scopesRemaining = {}
   let transformed = false
-  Object.keys(scopes).forEach((scopeKey) => {
-    const scopeValue = scopes[scopeKey]
-    const scopeKeyRelative = makeRelativeTo(scopeKey, "address")
-    const scopeValueRelative = makeImportsRelativeTo(scopeValue, makeRelativeTo)
+  Object.keys(scopes).forEach((scopeSpecifier) => {
+    const scopeMappings = scopes[scopeSpecifier]
+    const scopeSpecifierRelative = makeRelativeTo(scopeSpecifier, "address")
+    const scopeMappingsRelative = makeMappingsRelativeTo(scopeMappings, makeRelativeTo)
 
-    if (scopeKeyRelative) {
+    if (scopeSpecifierRelative) {
       transformed = true
-      scopesTransformed[scopeKeyRelative] = scopeValueRelative || scopeValue
-    } else if (scopeValueRelative) {
+      scopesTransformed[scopeSpecifierRelative] = scopeMappingsRelative || scopeMappings
+    } else if (scopeMappingsRelative) {
       transformed = true
-      scopesTransformed[scopeKey] = scopeValueRelative
+      scopesTransformed[scopeSpecifier] = scopeMappingsRelative
     } else {
-      scopesRemaining[scopeKey] = scopeValueRelative
+      scopesRemaining[scopeSpecifier] = scopeMappingsRelative
     }
   })
   return transformed ? { ...scopesTransformed, ...scopesRemaining } : null
-}
-
-const makeImportsRelativeTo = (imports, makeRelativeTo) => {
-  const importsTransformed = {}
-  const importsRemaining = {}
-  let transformed = false
-  Object.keys(imports).forEach((importKey) => {
-    const importValue = imports[importKey]
-    const importKeyRelative = makeRelativeTo(importKey, "specifier")
-    const importValueRelative = makeRelativeTo(importValue, "address")
-
-    if (importKeyRelative) {
-      transformed = true
-      importsTransformed[importKeyRelative] = importValueRelative || importValue
-    } else if (importValueRelative) {
-      transformed = true
-      importsTransformed[importKey] = importValueRelative
-    } else {
-      importsRemaining[importKey] = importValue
-    }
-  })
-  return transformed ? { ...importsTransformed, ...importsRemaining } : null
 }

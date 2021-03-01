@@ -45,23 +45,23 @@ export const applyImportMap = ({
 
   const { scopes } = importMap
   if (scopes && importer) {
-    const scopeKeyMatching = Object.keys(scopes).find((scopeKey) => {
-      return scopeKey === importer || specifierIsPrefixOf(scopeKey, importer)
+    const scopeSpecifierMatching = Object.keys(scopes).find((scopeSpecifier) => {
+      return scopeSpecifier === importer || specifierIsPrefixOf(scopeSpecifier, importer)
     })
-    if (scopeKeyMatching) {
-      const scopeValue = scopes[scopeKeyMatching]
-      const remappingFromScopeImports = applyImports(specifierNormalized, scopeValue)
-      if (remappingFromScopeImports !== null) {
-        return remappingFromScopeImports
+    if (scopeSpecifierMatching) {
+      const scopeMappings = scopes[scopeSpecifierMatching]
+      const mappingFromScopes = applyMappings(scopeMappings, specifierNormalized)
+      if (mappingFromScopes !== null) {
+        return mappingFromScopes
       }
     }
   }
 
   const { imports } = importMap
   if (imports) {
-    const remappingFromImports = applyImports(specifierNormalized, imports)
-    if (remappingFromImports !== null) {
-      return remappingFromImports
+    const mappingFromImports = applyMappings(imports, specifierNormalized)
+    if (mappingFromImports !== null) {
+      return mappingFromImports
     }
   }
 
@@ -72,22 +72,21 @@ export const applyImportMap = ({
   throw new Error(createBareSpecifierError({ specifier, importer }))
 }
 
-const applyImports = (specifier, imports) => {
-  const importKeyArray = Object.keys(imports)
+const applyMappings = (mappings, specifier) => {
+  const specifierCandidates = Object.keys(mappings)
 
   let i = 0
-  while (i < importKeyArray.length) {
-    const importKey = importKeyArray[i]
+  while (i < specifierCandidates.length) {
+    const specifierCandidate = specifierCandidates[i]
     i++
-    if (importKey === specifier) {
-      const importValue = imports[importKey]
-      return importValue
+    if (specifierCandidate === specifier) {
+      const address = mappings[specifierCandidate]
+      return address
     }
-    if (specifierIsPrefixOf(importKey, specifier)) {
-      const importValue = imports[importKey]
-      const afterImportKey = specifier.slice(importKey.length)
-
-      return tryUrlResolution(afterImportKey, importValue)
+    if (specifierIsPrefixOf(specifierCandidate, specifier)) {
+      const address = mappings[specifierCandidate]
+      const afterSpecifier = specifier.slice(specifierCandidate.length)
+      return tryUrlResolution(afterSpecifier, address)
     }
   }
 

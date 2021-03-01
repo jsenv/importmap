@@ -12,22 +12,26 @@ export const sortImportMap = (importMap) => {
 }
 
 export const sortImports = (imports) => {
-  const importsSorted = {}
+  const mappingsSorted = {}
+
   Object.keys(imports)
     .sort(compareLengthOrLocaleCompare)
     .forEach((name) => {
-      importsSorted[name] = imports[name]
+      mappingsSorted[name] = imports[name]
     })
-  return importsSorted
+
+  return mappingsSorted
 }
 
 export const sortScopes = (scopes) => {
   const scopesSorted = {}
+
   Object.keys(scopes)
     .sort(compareLengthOrLocaleCompare)
-    .forEach((scopeName) => {
-      scopesSorted[scopeName] = sortImports(scopes[scopeName])
+    .forEach((scopeSpecifier) => {
+      scopesSorted[scopeSpecifier] = sortImports(scopes[scopeSpecifier])
     })
+
   return scopesSorted
 }
 

@@ -12,15 +12,16 @@ export const normalizeImportMap = (importMap, baseUrl) => {
   const { imports, scopes } = importMap
 
   return {
-    imports: imports ? normalizeImports(imports, baseUrl) : undefined,
+    imports: imports ? normalizeMappings(imports, baseUrl) : undefined,
     scopes: scopes ? normalizeScopes(scopes, baseUrl) : undefined,
   }
 }
 
-const normalizeImports = (imports, baseUrl) => {
-  const importsNormalized = {}
-  Object.keys(imports).forEach((specifier) => {
-    const address = imports[specifier]
+const normalizeMappings = (mappings, baseUrl) => {
+  const mappingsNormalized = {}
+
+  Object.keys(mappings).forEach((specifier) => {
+    const address = mappings[specifier]
 
     if (typeof address !== "string") {
       console.warn(
@@ -56,28 +57,31 @@ const normalizeImports = (imports, baseUrl) => {
       )
       return
     }
-    importsNormalized[specifierResolved] = addressUrl
+    mappingsNormalized[specifierResolved] = addressUrl
   })
-  return sortImports(importsNormalized)
+
+  return sortImports(mappingsNormalized)
 }
 
 const normalizeScopes = (scopes, baseUrl) => {
   const scopesNormalized = {}
-  Object.keys(scopes).forEach((scope) => {
-    const scopeValue = scopes[scope]
-    const scopeUrl = tryUrlResolution(scope, baseUrl)
+
+  Object.keys(scopes).forEach((scopeSpecifier) => {
+    const scopeMappings = scopes[scopeSpecifier]
+    const scopeUrl = tryUrlResolution(scopeSpecifier, baseUrl)
     if (scopeUrl === null) {
       console.warn(
         formulateScopeResolutionFailed({
-          scope,
+          scope: scopeSpecifier,
           baseUrl,
         }),
       )
       return
     }
-    const scopeValueNormalized = normalizeImports(scopeValue, baseUrl)
+    const scopeValueNormalized = normalizeMappings(scopeMappings, baseUrl)
     scopesNormalized[scopeUrl] = scopeValueNormalized
   })
+
   return sortScopes(scopesNormalized)
 }
 
