@@ -69,7 +69,7 @@ export const applyImportMap = ({
     return specifierUrl
   }
 
-  throw new Error(createBareSpecifierError({ specifier, importer }))
+  throw createBareSpecifierError({ specifier, importer })
 }
 
 const applyMappings = (mappings, specifier) => {
