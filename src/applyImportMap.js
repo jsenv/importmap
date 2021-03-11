@@ -11,6 +11,7 @@ export const applyImportMap = ({
   createBareSpecifierError = ({ specifier, importer }) => {
     return new Error(createDetailedMessage(`Unmapped bare specifier.`, { specifier, importer }))
   },
+  onImportMapping = () => {},
 }) => {
   assertImportMap(importMap)
   if (typeof specifier !== "string") {
@@ -50,7 +51,12 @@ export const applyImportMap = ({
     })
     if (scopeSpecifierMatching) {
       const scopeMappings = scopes[scopeSpecifierMatching]
-      const mappingFromScopes = applyMappings(scopeMappings, specifierNormalized)
+      const mappingFromScopes = applyMappings(
+        scopeMappings,
+        specifierNormalized,
+        scopeSpecifierMatching,
+        onImportMapping,
+      )
       if (mappingFromScopes !== null) {
         return mappingFromScopes
       }
@@ -59,7 +65,12 @@ export const applyImportMap = ({
 
   const { imports } = importMap
   if (imports) {
-    const mappingFromImports = applyMappings(imports, specifierNormalized)
+    const mappingFromImports = applyMappings(
+      imports,
+      specifierNormalized,
+      undefined,
+      onImportMapping,
+    )
     if (mappingFromImports !== null) {
       return mappingFromImports
     }
@@ -72,21 +83,36 @@ export const applyImportMap = ({
   throw createBareSpecifierError({ specifier, importer })
 }
 
-const applyMappings = (mappings, specifier) => {
+const applyMappings = (mappings, specifierNormalized, scope, onImportMapping) => {
   const specifierCandidates = Object.keys(mappings)
 
   let i = 0
   while (i < specifierCandidates.length) {
     const specifierCandidate = specifierCandidates[i]
     i++
-    if (specifierCandidate === specifier) {
+    if (specifierCandidate === specifierNormalized) {
       const address = mappings[specifierCandidate]
+      onImportMapping({
+        scope,
+        from: specifierCandidate,
+        to: address,
+        before: specifierNormalized,
+        after: address,
+      })
       return address
     }
-    if (specifierIsPrefixOf(specifierCandidate, specifier)) {
+    if (specifierIsPrefixOf(specifierCandidate, specifierNormalized)) {
       const address = mappings[specifierCandidate]
-      const afterSpecifier = specifier.slice(specifierCandidate.length)
-      return tryUrlResolution(afterSpecifier, address)
+      const afterSpecifier = specifierNormalized.slice(specifierCandidate.length)
+      const addressFinal = tryUrlResolution(afterSpecifier, address)
+      onImportMapping({
+        scope,
+        from: specifierCandidate,
+        to: address,
+        before: specifierNormalized,
+        after: addressFinal,
+      })
+      return addressFinal
     }
   }
 

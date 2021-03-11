@@ -9,10 +9,17 @@ export const resolveImport = ({
   importMap,
   defaultExtension = true,
   createBareSpecifierError,
+  onImportMapping = () => {},
 }) => {
   return applyDefaultExtension({
     url: importMap
-      ? applyImportMap({ importMap, specifier, importer, createBareSpecifierError })
+      ? applyImportMap({
+          importMap,
+          specifier,
+          importer,
+          createBareSpecifierError,
+          onImportMapping,
+        })
       : resolveUrl(specifier, importer),
     importer,
     defaultExtension,
