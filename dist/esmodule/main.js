@@ -229,7 +229,9 @@ var applyImportMap = function applyImportMap(_ref) {
       specifier: specifier,
       importer: importer
     }));
-  } : _ref$createBareSpecif;
+  } : _ref$createBareSpecif,
+      _ref$onImportMapping = _ref.onImportMapping,
+      onImportMapping = _ref$onImportMapping === void 0 ? function () {} : _ref$onImportMapping;
   assertImportMap(importMap);
 
   if (typeof specifier !== "string") {
@@ -260,16 +262,16 @@ var applyImportMap = function applyImportMap(_ref) {
   var scopes = importMap.scopes;
 
   if (scopes && importer) {
-    var scopeKeyMatching = Object.keys(scopes).find(function (scopeKey) {
-      return scopeKey === importer || specifierIsPrefixOf(scopeKey, importer);
+    var scopeSpecifierMatching = Object.keys(scopes).find(function (scopeSpecifier) {
+      return scopeSpecifier === importer || specifierIsPrefixOf(scopeSpecifier, importer);
     });
 
-    if (scopeKeyMatching) {
-      var scopeValue = scopes[scopeKeyMatching];
-      var remappingFromScopeImports = applyImports(specifierNormalized, scopeValue);
+    if (scopeSpecifierMatching) {
+      var scopeMappings = scopes[scopeSpecifierMatching];
+      var mappingFromScopes = applyMappings(scopeMappings, specifierNormalized, scopeSpecifierMatching, onImportMapping);
 
-      if (remappingFromScopeImports !== null) {
-        return remappingFromScopeImports;
+      if (mappingFromScopes !== null) {
+        return mappingFromScopes;
       }
     }
   }
@@ -277,10 +279,10 @@ var applyImportMap = function applyImportMap(_ref) {
   var imports = importMap.imports;
 
   if (imports) {
-    var remappingFromImports = applyImports(specifierNormalized, imports);
+    var mappingFromImports = applyMappings(imports, specifierNormalized, undefined, onImportMapping);
 
-    if (remappingFromImports !== null) {
-      return remappingFromImports;
+    if (mappingFromImports !== null) {
+      return mappingFromImports;
     }
   }
 
@@ -288,29 +290,44 @@ var applyImportMap = function applyImportMap(_ref) {
     return specifierUrl;
   }
 
-  throw new Error(createBareSpecifierError({
+  throw createBareSpecifierError({
     specifier: specifier,
     importer: importer
-  }));
+  });
 };
 
-var applyImports = function applyImports(specifier, imports) {
-  var importKeyArray = Object.keys(imports);
+var applyMappings = function applyMappings(mappings, specifierNormalized, scope, onImportMapping) {
+  var specifierCandidates = Object.keys(mappings);
   var i = 0;
 
-  while (i < importKeyArray.length) {
-    var importKey = importKeyArray[i];
+  while (i < specifierCandidates.length) {
+    var specifierCandidate = specifierCandidates[i];
     i++;
 
-    if (importKey === specifier) {
-      var importValue = imports[importKey];
-      return importValue;
+    if (specifierCandidate === specifierNormalized) {
+      var address = mappings[specifierCandidate];
+      onImportMapping({
+        scope: scope,
+        from: specifierCandidate,
+        to: address,
+        before: specifierNormalized,
+        after: address
+      });
+      return address;
     }
 
-    if (specifierIsPrefixOf(importKey, specifier)) {
-      var _importValue = imports[importKey];
-      var afterImportKey = specifier.slice(importKey.length);
-      return tryUrlResolution(afterImportKey, _importValue);
+    if (specifierIsPrefixOf(specifierCandidate, specifierNormalized)) {
+      var _address = mappings[specifierCandidate];
+      var afterSpecifier = specifierNormalized.slice(specifierCandidate.length);
+      var addressFinal = tryUrlResolution(afterSpecifier, _address);
+      onImportMapping({
+        scope: scope,
+        from: specifierCandidate,
+        to: _address,
+        before: specifierNormalized,
+        after: addressFinal
+      });
+      return addressFinal;
     }
   }
 
@@ -391,7 +408,7 @@ var composeTwoImportMaps = function composeTwoImportMaps(leftImportMap, rightImp
   var rightHasImports = Boolean(rightImports);
 
   if (leftHasImports && rightHasImports) {
-    importMap.imports = composeTwoImports(leftImports, rightImports);
+    importMap.imports = composeTwoMappings(leftImports, rightImports);
   } else if (leftHasImports) {
     importMap.imports = _objectSpread({}, leftImports);
   } else if (rightHasImports) {
@@ -414,24 +431,24 @@ var composeTwoImportMaps = function composeTwoImportMaps(leftImportMap, rightImp
   return importMap;
 };
 
-var composeTwoImports = function composeTwoImports(leftImports, rightImports) {
-  var topLevelMappings = {};
-  Object.keys(leftImports).forEach(function (leftSpecifier) {
-    if (objectHasKey(rightImports, leftSpecifier)) {
+var composeTwoMappings = function composeTwoMappings(leftMappings, rightMappings) {
+  var mappings = {};
+  Object.keys(leftMappings).forEach(function (leftSpecifier) {
+    if (objectHasKey(rightMappings, leftSpecifier)) {
       // will be overidden
       return;
     }
 
-    var leftAddress = leftImports[leftSpecifier];
-    var rightSpecifier = Object.keys(rightImports).find(function (rightSpecifier) {
+    var leftAddress = leftMappings[leftSpecifier];
+    var rightSpecifier = Object.keys(rightMappings).find(function (rightSpecifier) {
       return compareAddressAndSpecifier(leftAddress, rightSpecifier);
     });
-    topLevelMappings[leftSpecifier] = rightSpecifier ? rightImports[rightSpecifier] : leftAddress;
+    mappings[leftSpecifier] = rightSpecifier ? rightMappings[rightSpecifier] : leftAddress;
   });
-  Object.keys(rightImports).forEach(function (rightSpecifier) {
-    topLevelMappings[rightSpecifier] = rightImports[rightSpecifier];
+  Object.keys(rightMappings).forEach(function (rightSpecifier) {
+    mappings[rightSpecifier] = rightMappings[rightSpecifier];
   });
-  return topLevelMappings;
+  return mappings;
 };
 
 var objectHasKey = function objectHasKey(object, key) {
@@ -444,33 +461,33 @@ var compareAddressAndSpecifier = function compareAddressAndSpecifier(address, sp
   return addressUrl === specifierUrl;
 };
 
-var composeTwoScopes = function composeTwoScopes(leftScopes, rightScopes, topLevelRemappings) {
-  var scopedRemappings = {};
+var composeTwoScopes = function composeTwoScopes(leftScopes, rightScopes, imports) {
+  var scopes = {};
   Object.keys(leftScopes).forEach(function (leftScopeKey) {
     if (objectHasKey(rightScopes, leftScopeKey)) {
       // will be merged
-      scopedRemappings[leftScopeKey] = leftScopes[leftScopeKey];
+      scopes[leftScopeKey] = leftScopes[leftScopeKey];
       return;
     }
 
-    var topLevelSpecifier = Object.keys(topLevelRemappings).find(function (topLevelSpecifierCandidate) {
+    var topLevelSpecifier = Object.keys(imports).find(function (topLevelSpecifierCandidate) {
       return compareAddressAndSpecifier(leftScopeKey, topLevelSpecifierCandidate);
     });
 
     if (topLevelSpecifier) {
-      scopedRemappings[topLevelRemappings[topLevelSpecifier]] = leftScopes[leftScopeKey];
+      scopes[imports[topLevelSpecifier]] = leftScopes[leftScopeKey];
     } else {
-      scopedRemappings[leftScopeKey] = leftScopes[leftScopeKey];
+      scopes[leftScopeKey] = leftScopes[leftScopeKey];
     }
   });
   Object.keys(rightScopes).forEach(function (rightScopeKey) {
-    if (objectHasKey(scopedRemappings, rightScopeKey)) {
-      scopedRemappings[rightScopeKey] = composeTwoImports(scopedRemappings[rightScopeKey], rightScopes[rightScopeKey]);
+    if (objectHasKey(scopes, rightScopeKey)) {
+      scopes[rightScopeKey] = composeTwoMappings(scopes[rightScopeKey], rightScopes[rightScopeKey]);
     } else {
-      scopedRemappings[rightScopeKey] = _objectSpread({}, rightScopes[rightScopeKey]);
+      scopes[rightScopeKey] = _objectSpread({}, rightScopes[rightScopeKey]);
     }
   });
-  return scopedRemappings;
+  return scopes;
 };
 
 var getCommonPathname = function getCommonPathname(pathname, otherPathname) {
@@ -598,13 +615,13 @@ var moveImportMap = function moveImportMap(importMap, fromUrl, toUrl) {
   var imports = importMap.imports;
 
   if (imports) {
-    importMapRelative.imports = makeImportsRelativeTo(imports, makeRelativeTo) || imports;
+    importMapRelative.imports = makeMappingsRelativeTo(imports, makeRelativeTo) || imports;
   }
 
   var scopes = importMap.scopes;
 
   if (scopes) {
-    importMapRelative.scopes = makeScopedRemappingRelativeTo(scopes, makeRelativeTo) || scopes;
+    importMapRelative.scopes = makeScopesRelativeTo(scopes, makeRelativeTo) || scopes;
   } // nothing changed
 
 
@@ -615,48 +632,48 @@ var moveImportMap = function moveImportMap(importMap, fromUrl, toUrl) {
   return importMapRelative;
 };
 
-var makeScopedRemappingRelativeTo = function makeScopedRemappingRelativeTo(scopes, makeRelativeTo) {
+var makeMappingsRelativeTo = function makeMappingsRelativeTo(mappings, makeRelativeTo) {
+  var mappingsTransformed = {};
+  var mappingsRemaining = {};
+  var transformed = false;
+  Object.keys(mappings).forEach(function (specifier) {
+    var address = mappings[specifier];
+    var specifierRelative = makeRelativeTo(specifier, "specifier");
+    var addressRelative = makeRelativeTo(address, "address");
+
+    if (specifierRelative) {
+      transformed = true;
+      mappingsTransformed[specifierRelative] = addressRelative || address;
+    } else if (addressRelative) {
+      transformed = true;
+      mappingsTransformed[specifier] = addressRelative;
+    } else {
+      mappingsRemaining[specifier] = address;
+    }
+  });
+  return transformed ? _objectSpread(_objectSpread({}, mappingsTransformed), mappingsRemaining) : null;
+};
+
+var makeScopesRelativeTo = function makeScopesRelativeTo(scopes, makeRelativeTo) {
   var scopesTransformed = {};
   var scopesRemaining = {};
   var transformed = false;
-  Object.keys(scopes).forEach(function (scopeKey) {
-    var scopeValue = scopes[scopeKey];
-    var scopeKeyRelative = makeRelativeTo(scopeKey, "address");
-    var scopeValueRelative = makeImportsRelativeTo(scopeValue, makeRelativeTo);
+  Object.keys(scopes).forEach(function (scopeSpecifier) {
+    var scopeMappings = scopes[scopeSpecifier];
+    var scopeSpecifierRelative = makeRelativeTo(scopeSpecifier, "address");
+    var scopeMappingsRelative = makeMappingsRelativeTo(scopeMappings, makeRelativeTo);
 
-    if (scopeKeyRelative) {
+    if (scopeSpecifierRelative) {
       transformed = true;
-      scopesTransformed[scopeKeyRelative] = scopeValueRelative || scopeValue;
-    } else if (scopeValueRelative) {
+      scopesTransformed[scopeSpecifierRelative] = scopeMappingsRelative || scopeMappings;
+    } else if (scopeMappingsRelative) {
       transformed = true;
-      scopesTransformed[scopeKey] = scopeValueRelative;
+      scopesTransformed[scopeSpecifier] = scopeMappingsRelative;
     } else {
-      scopesRemaining[scopeKey] = scopeValueRelative;
+      scopesRemaining[scopeSpecifier] = scopeMappingsRelative;
     }
   });
   return transformed ? _objectSpread(_objectSpread({}, scopesTransformed), scopesRemaining) : null;
-};
-
-var makeImportsRelativeTo = function makeImportsRelativeTo(imports, makeRelativeTo) {
-  var importsTransformed = {};
-  var importsRemaining = {};
-  var transformed = false;
-  Object.keys(imports).forEach(function (importKey) {
-    var importValue = imports[importKey];
-    var importKeyRelative = makeRelativeTo(importKey, "specifier");
-    var importValueRelative = makeRelativeTo(importValue, "address");
-
-    if (importKeyRelative) {
-      transformed = true;
-      importsTransformed[importKeyRelative] = importValueRelative || importValue;
-    } else if (importValueRelative) {
-      transformed = true;
-      importsTransformed[importKey] = importValueRelative;
-    } else {
-      importsRemaining[importKey] = importValue;
-    }
-  });
-  return transformed ? _objectSpread(_objectSpread({}, importsTransformed), importsRemaining) : null;
 };
 
 var sortImportMap = function sortImportMap(importMap) {
@@ -670,16 +687,16 @@ var sortImportMap = function sortImportMap(importMap) {
   } : {});
 };
 var sortImports = function sortImports(imports) {
-  var importsSorted = {};
+  var mappingsSorted = {};
   Object.keys(imports).sort(compareLengthOrLocaleCompare).forEach(function (name) {
-    importsSorted[name] = imports[name];
+    mappingsSorted[name] = imports[name];
   });
-  return importsSorted;
+  return mappingsSorted;
 };
 var sortScopes = function sortScopes(scopes) {
   var scopesSorted = {};
-  Object.keys(scopes).sort(compareLengthOrLocaleCompare).forEach(function (scopeName) {
-    scopesSorted[scopeName] = sortImports(scopes[scopeName]);
+  Object.keys(scopes).sort(compareLengthOrLocaleCompare).forEach(function (scopeSpecifier) {
+    scopesSorted[scopeSpecifier] = sortImports(scopes[scopeSpecifier]);
   });
   return scopesSorted;
 };
@@ -700,15 +717,15 @@ var normalizeImportMap = function normalizeImportMap(importMap, baseUrl) {
   var imports = importMap.imports,
       scopes = importMap.scopes;
   return {
-    imports: imports ? normalizeImports(imports, baseUrl) : undefined,
+    imports: imports ? normalizeMappings(imports, baseUrl) : undefined,
     scopes: scopes ? normalizeScopes(scopes, baseUrl) : undefined
   };
 };
 
-var normalizeImports = function normalizeImports(imports, baseUrl) {
-  var importsNormalized = {};
-  Object.keys(imports).forEach(function (specifier) {
-    var address = imports[specifier];
+var normalizeMappings = function normalizeMappings(mappings, baseUrl) {
+  var mappingsNormalized = {};
+  Object.keys(mappings).forEach(function (specifier) {
+    var address = mappings[specifier];
 
     if (typeof address !== "string") {
       console.warn(formulateAddressMustBeAString({
@@ -739,26 +756,26 @@ var normalizeImports = function normalizeImports(imports, baseUrl) {
       return;
     }
 
-    importsNormalized[specifierResolved] = addressUrl;
+    mappingsNormalized[specifierResolved] = addressUrl;
   });
-  return sortImports(importsNormalized);
+  return sortImports(mappingsNormalized);
 };
 
 var normalizeScopes = function normalizeScopes(scopes, baseUrl) {
   var scopesNormalized = {};
-  Object.keys(scopes).forEach(function (scope) {
-    var scopeValue = scopes[scope];
-    var scopeUrl = tryUrlResolution(scope, baseUrl);
+  Object.keys(scopes).forEach(function (scopeSpecifier) {
+    var scopeMappings = scopes[scopeSpecifier];
+    var scopeUrl = tryUrlResolution(scopeSpecifier, baseUrl);
 
     if (scopeUrl === null) {
       console.warn(formulateScopeResolutionFailed({
-        scope: scope,
+        scope: scopeSpecifier,
         baseUrl: baseUrl
       }));
       return;
     }
 
-    var scopeValueNormalized = normalizeImports(scopeValue, baseUrl);
+    var scopeValueNormalized = normalizeMappings(scopeMappings, baseUrl);
     scopesNormalized[scopeUrl] = scopeValueNormalized;
   });
   return sortScopes(scopesNormalized);
@@ -814,13 +831,16 @@ var resolveImport = function resolveImport(_ref) {
       importMap = _ref.importMap,
       _ref$defaultExtension = _ref.defaultExtension,
       defaultExtension = _ref$defaultExtension === void 0 ? true : _ref$defaultExtension,
-      createBareSpecifierError = _ref.createBareSpecifierError;
+      createBareSpecifierError = _ref.createBareSpecifierError,
+      _ref$onImportMapping = _ref.onImportMapping,
+      onImportMapping = _ref$onImportMapping === void 0 ? function () {} : _ref$onImportMapping;
   return applyDefaultExtension({
     url: importMap ? applyImportMap({
       importMap: importMap,
       specifier: specifier,
       importer: importer,
-      createBareSpecifierError: createBareSpecifierError
+      createBareSpecifierError: createBareSpecifierError,
+      onImportMapping: onImportMapping
     }) : resolveUrl(specifier, importer),
     importer: importer,
     defaultExtension: defaultExtension

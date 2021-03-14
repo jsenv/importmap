@@ -223,7 +223,8 @@ const applyImportMap = ({
       specifier,
       importer
     }));
-  }
+  },
+  onImportMapping = () => {}
 }) => {
   assertImportMap(importMap);
 
@@ -257,16 +258,16 @@ const applyImportMap = ({
   } = importMap;
 
   if (scopes && importer) {
-    const scopeKeyMatching = Object.keys(scopes).find(scopeKey => {
-      return scopeKey === importer || specifierIsPrefixOf(scopeKey, importer);
+    const scopeSpecifierMatching = Object.keys(scopes).find(scopeSpecifier => {
+      return scopeSpecifier === importer || specifierIsPrefixOf(scopeSpecifier, importer);
     });
 
-    if (scopeKeyMatching) {
-      const scopeValue = scopes[scopeKeyMatching];
-      const remappingFromScopeImports = applyImports(specifierNormalized, scopeValue);
+    if (scopeSpecifierMatching) {
+      const scopeMappings = scopes[scopeSpecifierMatching];
+      const mappingFromScopes = applyMappings(scopeMappings, specifierNormalized, scopeSpecifierMatching, onImportMapping);
 
-      if (remappingFromScopeImports !== null) {
-        return remappingFromScopeImports;
+      if (mappingFromScopes !== null) {
+        return mappingFromScopes;
       }
     }
   }
@@ -276,10 +277,10 @@ const applyImportMap = ({
   } = importMap;
 
   if (imports) {
-    const remappingFromImports = applyImports(specifierNormalized, imports);
+    const mappingFromImports = applyMappings(imports, specifierNormalized, undefined, onImportMapping);
 
-    if (remappingFromImports !== null) {
-      return remappingFromImports;
+    if (mappingFromImports !== null) {
+      return mappingFromImports;
     }
   }
 
@@ -287,29 +288,44 @@ const applyImportMap = ({
     return specifierUrl;
   }
 
-  throw new Error(createBareSpecifierError({
+  throw createBareSpecifierError({
     specifier,
     importer
-  }));
+  });
 };
 
-const applyImports = (specifier, imports) => {
-  const importKeyArray = Object.keys(imports);
+const applyMappings = (mappings, specifierNormalized, scope, onImportMapping) => {
+  const specifierCandidates = Object.keys(mappings);
   let i = 0;
 
-  while (i < importKeyArray.length) {
-    const importKey = importKeyArray[i];
+  while (i < specifierCandidates.length) {
+    const specifierCandidate = specifierCandidates[i];
     i++;
 
-    if (importKey === specifier) {
-      const importValue = imports[importKey];
-      return importValue;
+    if (specifierCandidate === specifierNormalized) {
+      const address = mappings[specifierCandidate];
+      onImportMapping({
+        scope,
+        from: specifierCandidate,
+        to: address,
+        before: specifierNormalized,
+        after: address
+      });
+      return address;
     }
 
-    if (specifierIsPrefixOf(importKey, specifier)) {
-      const importValue = imports[importKey];
-      const afterImportKey = specifier.slice(importKey.length);
-      return tryUrlResolution(afterImportKey, importValue);
+    if (specifierIsPrefixOf(specifierCandidate, specifierNormalized)) {
+      const address = mappings[specifierCandidate];
+      const afterSpecifier = specifierNormalized.slice(specifierCandidate.length);
+      const addressFinal = tryUrlResolution(afterSpecifier, address);
+      onImportMapping({
+        scope,
+        from: specifierCandidate,
+        to: address,
+        before: specifierNormalized,
+        after: addressFinal
+      });
+      return addressFinal;
     }
   }
 
@@ -331,7 +347,7 @@ const composeTwoImportMaps = (leftImportMap, rightImportMap) => {
   const rightHasImports = Boolean(rightImports);
 
   if (leftHasImports && rightHasImports) {
-    importMap.imports = composeTwoImports(leftImports, rightImports);
+    importMap.imports = composeTwoMappings(leftImports, rightImports);
   } else if (leftHasImports) {
     importMap.imports = { ...leftImports
     };
@@ -358,24 +374,24 @@ const composeTwoImportMaps = (leftImportMap, rightImportMap) => {
   return importMap;
 };
 
-const composeTwoImports = (leftImports, rightImports) => {
-  const topLevelMappings = {};
-  Object.keys(leftImports).forEach(leftSpecifier => {
-    if (objectHasKey(rightImports, leftSpecifier)) {
+const composeTwoMappings = (leftMappings, rightMappings) => {
+  const mappings = {};
+  Object.keys(leftMappings).forEach(leftSpecifier => {
+    if (objectHasKey(rightMappings, leftSpecifier)) {
       // will be overidden
       return;
     }
 
-    const leftAddress = leftImports[leftSpecifier];
-    const rightSpecifier = Object.keys(rightImports).find(rightSpecifier => {
+    const leftAddress = leftMappings[leftSpecifier];
+    const rightSpecifier = Object.keys(rightMappings).find(rightSpecifier => {
       return compareAddressAndSpecifier(leftAddress, rightSpecifier);
     });
-    topLevelMappings[leftSpecifier] = rightSpecifier ? rightImports[rightSpecifier] : leftAddress;
+    mappings[leftSpecifier] = rightSpecifier ? rightMappings[rightSpecifier] : leftAddress;
   });
-  Object.keys(rightImports).forEach(rightSpecifier => {
-    topLevelMappings[rightSpecifier] = rightImports[rightSpecifier];
+  Object.keys(rightMappings).forEach(rightSpecifier => {
+    mappings[rightSpecifier] = rightMappings[rightSpecifier];
   });
-  return topLevelMappings;
+  return mappings;
 };
 
 const objectHasKey = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
@@ -386,34 +402,34 @@ const compareAddressAndSpecifier = (address, specifier) => {
   return addressUrl === specifierUrl;
 };
 
-const composeTwoScopes = (leftScopes, rightScopes, topLevelRemappings) => {
-  const scopedRemappings = {};
+const composeTwoScopes = (leftScopes, rightScopes, imports) => {
+  const scopes = {};
   Object.keys(leftScopes).forEach(leftScopeKey => {
     if (objectHasKey(rightScopes, leftScopeKey)) {
       // will be merged
-      scopedRemappings[leftScopeKey] = leftScopes[leftScopeKey];
+      scopes[leftScopeKey] = leftScopes[leftScopeKey];
       return;
     }
 
-    const topLevelSpecifier = Object.keys(topLevelRemappings).find(topLevelSpecifierCandidate => {
+    const topLevelSpecifier = Object.keys(imports).find(topLevelSpecifierCandidate => {
       return compareAddressAndSpecifier(leftScopeKey, topLevelSpecifierCandidate);
     });
 
     if (topLevelSpecifier) {
-      scopedRemappings[topLevelRemappings[topLevelSpecifier]] = leftScopes[leftScopeKey];
+      scopes[imports[topLevelSpecifier]] = leftScopes[leftScopeKey];
     } else {
-      scopedRemappings[leftScopeKey] = leftScopes[leftScopeKey];
+      scopes[leftScopeKey] = leftScopes[leftScopeKey];
     }
   });
   Object.keys(rightScopes).forEach(rightScopeKey => {
-    if (objectHasKey(scopedRemappings, rightScopeKey)) {
-      scopedRemappings[rightScopeKey] = composeTwoImports(scopedRemappings[rightScopeKey], rightScopes[rightScopeKey]);
+    if (objectHasKey(scopes, rightScopeKey)) {
+      scopes[rightScopeKey] = composeTwoMappings(scopes[rightScopeKey], rightScopes[rightScopeKey]);
     } else {
-      scopedRemappings[rightScopeKey] = { ...rightScopes[rightScopeKey]
+      scopes[rightScopeKey] = { ...rightScopes[rightScopeKey]
       };
     }
   });
-  return scopedRemappings;
+  return scopes;
 };
 
 const getCommonPathname = (pathname, otherPathname) => {
@@ -547,7 +563,7 @@ const moveImportMap = (importMap, fromUrl, toUrl) => {
   } = importMap;
 
   if (imports) {
-    importMapRelative.imports = makeImportsRelativeTo(imports, makeRelativeTo) || imports;
+    importMapRelative.imports = makeMappingsRelativeTo(imports, makeRelativeTo) || imports;
   }
 
   const {
@@ -555,7 +571,7 @@ const moveImportMap = (importMap, fromUrl, toUrl) => {
   } = importMap;
 
   if (scopes) {
-    importMapRelative.scopes = makeScopedRemappingRelativeTo(scopes, makeRelativeTo) || scopes;
+    importMapRelative.scopes = makeScopesRelativeTo(scopes, makeRelativeTo) || scopes;
   } // nothing changed
 
 
@@ -566,51 +582,51 @@ const moveImportMap = (importMap, fromUrl, toUrl) => {
   return importMapRelative;
 };
 
-const makeScopedRemappingRelativeTo = (scopes, makeRelativeTo) => {
+const makeMappingsRelativeTo = (mappings, makeRelativeTo) => {
+  const mappingsTransformed = {};
+  const mappingsRemaining = {};
+  let transformed = false;
+  Object.keys(mappings).forEach(specifier => {
+    const address = mappings[specifier];
+    const specifierRelative = makeRelativeTo(specifier, "specifier");
+    const addressRelative = makeRelativeTo(address, "address");
+
+    if (specifierRelative) {
+      transformed = true;
+      mappingsTransformed[specifierRelative] = addressRelative || address;
+    } else if (addressRelative) {
+      transformed = true;
+      mappingsTransformed[specifier] = addressRelative;
+    } else {
+      mappingsRemaining[specifier] = address;
+    }
+  });
+  return transformed ? { ...mappingsTransformed,
+    ...mappingsRemaining
+  } : null;
+};
+
+const makeScopesRelativeTo = (scopes, makeRelativeTo) => {
   const scopesTransformed = {};
   const scopesRemaining = {};
   let transformed = false;
-  Object.keys(scopes).forEach(scopeKey => {
-    const scopeValue = scopes[scopeKey];
-    const scopeKeyRelative = makeRelativeTo(scopeKey, "address");
-    const scopeValueRelative = makeImportsRelativeTo(scopeValue, makeRelativeTo);
+  Object.keys(scopes).forEach(scopeSpecifier => {
+    const scopeMappings = scopes[scopeSpecifier];
+    const scopeSpecifierRelative = makeRelativeTo(scopeSpecifier, "address");
+    const scopeMappingsRelative = makeMappingsRelativeTo(scopeMappings, makeRelativeTo);
 
-    if (scopeKeyRelative) {
+    if (scopeSpecifierRelative) {
       transformed = true;
-      scopesTransformed[scopeKeyRelative] = scopeValueRelative || scopeValue;
-    } else if (scopeValueRelative) {
+      scopesTransformed[scopeSpecifierRelative] = scopeMappingsRelative || scopeMappings;
+    } else if (scopeMappingsRelative) {
       transformed = true;
-      scopesTransformed[scopeKey] = scopeValueRelative;
+      scopesTransformed[scopeSpecifier] = scopeMappingsRelative;
     } else {
-      scopesRemaining[scopeKey] = scopeValueRelative;
+      scopesRemaining[scopeSpecifier] = scopeMappingsRelative;
     }
   });
   return transformed ? { ...scopesTransformed,
     ...scopesRemaining
-  } : null;
-};
-
-const makeImportsRelativeTo = (imports, makeRelativeTo) => {
-  const importsTransformed = {};
-  const importsRemaining = {};
-  let transformed = false;
-  Object.keys(imports).forEach(importKey => {
-    const importValue = imports[importKey];
-    const importKeyRelative = makeRelativeTo(importKey, "specifier");
-    const importValueRelative = makeRelativeTo(importValue, "address");
-
-    if (importKeyRelative) {
-      transformed = true;
-      importsTransformed[importKeyRelative] = importValueRelative || importValue;
-    } else if (importValueRelative) {
-      transformed = true;
-      importsTransformed[importKey] = importValueRelative;
-    } else {
-      importsRemaining[importKey] = importValue;
-    }
-  });
-  return transformed ? { ...importsTransformed,
-    ...importsRemaining
   } : null;
 };
 
@@ -629,16 +645,16 @@ const sortImportMap = importMap => {
   };
 };
 const sortImports = imports => {
-  const importsSorted = {};
+  const mappingsSorted = {};
   Object.keys(imports).sort(compareLengthOrLocaleCompare).forEach(name => {
-    importsSorted[name] = imports[name];
+    mappingsSorted[name] = imports[name];
   });
-  return importsSorted;
+  return mappingsSorted;
 };
 const sortScopes = scopes => {
   const scopesSorted = {};
-  Object.keys(scopes).sort(compareLengthOrLocaleCompare).forEach(scopeName => {
-    scopesSorted[scopeName] = sortImports(scopes[scopeName]);
+  Object.keys(scopes).sort(compareLengthOrLocaleCompare).forEach(scopeSpecifier => {
+    scopesSorted[scopeSpecifier] = sortImports(scopes[scopeSpecifier]);
   });
   return scopesSorted;
 };
@@ -661,15 +677,15 @@ const normalizeImportMap = (importMap, baseUrl) => {
     scopes
   } = importMap;
   return {
-    imports: imports ? normalizeImports(imports, baseUrl) : undefined,
+    imports: imports ? normalizeMappings(imports, baseUrl) : undefined,
     scopes: scopes ? normalizeScopes(scopes, baseUrl) : undefined
   };
 };
 
-const normalizeImports = (imports, baseUrl) => {
-  const importsNormalized = {};
-  Object.keys(imports).forEach(specifier => {
-    const address = imports[specifier];
+const normalizeMappings = (mappings, baseUrl) => {
+  const mappingsNormalized = {};
+  Object.keys(mappings).forEach(specifier => {
+    const address = mappings[specifier];
 
     if (typeof address !== "string") {
       console.warn(formulateAddressMustBeAString({
@@ -700,26 +716,26 @@ const normalizeImports = (imports, baseUrl) => {
       return;
     }
 
-    importsNormalized[specifierResolved] = addressUrl;
+    mappingsNormalized[specifierResolved] = addressUrl;
   });
-  return sortImports(importsNormalized);
+  return sortImports(mappingsNormalized);
 };
 
 const normalizeScopes = (scopes, baseUrl) => {
   const scopesNormalized = {};
-  Object.keys(scopes).forEach(scope => {
-    const scopeValue = scopes[scope];
-    const scopeUrl = tryUrlResolution(scope, baseUrl);
+  Object.keys(scopes).forEach(scopeSpecifier => {
+    const scopeMappings = scopes[scopeSpecifier];
+    const scopeUrl = tryUrlResolution(scopeSpecifier, baseUrl);
 
     if (scopeUrl === null) {
       console.warn(formulateScopeResolutionFailed({
-        scope,
+        scope: scopeSpecifier,
         baseUrl
       }));
       return;
     }
 
-    const scopeValueNormalized = normalizeImports(scopeValue, baseUrl);
+    const scopeValueNormalized = normalizeMappings(scopeMappings, baseUrl);
     scopesNormalized[scopeUrl] = scopeValueNormalized;
   });
   return sortScopes(scopesNormalized);
@@ -791,14 +807,16 @@ const resolveImport = ({
   importer,
   importMap,
   defaultExtension = true,
-  createBareSpecifierError
+  createBareSpecifierError,
+  onImportMapping = () => {}
 }) => {
   return applyDefaultExtension({
     url: importMap ? applyImportMap({
       importMap,
       specifier,
       importer,
-      createBareSpecifierError
+      createBareSpecifierError,
+      onImportMapping
     }) : resolveUrl(specifier, importer),
     importer,
     defaultExtension
