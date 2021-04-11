@@ -5,8 +5,9 @@ import { sortImports, sortScopes } from "./sortImportMap.js"
 
 export const normalizeImportMap = (importMap, baseUrl) => {
   assertImportMap(importMap)
-  if (typeof baseUrl !== "string") {
-    throw new TypeError(formulateBaseUrlMustBeAString({ baseUrl }))
+
+  if (isStringOrUrl(baseUrl)) {
+    throw new TypeError(formulateBaseUrlMustBeStringOrUrl({ baseUrl }))
   }
 
   const { imports, scopes } = importMap
@@ -15,6 +16,18 @@ export const normalizeImportMap = (importMap, baseUrl) => {
     imports: imports ? normalizeMappings(imports, baseUrl) : undefined,
     scopes: scopes ? normalizeScopes(scopes, baseUrl) : undefined,
   }
+}
+
+const isStringOrUrl = (value) => {
+  if (typeof value === "string") {
+    return true
+  }
+
+  if (typeof URL === "function" && value instanceof URL) {
+    return true
+  }
+
+  return false
 }
 
 const normalizeMappings = (mappings, baseUrl) => {
@@ -85,7 +98,7 @@ const normalizeScopes = (scopes, baseUrl) => {
   return sortScopes(scopesNormalized)
 }
 
-const formulateBaseUrlMustBeAString = ({ baseUrl }) => `baseUrl must be a string.
+const formulateBaseUrlMustBeStringOrUrl = ({ baseUrl }) => `baseUrl must be a string or an url.
 --- base url ---
 ${baseUrl}`
 
