@@ -6,7 +6,7 @@ import { sortImports, sortScopes } from "./sortImportMap.js"
 export const normalizeImportMap = (importMap, baseUrl) => {
   assertImportMap(importMap)
 
-  if (isStringOrUrl(baseUrl)) {
+  if (!isStringOrUrl(baseUrl)) {
     throw new TypeError(formulateBaseUrlMustBeStringOrUrl({ baseUrl }))
   }
 
