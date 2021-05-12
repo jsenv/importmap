@@ -27,5 +27,5 @@ executeTestPlan({
       },
     },
   },
-  coverageV8MergeConflictIsExpected: true
+  coverageV8MergeConflictIsExpected: true,
 })
