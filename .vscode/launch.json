@@ -18,37 +18,6 @@
         "node_modules/regenerator-trasform/**",
         "<node_internals>/**/*.js"
       ]
-    },
-    {
-      "name": "jsenv-node",
-      "type": "node",
-      "request": "launch",
-      "protocol": "inspector",
-      "program": "${workspaceFolder}/script/run-node/run-node.js",
-      "args": ["${relativeFile}"],
-      "autoAttachChildProcesses": true,
-      "sourceMaps": true,
-      "smartStep": true,
-      "skipFiles": [
-        // "node_modules/**",
-        "node_modules/@babel/**",
-        "node_modules/@jsenv/cancellation/**",
-        "<node_internals>/**/*.js"
-      ]
-    },
-    {
-      "name": "jsenv-node-attach-child",
-      "type": "node",
-      "request": "attach",
-      "port": 40000,
-      "smartStep": true,
-      "sourceMaps": true,
-      "skipFiles": [
-        // "node_modules/**",
-        "node_modules/@babel/**",
-        "node_modules/@jsenv/cancellation/**",
-        "<node_internals>/**/*.js"
-      ]
     }
   ]
 }

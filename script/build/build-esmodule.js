@@ -3,9 +3,11 @@ import * as jsenvConfig from "../../jsenv.config.js"
 
 buildProject({
   ...jsenvConfig,
+  buildDirectoryRelativeUrl: "./dist/esmodule",
   format: "esmodule",
+  importResolutionMethod: "node",
   entryPointMap: {
-    "./index.js": "./main.js",
+    "./index.js": "./jsenv_importmap.js",
   },
   bundleDirectoryClean: true,
 })

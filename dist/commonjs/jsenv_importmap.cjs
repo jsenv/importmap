@@ -666,8 +666,8 @@ const compareLengthOrLocaleCompare = (a, b) => {
 const normalizeImportMap = (importMap, baseUrl) => {
   assertImportMap(importMap);
 
-  if (typeof baseUrl !== "string") {
-    throw new TypeError(formulateBaseUrlMustBeAString({
+  if (!isStringOrUrl(baseUrl)) {
+    throw new TypeError(formulateBaseUrlMustBeStringOrUrl({
       baseUrl
     }));
   }
@@ -680,6 +680,18 @@ const normalizeImportMap = (importMap, baseUrl) => {
     imports: imports ? normalizeMappings(imports, baseUrl) : undefined,
     scopes: scopes ? normalizeScopes(scopes, baseUrl) : undefined
   };
+};
+
+const isStringOrUrl = value => {
+  if (typeof value === "string") {
+    return true;
+  }
+
+  if (typeof URL === "function" && value instanceof URL) {
+    return true;
+  }
+
+  return false;
 };
 
 const normalizeMappings = (mappings, baseUrl) => {
@@ -741,9 +753,9 @@ const normalizeScopes = (scopes, baseUrl) => {
   return sortScopes(scopesNormalized);
 };
 
-const formulateBaseUrlMustBeAString = ({
+const formulateBaseUrlMustBeStringOrUrl = ({
   baseUrl
-}) => `baseUrl must be a string.
+}) => `baseUrl must be a string or an url.
 --- base url ---
 ${baseUrl}`;
 
@@ -864,4 +876,4 @@ exports.resolveSpecifier = resolveSpecifier;
 exports.resolveUrl = resolveUrl;
 exports.sortImportMap = sortImportMap;
 
-//# sourceMappingURL=main.cjs.map
+//# sourceMappingURL=jsenv_importmap.cjs.map

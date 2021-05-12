@@ -358,20 +358,35 @@ var defineProperty = (function (obj, key, value) {
   return obj;
 });
 
-function _objectSpread (target) {
+function ownKeys(object, enumerableOnly) {
+  var keys = Object.keys(object);
+
+  if (Object.getOwnPropertySymbols) {
+    var symbols = Object.getOwnPropertySymbols(object);
+
+    if (enumerableOnly) {
+      symbols = symbols.filter(function (sym) {
+        return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+      });
+    }
+
+    keys.push.apply(keys, symbols);
+  }
+
+  return keys;
+}
+
+function _objectSpread2(target) {
   for (var i = 1; i < arguments.length; i++) {
-    // eslint-disable-next-line prefer-rest-params
-    var source = arguments[i] === null ? {} : arguments[i];
+    var source = arguments[i] != null ? arguments[i] : {};
 
     if (i % 2) {
-      // eslint-disable-next-line no-loop-func
       ownKeys(Object(source), true).forEach(function (key) {
         defineProperty(target, key, source[key]);
       });
     } else if (Object.getOwnPropertyDescriptors) {
       Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
     } else {
-      // eslint-disable-next-line no-loop-func
       ownKeys(Object(source)).forEach(function (key) {
         Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
       });
@@ -379,23 +394,6 @@ function _objectSpread (target) {
   }
 
   return target;
-} // This function is different to "Reflect.ownKeys". The enumerableOnly
-// filters on symbol properties only. Returned string properties are always
-// enumerable. It is good to use in objectSpread.
-
-function ownKeys(object, enumerableOnly) {
-  var keys = Object.keys(object);
-
-  if (Object.getOwnPropertySymbols) {
-    var symbols = Object.getOwnPropertySymbols(object);
-    if (enumerableOnly) symbols = symbols.filter(function (sym) {
-      return Object.getOwnPropertyDescriptor(object, sym).enumerable;
-    }); // eslint-disable-next-line prefer-spread
-
-    keys.push.apply(keys, symbols);
-  }
-
-  return keys;
 }
 
 var composeTwoImportMaps = function composeTwoImportMaps(leftImportMap, rightImportMap) {
@@ -410,9 +408,9 @@ var composeTwoImportMaps = function composeTwoImportMaps(leftImportMap, rightImp
   if (leftHasImports && rightHasImports) {
     importMap.imports = composeTwoMappings(leftImports, rightImports);
   } else if (leftHasImports) {
-    importMap.imports = _objectSpread({}, leftImports);
+    importMap.imports = _objectSpread2({}, leftImports);
   } else if (rightHasImports) {
-    importMap.imports = _objectSpread({}, rightImports);
+    importMap.imports = _objectSpread2({}, rightImports);
   }
 
   var leftScopes = leftImportMap.scopes;
@@ -423,9 +421,9 @@ var composeTwoImportMaps = function composeTwoImportMaps(leftImportMap, rightImp
   if (leftHasScopes && rightHasScopes) {
     importMap.scopes = composeTwoScopes(leftScopes, rightScopes, importMap.imports || {});
   } else if (leftHasScopes) {
-    importMap.scopes = _objectSpread({}, leftScopes);
+    importMap.scopes = _objectSpread2({}, leftScopes);
   } else if (rightHasScopes) {
-    importMap.scopes = _objectSpread({}, rightScopes);
+    importMap.scopes = _objectSpread2({}, rightScopes);
   }
 
   return importMap;
@@ -484,7 +482,7 @@ var composeTwoScopes = function composeTwoScopes(leftScopes, rightScopes, import
     if (objectHasKey(scopes, rightScopeKey)) {
       scopes[rightScopeKey] = composeTwoMappings(scopes[rightScopeKey], rightScopes[rightScopeKey]);
     } else {
-      scopes[rightScopeKey] = _objectSpread({}, rightScopes[rightScopeKey]);
+      scopes[rightScopeKey] = _objectSpread2({}, rightScopes[rightScopeKey]);
     }
   });
   return scopes;
@@ -651,7 +649,7 @@ var makeMappingsRelativeTo = function makeMappingsRelativeTo(mappings, makeRelat
       mappingsRemaining[specifier] = address;
     }
   });
-  return transformed ? _objectSpread(_objectSpread({}, mappingsTransformed), mappingsRemaining) : null;
+  return transformed ? _objectSpread2(_objectSpread2({}, mappingsTransformed), mappingsRemaining) : null;
 };
 
 var makeScopesRelativeTo = function makeScopesRelativeTo(scopes, makeRelativeTo) {
@@ -673,14 +671,14 @@ var makeScopesRelativeTo = function makeScopesRelativeTo(scopes, makeRelativeTo)
       scopesRemaining[scopeSpecifier] = scopeMappingsRelative;
     }
   });
-  return transformed ? _objectSpread(_objectSpread({}, scopesTransformed), scopesRemaining) : null;
+  return transformed ? _objectSpread2(_objectSpread2({}, scopesTransformed), scopesRemaining) : null;
 };
 
 var sortImportMap = function sortImportMap(importMap) {
   assertImportMap(importMap);
   var imports = importMap.imports,
       scopes = importMap.scopes;
-  return _objectSpread(_objectSpread({}, imports ? {
+  return _objectSpread2(_objectSpread2({}, imports ? {
     imports: sortImports(imports)
   } : {}), scopes ? {
     scopes: sortScopes(scopes)
@@ -708,8 +706,8 @@ var compareLengthOrLocaleCompare = function compareLengthOrLocaleCompare(a, b) {
 var normalizeImportMap = function normalizeImportMap(importMap, baseUrl) {
   assertImportMap(importMap);
 
-  if (typeof baseUrl !== "string") {
-    throw new TypeError(formulateBaseUrlMustBeAString({
+  if (!isStringOrUrl(baseUrl)) {
+    throw new TypeError(formulateBaseUrlMustBeStringOrUrl({
       baseUrl: baseUrl
     }));
   }
@@ -720,6 +718,18 @@ var normalizeImportMap = function normalizeImportMap(importMap, baseUrl) {
     imports: imports ? normalizeMappings(imports, baseUrl) : undefined,
     scopes: scopes ? normalizeScopes(scopes, baseUrl) : undefined
   };
+};
+
+var isStringOrUrl = function isStringOrUrl(value) {
+  if (typeof value === "string") {
+    return true;
+  }
+
+  if (typeof URL === "function" && value instanceof URL) {
+    return true;
+  }
+
+  return false;
 };
 
 var normalizeMappings = function normalizeMappings(mappings, baseUrl) {
@@ -781,9 +791,9 @@ var normalizeScopes = function normalizeScopes(scopes, baseUrl) {
   return sortScopes(scopesNormalized);
 };
 
-var formulateBaseUrlMustBeAString = function formulateBaseUrlMustBeAString(_ref) {
+var formulateBaseUrlMustBeStringOrUrl = function formulateBaseUrlMustBeStringOrUrl(_ref) {
   var baseUrl = _ref.baseUrl;
-  return "baseUrl must be a string.\n--- base url ---\n".concat(baseUrl);
+  return "baseUrl must be a string or an url.\n--- base url ---\n".concat(baseUrl);
 };
 
 var formulateAddressMustBeAString = function formulateAddressMustBeAString(_ref2) {
@@ -881,4 +891,4 @@ var applyDefaultExtension = function applyDefaultExtension(_ref2) {
 
 export { applyImportMap, composeTwoImportMaps, moveImportMap, normalizeImportMap, resolveImport, resolveSpecifier, resolveUrl, sortImportMap };
 
-//# sourceMappingURL=main.js.map
+//# sourceMappingURL=jsenv_importmap.js.map
