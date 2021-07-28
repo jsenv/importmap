@@ -8,7 +8,7 @@ Helpers to implement importmaps.
 
 # Presentation
 
-`@jsenv/importmap` can be used to implement the behaviour of importmap as described in the [WICG specification](https://github.com/WICG/import-maps). It is written using ES modules and compatible with browsers and Node.js. Amongst other things, this repository is used to provide [importmap in ESLint](https://github.com/jsenv/jsenv-importmap-eslint-resolver).
+`@jsenv/importmap` can be used to implement the behaviour of importmap as described in the [WICG specification](https://github.com/WICG/import-maps). It is written using ES modules and compatible with browsers and Node.js. Amongst other things, this repository is used to provide [importmap in ESLint](https://github.com/jsenv/importmap-eslint-resolver#presentation).
 
 # Installation
 
@@ -18,7 +18,7 @@ npm install @jsenv/importmap
 
 # composeTwoImportMaps
 
-`composeTwoImportMaps` takes two `importMap` and return a single `importMap` being the composition of the two.
+_composeTwoImportMaps_ takes two _importMap_ and return a single _importMap_ being the composition of the two.
 
 ```js
 import { composeTwoImportMaps } from "@jsenv/importmap"
@@ -47,11 +47,9 @@ console.log(JSON.stringify(importMap, null, "  "))
 }
 ```
 
-— source code at [src/composeTwoImportMaps.js](./src/composeTwoImportMaps.js).
-
 # normalizeImportMap
 
-`normalizeImportMap` returns an `importMap` resolved against an `url` and sorted.
+_normalizeImportMap_ returns an _importMap_ resolved against an _url_ and sorted.
 
 ```js
 import { normalizeImportMap } from "@jsenv/importmap"
@@ -78,11 +76,9 @@ console.log(JSON.stringify(importMap, null, '  ')
 }
 ```
 
-— source code at [src/normalizeImportMap.js](./src/normalizeImportMap.js).
-
 # resolveImport
 
-`resolveImport` returns an import `url` applying an `importMap` to `specifier` and `importer`. The provided `importMap` must be resolved and sorted to work as expected. You can use [normalizeImportMap](#normalizeimportmap) to do that.
+_resolveImport_ returns an import _url_ applying an _importMap_ to _specifier_ and _importer_. The provided _importMap_ must be resolved and sorted to work as expected. You can use [normalizeImportMap](#normalizeimportmap) to do that.
 
 ```js
 import { resolveImport } from "@jsenv/importmap"
@@ -104,11 +100,9 @@ console.log(importUrl)
 http://domain.com/main.js
 ```
 
-— source code at [src/resolveImport.js](./src/resolveImport.js).
-
 # moveImportMap
 
-`moveImportMap` receives `importMap`, `fromUrl`, `toUrl` and return an importmap where all relative urls and specifiers becomes relative to `toUrl` instead of `fromUrl`.
+_moveImportMap_ receives _importMap_, _fromUrl_, _toUrl_ and return an importmap where all relative urls and specifiers becomes relative to _toUrl_ instead of _fromUrl_.
 
 This function exists in case you need to move an importmap file somewhere else in the filesystem. This is not a common use case but might happen.
 
@@ -134,5 +128,3 @@ console.log(JSON.stringify(importMap, null, '  ')
   }
 }
 ```
-
-— source code at [src/moveImportMap.js](./src/moveImportMap.js).
