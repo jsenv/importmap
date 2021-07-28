@@ -1,4 +1,4 @@
-# import-map
+# importmap
 
 Helpers to implement importmaps.
 
