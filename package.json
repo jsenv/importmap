@@ -58,9 +58,9 @@
     "@jsenv/prettier-check-project": "5.6.1",
     "eslint": "7.31.0",
     "eslint-plugin-import": "2.23.4",
-    "playwright-chromium": "1.13.0",
-    "playwright-firefox": "1.13.0",
-    "playwright-webkit": "1.13.0",
+    "playwright-chromium": "1.12.3",
+    "playwright-firefox": "1.12.3",
+    "playwright-webkit": "1.12.3",
     "prettier": "2.3.2"
   }
 }
