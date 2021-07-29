@@ -4,7 +4,7 @@
 // https://github.com/browserify/resolve/blob/master/lib/core.json#L1
 
 export const isSpecifierForNodeCoreModule = (specifier) => {
-  return NODE_CORE_MODULE_SPECIFIERS.includes(specifier)
+  return specifier.startsWith("node:") || NODE_CORE_MODULE_SPECIFIERS.includes(specifier)
 }
 
 const NODE_CORE_MODULE_SPECIFIERS = [
