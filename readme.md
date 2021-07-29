@@ -3,7 +3,7 @@
 Helpers to implement importmaps.
 
 [![npm package](https://img.shields.io/npm/v/@jsenv/importmap.svg?logo=npm&label=package)](https://www.npmjs.com/package/@jsenv/importmap)
-[![github ci](https://github.com/jsenv/importmap/workflows/ci/badge.svg)](https://github.com/jsenv/importmap/actions?workflow=ci)
+[![github main workflow](https://github.com/jsenv/importmap/workflows/main/badge.svg)](https://github.com/jsenv/importmap/actions?workflow=main)
 [![codecov coverage](https://codecov.io/gh/jsenv/importmap/branch/master/graph/badge.svg)](https://codecov.io/gh/jsenv/importmap)
 
 # Presentation
