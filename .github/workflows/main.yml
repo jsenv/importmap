@@ -44,6 +44,8 @@ jobs:
           node-version: ${{ matrix.node }}
       - name: npm install
         run: npm install
+      - name: install playwright deps
+        run: npx playwright install-deps
       - name: check lint
         run: npm run eslint-check
       - name: check tests
