@@ -1,12 +1,4 @@
-# importmap
-
-Helpers to implement importmaps.
-
-[![npm package](https://img.shields.io/npm/v/@jsenv/importmap.svg?logo=npm&label=package)](https://www.npmjs.com/package/@jsenv/importmap)
-[![github main workflow](https://github.com/jsenv/importmap/workflows/main/badge.svg)](https://github.com/jsenv/importmap/actions?workflow=main)
-[![codecov coverage](https://codecov.io/gh/jsenv/importmap/branch/master/graph/badge.svg)](https://codecov.io/gh/jsenv/importmap)
-
-# Presentation
+# importmap [![npm package](https://img.shields.io/npm/v/@jsenv/importmap.svg?logo=npm&label=package)](https://www.npmjs.com/package/@jsenv/importmap) [![github main workflow](https://github.com/jsenv/importmap/workflows/main/badge.svg)](https://github.com/jsenv/importmap/actions?workflow=main) [![codecov coverage](https://codecov.io/gh/jsenv/importmap/branch/master/graph/badge.svg)](https://codecov.io/gh/jsenv/importmap)
 
 `@jsenv/importmap` can be used to implement the behaviour of importmap as described in the [WICG specification](https://github.com/WICG/import-maps). It is written using ES modules and compatible with browsers and Node.js. Amongst other things, this repository is used to provide [importmap in ESLint](https://github.com/jsenv/importmap-eslint-resolver#presentation).
 
