@@ -8,6 +8,7 @@
       "protocol": "inspector",
       "program": "${file}",
       // "runtimeVersion": "13.6.0",
+      "console": "integratedTerminal",
       "autoAttachChildProcesses": true,
       "sourceMaps": true,
       "smartStep": true,

@@ -292,3 +292,18 @@ import { resolveImport } from "../index.js"
   const expected = `http://example.com/folder/node_modules/foo/node_modules/bar/bar.js`
   assert({ actual, expected })
 }
+
+// core-js test
+{
+  const actual = resolveImport({
+    specifier: "core-js/stable/object/entries.js",
+    importer: "http://example.com",
+    importMap: {
+      imports: {
+        "core-js/": "http://example.com/node_modules/core-js/",
+      },
+    },
+  })
+  const expected = `http://example.com/node_modules/core-js/stable/object/entries.js`
+  assert({ actual, expected })
+}
