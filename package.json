@@ -16,7 +16,7 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./index.js",
+      "import": "./main.js",
       "require": "./dist/commonjs/jsenv_importmap.cjs"
     },
     "./*": "./*"
@@ -25,7 +25,7 @@
   "files": [
     "/dist/",
     "/src/",
-    "/index.js"
+    "/main.js"
   ],
   "scripts": {
     "dev": "node ./script/server/start_dev_server.mjs",

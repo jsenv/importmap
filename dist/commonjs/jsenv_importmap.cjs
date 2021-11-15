@@ -818,21 +818,33 @@ const resolveImport = ({
   specifier,
   importer,
   importMap,
-  defaultExtension = true,
+  defaultExtension = false,
   createBareSpecifierError,
   onImportMapping = () => {}
 }) => {
-  return applyDefaultExtension({
-    url: importMap ? applyImportMap({
+  let url;
+
+  if (importMap) {
+    url = applyImportMap({
       importMap,
       specifier,
       importer,
       createBareSpecifierError,
       onImportMapping
-    }) : resolveUrl(specifier, importer),
-    importer,
-    defaultExtension
-  });
+    });
+  } else {
+    url = resolveUrl(specifier, importer);
+  }
+
+  if (defaultExtension) {
+    url = applyDefaultExtension({
+      url,
+      importer,
+      defaultExtension
+    });
+  }
+
+  return url;
 };
 
 const applyDefaultExtension = ({
