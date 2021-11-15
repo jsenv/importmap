@@ -1,5 +1,8 @@
 export const getCommonPathname = (pathname, otherPathname) => {
-  const firstDifferentCharacterIndex = findFirstDifferentCharacterIndex(pathname, otherPathname)
+  const firstDifferentCharacterIndex = findFirstDifferentCharacterIndex(
+    pathname,
+    otherPathname,
+  )
 
   // pathname and otherpathname are exactly the same
   if (firstDifferentCharacterIndex === -1) {

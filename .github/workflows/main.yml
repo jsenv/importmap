@@ -1,38 +1,35 @@
-# This file configure a GitHub workflow responsible to perform
-# various checks related to the codebase.
+# This is a GitHub workflow YAML file
+# see https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions
 #
-# For that reason it's runned on every pull request and push to main.
+# If you want to update this file it's recommended to use a YAML validator
+# https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml
+# configured to validate with https://json.schemastore.org/github-workflow.json
 #
-# It does the following:
-#  - Check lint passes (no eslint error on files)
-#  - Check tests passes (none is failing)
-#  - Upload code coverage from tests to codecov
+# This workflow is responsible to perform various checks related to the codebase,
+# For every push to main or on a pull request, it
+# - ensures there is no eslint error on files
+# - ensures there is no test failing
+# - uploads code coverage from tests to codecov
 #
-# If all these steps are passing the workflow ends up
-# publishing package on npm if needed. It will publish the npm package
-# using the token found in secrets.NPM_TOKEN. Be sure to create this
-# token in the GitHub repository.
-#
-# If you want to update this file it's recommended to use
-# a YAML validator such as https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml
-# configured to validate this file with https://json.schemastore.org/github-workflow.json
+# If all these steps are passing and there is a secrets.NPM_TOKEN and version in package.json
+# is not already published, workflow published the package on npm.
 
 name: main
 
 on:
-  pull_request:
-    branches:
-      - "**"
   push:
     branches:
       - master
+  pull_request:
+    branches:
+      - "**"
 
 jobs:
   test:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        node: [16.3.0]
+        os: [ubuntu-20.04, macos-10.15, windows-2019]
+        node: [16.13.0]
     runs-on: ${{ matrix.os }}
     name: test on ${{ matrix.os }} and node ${{ matrix.node }}
     env:
@@ -42,36 +39,40 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node }}
-      - name: npm install
+      - name: NPM installation
         run: npm install
-      - name: install playwright deps
-        run: npx playwright install-deps
+      - name: Playwright installtion
+        run: npm run playwright-install
       - name: check lint
         run: npm run eslint-check
       - name: check tests
         run: npm run test-with-coverage
       - name: upload coverage
-        run: npm run upload-coverage
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          # see "coverageJsonFileRelativeUrl" in script/test/test.mjs
+          files: ./coverage/coverage.json
+          verbose: true
 
   release:
     needs: [test]
     if: success() && github.event_name == 'push'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     name: release
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: "16.x"
+          node-version: "16.13.0"
       - name: npm install
         run: npm install
       - name: publish package
-        run: node --experimental-top-level-await ./.github/workflows/main/publish-package.js
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        if: env.NPM_TOKEN != null
+        run: node ./.github/workflows/main/publish_package.mjs
       - name: ensure github release
-        run: node --experimental-top-level-await ./.github/workflows/main/ensure-github-release-for-package.js
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node ./.github/workflows/main/github_release.mjs

@@ -25,7 +25,11 @@ export const composeTwoImportMaps = (leftImportMap, rightImportMap) => {
   const leftHasScopes = Boolean(leftScopes)
   const rightHasScopes = Boolean(rightScopes)
   if (leftHasScopes && rightHasScopes) {
-    importMap.scopes = composeTwoScopes(leftScopes, rightScopes, importMap.imports || {})
+    importMap.scopes = composeTwoScopes(
+      leftScopes,
+      rightScopes,
+      importMap.imports || {},
+    )
   } else if (leftHasScopes) {
     importMap.scopes = { ...leftScopes }
   } else if (rightHasScopes) {
@@ -47,7 +51,9 @@ const composeTwoMappings = (leftMappings, rightMappings) => {
     const rightSpecifier = Object.keys(rightMappings).find((rightSpecifier) => {
       return compareAddressAndSpecifier(leftAddress, rightSpecifier)
     })
-    mappings[leftSpecifier] = rightSpecifier ? rightMappings[rightSpecifier] : leftAddress
+    mappings[leftSpecifier] = rightSpecifier
+      ? rightMappings[rightSpecifier]
+      : leftAddress
   })
 
   Object.keys(rightMappings).forEach((rightSpecifier) => {
@@ -57,7 +63,8 @@ const composeTwoMappings = (leftMappings, rightMappings) => {
   return mappings
 }
 
-const objectHasKey = (object, key) => Object.prototype.hasOwnProperty.call(object, key)
+const objectHasKey = (object, key) =>
+  Object.prototype.hasOwnProperty.call(object, key)
 
 const compareAddressAndSpecifier = (address, specifier) => {
   const addressUrl = resolveUrl(address, "file:///")
@@ -74,9 +81,14 @@ const composeTwoScopes = (leftScopes, rightScopes, imports) => {
       scopes[leftScopeKey] = leftScopes[leftScopeKey]
       return
     }
-    const topLevelSpecifier = Object.keys(imports).find((topLevelSpecifierCandidate) => {
-      return compareAddressAndSpecifier(leftScopeKey, topLevelSpecifierCandidate)
-    })
+    const topLevelSpecifier = Object.keys(imports).find(
+      (topLevelSpecifierCandidate) => {
+        return compareAddressAndSpecifier(
+          leftScopeKey,
+          topLevelSpecifierCandidate,
+        )
+      },
+    )
     if (topLevelSpecifier) {
       scopes[imports[topLevelSpecifier]] = leftScopes[leftScopeKey]
     } else {
@@ -86,7 +98,10 @@ const composeTwoScopes = (leftScopes, rightScopes, imports) => {
 
   Object.keys(rightScopes).forEach((rightScopeKey) => {
     if (objectHasKey(scopes, rightScopeKey)) {
-      scopes[rightScopeKey] = composeTwoMappings(scopes[rightScopeKey], rightScopes[rightScopeKey])
+      scopes[rightScopeKey] = composeTwoMappings(
+        scopes[rightScopeKey],
+        rightScopes[rightScopeKey],
+      )
     } else {
       scopes[rightScopeKey] = {
         ...rightScopes[rightScopeKey],

@@ -63,7 +63,9 @@ export const resolveUrl = (specifier, baseUrl) => {
       }
     }
 
-    const resolvedPathname = `${importerFolders.join("/")}/${unresolvedPathname}`
+    const resolvedPathname = `${importerFolders.join(
+      "/",
+    )}/${unresolvedPathname}`
     return `${baseOrigin}${resolvedPathname}`
   }
 
@@ -77,13 +79,19 @@ export const resolveUrl = (specifier, baseUrl) => {
   return `${baseOrigin}${pathnameToParentPathname(basePathname)}${specifier}`
 }
 
-const writeBaseUrlMustBeAString = ({ baseUrl, specifier }) => `baseUrl must be a string.
+const writeBaseUrlMustBeAString = ({
+  baseUrl,
+  specifier,
+}) => `baseUrl must be a string.
 --- base url ---
 ${baseUrl}
 --- specifier ---
 ${specifier}`
 
-const writeBaseUrlMustBeAbsolute = ({ baseUrl, specifier }) => `baseUrl must be absolute.
+const writeBaseUrlMustBeAbsolute = ({
+  baseUrl,
+  specifier,
+}) => `baseUrl must be absolute.
 --- base url ---
 ${baseUrl}
 --- specifier ---

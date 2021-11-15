@@ -1,6 +1,6 @@
 import { publishPackage } from "@jsenv/package-publish"
 
-publishPackage({
+await publishPackage({
   projectDirectoryUrl: new URL("../../../", import.meta.url),
   registriesConfig: {
     "https://registry.npmjs.org": {

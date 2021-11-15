@@ -9,6 +9,8 @@ export const assertImportMap = (value) => {
   }
 
   if (Array.isArray(value)) {
-    throw new TypeError(`an importMap must be an object, received array ${value}`)
+    throw new TypeError(
+      `an importMap must be an object, received array ${value}`,
+    )
   }
 }

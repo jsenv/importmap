@@ -1,3 +1,8 @@
+/*
+ * This file uses "@jsenv/eslint-config" to configure ESLint
+ * See https://github.com/jsenv/eslint-config#eslint-config----
+ */
+
 const {
   composeEslintConfig,
   eslintConfigBase,
@@ -9,38 +14,109 @@ const {
 
 const eslintConfig = composeEslintConfig(
   eslintConfigBase,
+
+  // Enables top level await
   {
-    rules: jsenvEslintRules,
-  },
-  {
-    env: {
-      node: true,
+    parserOptions: {
+      ecmaVersion: 2022,
     },
   },
+
+  // Files in this repository are all meant to be executed in Node.js and browsers
+  // and we want to tell this to ESLint.
+  {
+    env: {
+      "shared-node-browser": true,
+    },
+  },
+
+  // Reuse jsenv eslint rules
+  {
+    rules: {
+      ...jsenvEslintRules,
+    },
+  },
+
+  // Enable HTML plugin
+  {
+    plugins: ["html"],
+    settings: {
+      extensions: [".html"],
+    },
+    // .html files are written for browsers
+    overrides: [
+      {
+        files: ["**/*.html"],
+        env: {
+          "shared-node-browser": false,
+          "browser": true,
+        },
+      },
+    ],
+  },
+
+  // Enable import plugin
   {
     plugins: ["import"],
     settings: {
       "import/resolver": {
+        // Tell ESLint to use the importmap to resolve imports.
+        // Read more in https://github.com/jsenv/importmap-node-module#Configure-vscode-and-eslint-for-importmap
         "@jsenv/importmap-eslint-resolver": {
           projectDirectoryUrl: __dirname,
-          importMapFileRelativeUrl: "./import-map.importmap",
+          importMapFileRelativeUrl: "./node_resolution.importmap",
           node: true,
         },
       },
+      "import/extensions": [".js", ".mjs"],
     },
     rules: jsenvEslintRulesForImport,
   },
-  // inside *.cjs files:
-  // 1. restore commonJS "globals"
-  // 2. use commonjs module resolution
+
+  // .mjs files
+  {
+    overrides: [
+      {
+        files: ["**/*.mjs"],
+        env: {
+          "shared-node-browser": false,
+          "node": true,
+        },
+        globals: {
+          __filename: "off",
+          __dirname: "off",
+          require: "off",
+          exports: "off",
+        },
+        settings: {
+          "import/resolver": {
+            "@jsenv/importmap-eslint-resolver": {
+              node: true,
+            },
+          },
+        },
+      },
+    ],
+  },
+
+  // .cjs files
   {
     overrides: [
       {
         files: ["**/*.cjs"],
         env: {
+          browser: false,
           node: true,
           commonjs: true,
         },
+        // inside *.cjs files. restore commonJS "globals"
+        globals: {
+          __filename: true,
+          __dirname: true,
+          require: true,
+          exports: true,
+        },
+        // inside *.cjs files, use commonjs module resolution
         settings: {
           "import/resolver": {
             node: {},
@@ -49,7 +125,11 @@ const eslintConfig = composeEslintConfig(
       },
     ],
   },
+
   eslintConfigToPreferExplicitGlobals,
+
+  // We are using prettier, disable all eslint rules
+  // already handled by prettier.
   eslintConfigForPrettier,
 )
 
