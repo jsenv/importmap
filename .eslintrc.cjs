@@ -73,20 +73,40 @@ const eslintConfig = composeEslintConfig(
     rules: jsenvEslintRulesForImport,
   },
 
-  // package is "type": "module" so:
-  // 1. disable commonjs globals by default
-  // 2. Re-enable commonjs into *.cjs files
+  // .mjs files
   {
-    globals: {
-      __filename: "off",
-      __dirname: "off",
-      require: "off",
-      exports: "off",
-    },
+    overrides: [
+      {
+        files: ["**/*.mjs"],
+        env: {
+          "shared-node-browser": false,
+          "node": true,
+        },
+        globals: {
+          __filename: "off",
+          __dirname: "off",
+          require: "off",
+          exports: "off",
+        },
+        settings: {
+          "import/resolver": {
+            "@jsenv/importmap-eslint-resolver": {
+              node: true,
+            },
+          },
+        },
+      },
+    ],
+  },
+
+  // .cjs files
+  {
     overrides: [
       {
         files: ["**/*.cjs"],
         env: {
+          browser: false,
+          node: true,
           commonjs: true,
         },
         // inside *.cjs files. restore commonJS "globals"
@@ -96,7 +116,6 @@ const eslintConfig = composeEslintConfig(
           require: true,
           exports: true,
         },
-
         // inside *.cjs files, use commonjs module resolution
         settings: {
           "import/resolver": {
