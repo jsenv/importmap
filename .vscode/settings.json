@@ -1,0 +1,6 @@
+{
+  "search.exclude": {
+    "**/.jsenv/**": true
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
+}
