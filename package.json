@@ -38,6 +38,7 @@
 		"test-with-coverage": "npm run test -- --coverage",
     "prettier-check": "prettier --check .",
     "prettier-write": "prettier --write .",
+    "playwright-install": "npx playwright install-deps && npx playwright install",
 		"postinstall": "npm run importmap-generate",
 		"prepublishOnly": "node ./script/publish/remove_postinstall.mjs && npm run dist",
 		"postpublish": "node ./script/publish/restore_postinstall.mjs"
