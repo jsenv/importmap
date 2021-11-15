@@ -1,5 +1,6 @@
 import { assert } from "@jsenv/assert"
-import { composeTwoImportMaps, sortImportMap } from "../index.js"
+
+import { composeTwoImportMaps, sortImportMap } from "@jsenv/importmap"
 
 {
   const actual = sortImportMap(

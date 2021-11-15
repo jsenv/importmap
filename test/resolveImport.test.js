@@ -1,5 +1,6 @@
 import { assert } from "@jsenv/assert"
-import { resolveImport } from "../index.js"
+
+import { resolveImport } from "@jsenv/importmap"
 
 // remap basic
 {

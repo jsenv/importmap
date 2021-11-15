@@ -1,5 +1,6 @@
 import { assert } from "@jsenv/assert"
-import { resolveUrl } from "../index.js"
+
+import { resolveUrl } from "@jsenv/importmap"
 
 // bare
 {

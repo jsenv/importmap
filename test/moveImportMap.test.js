@@ -1,5 +1,6 @@
 import { assert } from "@jsenv/assert"
-import { moveImportMap } from "../src/moveImportMap.js"
+
+import { moveImportMap } from "@jsenv/importmap"
 
 // move up
 {
