@@ -184,6 +184,7 @@ import { resolveImport } from "../index.js"
   const actual = resolveImport({
     specifier: "file",
     importer: "http://example.com/index.js",
+    defaultExtension: true,
   })
   const expected = "http://example.com/file.js"
   assert({ actual, expected })
@@ -194,6 +195,7 @@ import { resolveImport } from "../index.js"
   const actual = resolveImport({
     specifier: "file",
     importer: "http://example.com/index.ts?foo=bar",
+    defaultExtension: true,
   })
   const expected = "http://example.com/file.ts"
   assert({ actual, expected })
