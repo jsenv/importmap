@@ -32,8 +32,12 @@ export const urlToRelativeUrl = (urlArg, baseUrlArg) => {
   const specificPathname = pathname.slice(commonPathname.length)
   const baseSpecificPathname = basePathname.slice(commonPathname.length)
   if (baseSpecificPathname.includes("/")) {
-    const baseSpecificParentPathname = pathnameToParentPathname(baseSpecificPathname)
-    const relativeDirectoriesNotation = baseSpecificParentPathname.replace(/.*?\//g, "../")
+    const baseSpecificParentPathname =
+      pathnameToParentPathname(baseSpecificPathname)
+    const relativeDirectoriesNotation = baseSpecificParentPathname.replace(
+      /.*?\//g,
+      "../",
+    )
     return `${relativeDirectoriesNotation}${specificPathname}${search}${hash}`
   }
   return `${specificPathname}${search}${hash}`

@@ -12,4 +12,3 @@ await buildProject({
   },
   buildDirectoryClean: true,
 })
-

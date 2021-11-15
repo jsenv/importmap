@@ -8,7 +8,11 @@ import { moveImportMap } from "../src/moveImportMap.js"
       "./dir/foo.js": "../bar.js",
     },
   }
-  const actual = moveImportMap(importMap, "file:///project/test/dist/", "file:///project/test/")
+  const actual = moveImportMap(
+    importMap,
+    "file:///project/test/dist/",
+    "file:///project/test/",
+  )
   const expected = {
     imports: {
       "./dist/dir/foo.js": "./bar.js",
@@ -24,7 +28,11 @@ import { moveImportMap } from "../src/moveImportMap.js"
       "./dist/dir/foo.js": "./bar.js",
     },
   }
-  const actual = moveImportMap(importMap, "file:///project/test/", "file:///project/test/dist/")
+  const actual = moveImportMap(
+    importMap,
+    "file:///project/test/",
+    "file:///project/test/dist/",
+  )
   const expected = {
     imports: {
       "./dir/foo.js": "../bar.js",

@@ -35,16 +35,21 @@ export const moveImportMap = (importMap, fromUrl, toUrl) => {
   const importMapRelative = {}
   const { imports } = importMap
   if (imports) {
-    importMapRelative.imports = makeMappingsRelativeTo(imports, makeRelativeTo) || imports
+    importMapRelative.imports =
+      makeMappingsRelativeTo(imports, makeRelativeTo) || imports
   }
 
   const { scopes } = importMap
   if (scopes) {
-    importMapRelative.scopes = makeScopesRelativeTo(scopes, makeRelativeTo) || scopes
+    importMapRelative.scopes =
+      makeScopesRelativeTo(scopes, makeRelativeTo) || scopes
   }
 
   // nothing changed
-  if (importMapRelative.imports === imports && importMapRelative.scopes === scopes) {
+  if (
+    importMapRelative.imports === imports &&
+    importMapRelative.scopes === scopes
+  ) {
     return importMap
   }
   return importMapRelative
@@ -79,11 +84,15 @@ const makeScopesRelativeTo = (scopes, makeRelativeTo) => {
   Object.keys(scopes).forEach((scopeSpecifier) => {
     const scopeMappings = scopes[scopeSpecifier]
     const scopeSpecifierRelative = makeRelativeTo(scopeSpecifier, "address")
-    const scopeMappingsRelative = makeMappingsRelativeTo(scopeMappings, makeRelativeTo)
+    const scopeMappingsRelative = makeMappingsRelativeTo(
+      scopeMappings,
+      makeRelativeTo,
+    )
 
     if (scopeSpecifierRelative) {
       transformed = true
-      scopesTransformed[scopeSpecifierRelative] = scopeMappingsRelative || scopeMappings
+      scopesTransformed[scopeSpecifierRelative] =
+        scopeMappingsRelative || scopeMappings
     } else if (scopeMappingsRelative) {
       transformed = true
       scopesTransformed[scopeSpecifier] = scopeMappingsRelative

@@ -98,11 +98,16 @@ const normalizeScopes = (scopes, baseUrl) => {
   return sortScopes(scopesNormalized)
 }
 
-const formulateBaseUrlMustBeStringOrUrl = ({ baseUrl }) => `baseUrl must be a string or an url.
+const formulateBaseUrlMustBeStringOrUrl = ({
+  baseUrl,
+}) => `baseUrl must be a string or an url.
 --- base url ---
 ${baseUrl}`
 
-const formulateAddressMustBeAString = ({ specifier, address }) => `Address must be a string.
+const formulateAddressMustBeAString = ({
+  specifier,
+  address,
+}) => `Address must be a string.
 --- address ---
 ${address}
 --- specifier ---
@@ -132,7 +137,10 @@ ${address}
 --- specifier ---
 ${specifier}`
 
-const formulateScopeResolutionFailed = ({ scope, baseUrl }) => `Scope url resolution failed.
+const formulateScopeResolutionFailed = ({
+  scope,
+  baseUrl,
+}) => `Scope url resolution failed.
 --- scope ---
 ${scope}
 --- base url ---

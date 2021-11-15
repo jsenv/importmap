@@ -9,7 +9,12 @@ export const applyImportMap = ({
   specifier,
   importer,
   createBareSpecifierError = ({ specifier, importer }) => {
-    return new Error(createDetailedMessage(`Unmapped bare specifier.`, { specifier, importer }))
+    return new Error(
+      createDetailedMessage(`Unmapped bare specifier.`, {
+        specifier,
+        importer,
+      }),
+    )
   },
   onImportMapping = () => {},
 }) => {
@@ -46,9 +51,14 @@ export const applyImportMap = ({
 
   const { scopes } = importMap
   if (scopes && importer) {
-    const scopeSpecifierMatching = Object.keys(scopes).find((scopeSpecifier) => {
-      return scopeSpecifier === importer || specifierIsPrefixOf(scopeSpecifier, importer)
-    })
+    const scopeSpecifierMatching = Object.keys(scopes).find(
+      (scopeSpecifier) => {
+        return (
+          scopeSpecifier === importer ||
+          specifierIsPrefixOf(scopeSpecifier, importer)
+        )
+      },
+    )
     if (scopeSpecifierMatching) {
       const scopeMappings = scopes[scopeSpecifierMatching]
       const mappingFromScopes = applyMappings(
@@ -83,7 +93,12 @@ export const applyImportMap = ({
   throw createBareSpecifierError({ specifier, importer })
 }
 
-const applyMappings = (mappings, specifierNormalized, scope, onImportMapping) => {
+const applyMappings = (
+  mappings,
+  specifierNormalized,
+  scope,
+  onImportMapping,
+) => {
   const specifierCandidates = Object.keys(mappings)
 
   let i = 0
@@ -103,7 +118,9 @@ const applyMappings = (mappings, specifierNormalized, scope, onImportMapping) =>
     }
     if (specifierIsPrefixOf(specifierCandidate, specifierNormalized)) {
       const address = mappings[specifierCandidate]
-      const afterSpecifier = specifierNormalized.slice(specifierCandidate.length)
+      const afterSpecifier = specifierNormalized.slice(
+        specifierCandidate.length,
+      )
       const addressFinal = tryUrlResolution(afterSpecifier, address)
       onImportMapping({
         scope,
@@ -120,5 +137,8 @@ const applyMappings = (mappings, specifierNormalized, scope, onImportMapping) =>
 }
 
 const specifierIsPrefixOf = (specifierHref, href) => {
-  return specifierHref[specifierHref.length - 1] === "/" && href.startsWith(specifierHref)
+  return (
+    specifierHref[specifierHref.length - 1] === "/" &&
+    href.startsWith(specifierHref)
+  )
 }

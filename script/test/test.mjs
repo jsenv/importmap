@@ -11,7 +11,7 @@ import * as jsenvConfig from "../../jsenv.config.mjs"
 await executeTestPlan({
   ...jsenvConfig,
   testPlan: {
-    "test/**/*.test.mjs": {
+    "test/**/*.test.js": {
       node: {
         runtime: nodeRuntime,
       },
