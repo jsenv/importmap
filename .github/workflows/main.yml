@@ -41,6 +41,8 @@ jobs:
           node-version: ${{ matrix.node }}
       - name: Install node modules
         run: npm install
+      - name: Install playwright
+        run: npm run playwright-install
       - name: Generate importmap
         run: npm run importmap
       - name: Run ESLint
