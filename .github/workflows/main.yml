@@ -28,7 +28,7 @@ jobs:
   test:
     strategy:
       matrix:
-        os: [ubuntu-20.04, macos-10.15, windows-2019]
+        os: [ubuntu-20.04, macos-10.15, windows-2022]
         node: [16.13.0]
     runs-on: ${{ matrix.os }}
     name: test on ${{ matrix.os }} and node ${{ matrix.node }}
@@ -36,18 +36,18 @@ jobs:
       CI: true
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node }}
-      - name: NPM installation
+      - name: Install node modules
         run: npm install
-      - name: Playwright installtion
-        run: npm run playwright-install
-      - name: check lint
-        run: npm run eslint-check
-      - name: check tests
+      - name: Generate importmap
+        run: npm run importmap
+      - name: Run ESLint
+        run: npm run eslint
+      - name: Run tests
         run: npm run test-with-coverage
-      - name: upload coverage
+      - name: Upload coverage
         uses: codecov/codecov-action@v2
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -62,17 +62,17 @@ jobs:
     name: release
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
           node-version: "16.13.0"
-      - name: npm install
+      - name: Install node modules
         run: npm install
-      - name: publish package
+      - name: Publish package
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         if: env.NPM_TOKEN != null
         run: node ./.github/workflows/main/publish_package.mjs
-      - name: ensure github release
+      - name: Ensure GitHub release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node ./.github/workflows/main/github_release.mjs

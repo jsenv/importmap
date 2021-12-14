@@ -28,5 +28,5 @@ await executeTestPlan({
       },
     },
   },
-  coverageV8MergeConflictIsExpected: true,
+  coverageV8ConflictWarning: false,
 })

@@ -29,35 +29,31 @@
   ],
   "scripts": {
     "dev": "node ./script/server/start_dev_server.mjs",
-    "eslint-check": "node ./node_modules/eslint/bin/eslint.js . --ext=.js,.mjs,.html",
-    "importmap-generate": "node ./script/importmap/generate_importmap.mjs",
+    "eslint": "node ./node_modules/eslint/bin/eslint.js . --ext=.js,.mjs,.html",
+    "importmap": "node ./script/importmap/importmap.mjs",
     "dist": "npm run build-esmodule && npm run build-commonjs",
     "build-esmodule": "node --experimental-import-meta-resolve ./script/build/build_esmodule.mjs",
     "build-commonjs": "node --experimental-import-meta-resolve ./script/build/build_commonjs.mjs",
     "test": "node ./script/test/test.mjs",
 		"test-with-coverage": "npm run test -- --coverage",
-    "prettier-check": "prettier --check .",
-    "prettier-write": "prettier --write .",
-    "playwright-install": "npx playwright install-deps && npx playwright install",
-		"postinstall": "npm run importmap-generate",
-		"prepublishOnly": "node ./script/publish/remove_postinstall.mjs && npm run dist",
-		"postpublish": "node ./script/publish/restore_postinstall.mjs"
+    "prettier": "prettier --write .",
+    "playwright-install": "npx playwright install-deps && npx playwright install"
   },
   "dependencies": {
     "@jsenv/logger": "4.0.1"
   },
   "devDependencies": {
-    "@jsenv/assert": "2.3.2",
-    "@jsenv/core": "23.8.7",
+    "@jsenv/assert": "2.4.0",
+    "@jsenv/core": "24.5.8",
     "@jsenv/eslint-config": "16.0.9",
     "@jsenv/github-release-package": "1.2.3",
-    "@jsenv/importmap-eslint-resolver": "5.1.2",
-    "@jsenv/importmap-node-module": "2.6.0",
+    "@jsenv/importmap-eslint-resolver": "5.2.1",
+    "@jsenv/importmap-node-module": "3.2.0",
     "@jsenv/package-publish": "1.6.2",
-    "eslint": "8.2.0",
+    "eslint": "8.4.1",
     "eslint-plugin-html": "6.2.0",
     "eslint-plugin-import": "2.25.3",
-    "playwright": "1.16.3",
-    "prettier": "2.4.1"
+    "playwright": "1.17.1",
+    "prettier": "2.5.1"
   }
 }
