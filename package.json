@@ -28,7 +28,6 @@
     "/main.js"
   ],
   "scripts": {
-    "dev": "node ./script/server/start_dev_server.mjs",
     "eslint": "node ./node_modules/eslint/bin/eslint.js . --ext=.js,.mjs,.html",
     "importmap": "node ./script/importmap/importmap.mjs",
     "dist": "npm run build-esmodule && npm run build-commonjs",
@@ -36,6 +35,7 @@
     "build-commonjs": "node --experimental-import-meta-resolve ./script/build/build_commonjs.mjs",
     "test": "node ./script/test/test.mjs",
 		"test-with-coverage": "npm run test -- --coverage",
+    "dev": "node ./script/dev/dev.mjs",
     "prettier": "prettier --write .",
     "playwright-install": "npx playwright install-deps && npx playwright install"
   },
