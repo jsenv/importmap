@@ -1,6 +1,6 @@
 {
   "name": "@jsenv/importmap",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Helpers to implement importmaps",
   "license": "MIT",
   "repository": {
@@ -39,9 +39,7 @@
     "prettier": "prettier --write .",
     "playwright-install": "npx playwright install-deps && npx playwright install"
   },
-  "dependencies": {
-    "@jsenv/logger": "4.0.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@jsenv/assert": "2.4.0",
     "@jsenv/core": "24.5.8",

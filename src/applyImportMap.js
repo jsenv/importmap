@@ -1,4 +1,4 @@
-import { createDetailedMessage } from "@jsenv/logger"
+import { createDetailedMessage } from "./internal/detailed_message.js"
 import { assertImportMap } from "./internal/assertImportMap.js"
 import { hasScheme } from "./internal/hasScheme.js"
 import { tryUrlResolution } from "./internal/tryUrlResolution.js"
